@@ -50,7 +50,7 @@ const JobCard = ({ job, index }) => {
   };
 
   // Safely extract the ID
-  const jobId = job._id?.$oid || job._id;
+  const jobId = job._id?.$id || job._id;
 
   return (
     <motion.div

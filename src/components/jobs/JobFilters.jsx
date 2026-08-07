@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useMemo } from "react";
+import React, { useState, useMemo, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { TextField, InputGroup, Select, ListBox } from "@heroui/react";
 import { Magnifier, ChevronDown } from "@gravity-ui/icons";
@@ -37,11 +37,21 @@ const itemVariants = {
   },
 };
 
-export default function JobFilters({ initialJobs = [] }) {
-  const [searchQuery, setSearchQuery] = useState("");
+// ✅ Accept initialSearch and initialLocation as props
+export default function JobFilters({ 
+  initialJobs = [], 
+  initialSearch = "",
+  initialLocation = ""
+}) {
+  const [searchQuery, setSearchQuery] = useState(initialSearch);
   const [selectedType, setSelectedType] = useState("all");
   const [selectedCategory, setSelectedCategory] = useState("all");
   const [isRemoteOnly, setIsRemoteOnly] = useState(false);
+
+  // ✅ Sync state when URL parameters change (e.g. from Homepage)
+  useEffect(() => {
+    setSearchQuery(initialSearch);
+  }, [initialSearch]);
 
   // Get unique categories from jobs
   const categories = useMemo(() => {
@@ -93,6 +103,65 @@ export default function JobFilters({ initialJobs = [] }) {
 
   return (
     <div className="w-full">
+      
+      {/* ✅ Active Filter Chips */}
+      {(searchQuery || selectedType !== "all" || selectedCategory !== "all" || isRemoteOnly) && (
+        <div className="flex flex-wrap gap-2 mb-4">
+          {searchQuery && (
+            <motion.div 
+              initial={{ opacity: 0, scale: 0.8 }}
+              animate={{ opacity: 1, scale: 1 }}
+            >
+              <span className="inline-flex items-center gap-2 px-3 py-1 bg-blue-500/10 text-blue-400 border border-blue-500/20 rounded-full text-xs">
+                Searching: "{searchQuery}"
+                <button onClick={() => setSearchQuery("")} className="hover:text-blue-300 transition-colors">
+                  <FaTimes size={12} />
+                </button>
+              </span>
+            </motion.div>
+          )}
+          {selectedType !== "all" && (
+            <motion.div 
+              initial={{ opacity: 0, scale: 0.8 }}
+              animate={{ opacity: 1, scale: 1 }}
+            >
+              <span className="inline-flex items-center gap-2 px-3 py-1 bg-purple-500/10 text-purple-400 border border-purple-500/20 rounded-full text-xs">
+                Type: {selectedType}
+                <button onClick={() => setSelectedType("all")} className="hover:text-purple-300 transition-colors">
+                  <FaTimes size={12} />
+                </button>
+              </span>
+            </motion.div>
+          )}
+          {selectedCategory !== "all" && (
+            <motion.div 
+              initial={{ opacity: 0, scale: 0.8 }}
+              animate={{ opacity: 1, scale: 1 }}
+            >
+              <span className="inline-flex items-center gap-2 px-3 py-1 bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 rounded-full text-xs">
+                Category: {selectedCategory}
+                <button onClick={() => setSelectedCategory("all")} className="hover:text-emerald-300 transition-colors">
+                  <FaTimes size={12} />
+                </button>
+              </span>
+            </motion.div>
+          )}
+          {isRemoteOnly && (
+            <motion.div 
+              initial={{ opacity: 0, scale: 0.8 }}
+              animate={{ opacity: 1, scale: 1 }}
+            >
+              <span className="inline-flex items-center gap-2 px-3 py-1 bg-cyan-500/10 text-cyan-400 border border-cyan-500/20 rounded-full text-xs">
+                Remote Only
+                <button onClick={() => setIsRemoteOnly(false)} className="hover:text-cyan-300 transition-colors">
+                  <FaTimes size={12} />
+                </button>
+              </span>
+            </motion.div>
+          )}
+        </div>
+      )}
+
       {/* Filter Section */}
       <div className="flex flex-col gap-4 bg-zinc-900/50 p-6 rounded-[24px] border border-zinc-800/80 max-w-7xl mx-auto mb-10">
         <div className="grid grid-cols-1 md:grid-cols-12 gap-4 items-end">

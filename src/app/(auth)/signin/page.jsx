@@ -1,13 +1,14 @@
+// frontend/src/app/(auth)/signin/page.jsx
 "use client";
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
-
+import { useSearchParams, useRouter } from "next/navigation";
 import { FcGoogle } from "react-icons/fc";
 import { FaGithub } from "react-icons/fa";
+import { User, Lock, Rocket, Ban } from "lucide-react";
 import "../signup/signup.css";
-
+import { Eye, EyeSlash, Envelope, Lock as LockIcon } from "@gravity-ui/icons";
 import {
   Card,
   Separator,
@@ -20,88 +21,133 @@ import {
   TextField,
 } from "@heroui/react";
 
-import { Eye, EyeSlash, Envelope, Lock } from "@gravity-ui/icons";
-import { authClient, signIn, useSession } from "@/lib/auth-client";
-
+import { authClient } from "@/lib/auth-client";
 import toast from "react-hot-toast";
+import LoadingPage from "@/app/loading";
 
 export default function SigninPage() {
   const router = useRouter();
-  const { data: session, isPending } = useSession();
-
+  const searchParams = useSearchParams();
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
+  const [error, setError] = useState("");
+  const [isRedirecting, setIsRedirecting] = useState(false);
 
-  // Redirect to home if already signed in
+  const redirectPath = searchParams.get('redirect') || '/browse-jobs';
+  const errorParam = searchParams.get('error');
+
   useEffect(() => {
-    if (session) {
-      router.push("/");
+    if (errorParam) {
+      toast.error(`${errorParam} sign in failed. Please try again.`);
     }
-  }, [session, router]);
+  }, [errorParam]);
+
+  // ✅ Check for suspended session on load
+  useEffect(() => {
+    const checkSession = async () => {
+      try {
+        const session = await authClient.getSession();
+        if (session?.user) {
+          // ✅ Check if user is suspended
+          if (session.user.status === 'suspended') {
+            toast.error('Your account has been suspended. Please contact support.');
+            await authClient.signOut();
+            setIsRedirecting(false);
+            return;
+          }
+          
+          setIsRedirecting(true);
+          router.push(redirectPath);
+        }
+      } catch (err) {
+        console.log("No active session");
+      }
+    };
+    checkSession();
+  }, [router, redirectPath]);
 
   const onSubmit = async (e) => {
     e.preventDefault();
+    setError("");
     setIsLoading(true);
 
     try {
-      const formData = new FormData(e.currentTarget);
-      const user = Object.fromEntries(formData.entries());
-
-      const { error } = await authClient.signIn.email({
-        email: user.email,
-        password: user.password,
-        callbackURL: "/",
+      const result = await authClient.signIn.email({
+        email: email,
+        password: password,
+        rememberMe: true,
       });
 
-      if (error) {
-        toast.error(error.message || "Sign in failed");
+      if (result?.error) {
+        // ✅ Check if error indicates suspension
+        if (result.error.message?.toLowerCase().includes('suspended')) {
+          toast.error('Your account has been suspended. Please contact support.');
+          setError('Account suspended. Please contact support.');
+        } else {
+          setError(result.error.message || "Sign in failed");
+          toast.error(result.error.message || "Sign in failed");
+        }
+        setIsLoading(false);
+        return;
+      }
+
+      // ✅ After successful sign-in, check if user is suspended
+      const session = await authClient.getSession();
+      if (session?.user?.status === 'suspended') {
+        toast.error('Your account has been suspended. Please contact support.');
+        await authClient.signOut();
+        setError('Account suspended. Please contact support.');
+        setIsLoading(false);
         return;
       }
 
       toast.success("Signed in successfully");
-      router.push("/");
-    } catch (error) {
-      console.log(error);
-      toast.error("Something went wrong");
-    } finally {
+      setIsRedirecting(true);
+      router.push(redirectPath);
+
+    } catch (err) {
+      setError(err.message || "An unexpected error occurred");
+      toast.error(err.message || "An unexpected error occurred");
       setIsLoading(false);
     }
   };
 
-  const handleGoogleSignin = async () => {
+  // ✅ Social signin handler with suspension check
+  const handleSocialSignin = async (provider) => {
     try {
-      await signIn.social({
-        provider: "google",
-        callbackURL: "/",
+      console.log(`🔄 Signing in with ${provider}...`);
+      
+      setIsLoading(true);
+      
+      const result = await authClient.signIn.social({
+        provider: provider,
+        callbackURL: `${window.location.origin}/browse-jobs`,
       });
-    } catch (error) {
-      toast.error("Google sign in failed");
+      
+      console.log(`📦 ${provider} sign in initiated:`, result);
+      
+    } catch (err) {
+      console.error(`❌ ${provider} sign in failed:`, err);
+      toast.error(`${provider} sign in failed: ${err.message || "Please try again"}`);
+      setIsLoading(false);
     }
   };
 
-  const handleGithubSignin = async () => {
-    try {
-      await signIn.social({
-        provider: "github",
-        callbackURL: "/",
-      });
-    } catch (error) {
-      toast.error("GitHub sign in failed");
-    }
-  };
-
-  // Show loading while checking session (only one loading state)
-  if (isPending) {
+  if (isRedirecting || isLoading) {
     return (
-      <div className="min-h-screen flex justify-center items-center bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900">
-        <div className="w-12 h-12 border-4 border-cyan-500 border-t-transparent rounded-full animate-spin"></div>
-      </div>
+      <LoadingPage 
+        title={isRedirecting ? "Redirecting..." : "Signing In..."}
+        message={isRedirecting ? "Taking you to your dashboard" : "Please wait while we sign you in"}
+        customStats={[
+          { icon: User, label: "Verifying credentials", animate: "spin" },
+          { icon: Lock, label: "Setting up session", animate: "pulse" },
+          { icon: Rocket, label: "Preparing dashboard", animate: "bounce" },
+        ]}
+        customColor="from-blue-400 via-cyan-400 to-teal-400"
+      />
     );
-  }
-
-  // If signed in, don't show signin form (will redirect via useEffect)
-  if (session) {
-    return null;
   }
 
   return (
@@ -112,8 +158,7 @@ export default function SigninPage() {
         <div className="gradient-orb gradient-orb-3"></div>
         <div className="grid-overlay"></div>
       </div>
-
-      <div className="signup-content">
+      <div className="signup-content pt-15">
         <div className="signup-header">
           <h1 className="signup-title">Welcome Back</h1>
           <p className="signup-subtitle">Sign in to your account</p>
@@ -121,31 +166,41 @@ export default function SigninPage() {
 
         <Card className="signup-card">
           <div className="signup-card-inner">
+            {error && (
+              <div className={`mb-4 p-3 border rounded-lg text-sm text-center ${
+                error.toLowerCase().includes('suspended') 
+                  ? 'bg-red-500/10 border-red-500/20 text-red-500'
+                  : 'bg-red-500/10 border-red-500/20 text-red-500'
+              }`}>
+                {error}
+              </div>
+            )}
+
             <Form onSubmit={onSubmit} className="signup-form">
-              {/* EMAIL field */}
               <TextField isRequired name="email" type="email">
                 <Label className="form-label">Email Address</Label>
                 <div className="input-wrapper">
                   <Envelope className="input-icon" size={18} />
                   <Input
-                    name="email"
                     placeholder="you@example.com"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
                     className="custom-input"
                   />
                 </div>
                 <FieldError />
               </TextField>
 
-              {/* PASSWORD field */}
               <TextField isRequired name="password">
                 <Label className="form-label">Password</Label>
                 <div className="password-wrapper">
                   <div className="input-wrapper">
-                    <Lock className="input-icon" size={18} />
+                    <LockIcon className="input-icon" size={18} />
                     <Input
-                      name="password"
                       type={showPassword ? "text" : "password"}
                       placeholder="Enter password"
+                      value={password}
+                      onChange={(e) => setPassword(e.target.value)}
                       className="custom-input"
                     />
                   </div>
@@ -163,46 +218,52 @@ export default function SigninPage() {
                 <FieldError />
               </TextField>
 
-              {/* Submit Button */}
+              <div className="text-right">
+                <Link
+                  href="/forget-password"
+                  className="text-sm text-cyan-400 hover:text-cyan-300 transition-colors"
+                >
+                  Forget password?
+                </Link>
+              </div>
+
               <Button
                 type="submit"
                 className="submit-button"
                 isLoading={isLoading}
                 isDisabled={isLoading}
               >
-                {isLoading ? "Signing In..." : "Sign In"}
+                Sign In
               </Button>
             </Form>
 
-            {/* Divider */}
             <div className="divider-container">
               <Separator className="divider-line" />
               <span className="divider-text">OR CONTINUE WITH</span>
               <Separator className="divider-line" />
             </div>
 
-            {/* Social Buttons */}
             <div className="social-buttons">
-              <Button
-                onClick={handleGoogleSignin}
-                variant="bordered"
+              <Button 
+                onClick={() => handleSocialSignin("google")} 
+                variant="bordered" 
                 className="social-button"
+                isDisabled={isLoading}
               >
                 <FcGoogle size={20} />
                 Google
               </Button>
-
-              <Button
-                onClick={handleGithubSignin}
-                variant="bordered"
+              <Button 
+                onClick={() => handleSocialSignin("github")} 
+                variant="bordered" 
                 className="social-button"
+                isDisabled={isLoading}
               >
                 <FaGithub size={18} />
                 GitHub
               </Button>
             </div>
 
-            {/* Sign In Link */}
             <p className="signin-link">
               Don't have an account?{" "}
               <Link href="/signup" className="signin-link-highlight">

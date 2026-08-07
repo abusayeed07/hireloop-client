@@ -1,132 +1,50 @@
 "use client";
 
-import "./signup.css";
 import Link from "next/link";
-import { useState, useEffect } from "react";
-import { useRouter } from "next/navigation";
-import { authClient, signIn, signUp, useSession } from "@/lib/auth-client";
-import toast from "react-hot-toast";
-
-import { FcGoogle } from "react-icons/fc";
-import { FaGithub } from "react-icons/fa";
-
+import { motion } from "framer-motion";
 import {
-  Card,
-  Separator,
-  Button,
-  Description,
-  FieldError,
-  Form,
-  Input,
-  Label,
-  TextField,
-} from "@heroui/react";
+  Briefcase,
+  User,
+  ArrowRight,
+  CheckCircle2,
+} from "lucide-react";
+import "./signup.css";
 
-import {
-  Eye,
-  EyeSlash,
-  Person,
-  Envelope,
-  Lock,
-  Camera,
-} from "@gravity-ui/icons";
-
-export default function SignUpPage() {
-  const router = useRouter();
-  const { data: session } = useSession();
-
-  // UI State
-  const [isLoading, setIsLoading] = useState(false);
-  const [showPassword, setShowPassword] = useState(false);
-  const [roleError, setRoleError] = useState("");
-
-  // Redirect to home if already signed in
-  useEffect(() => {
-    if (session) {
-      router.push("/");
-    }
-  }, [session, router]);
-
-  // signup
-  const onSubmit = async (e) => {
-    e.preventDefault();
-    
-    const formData = new FormData(e.currentTarget);
-    const role = formData.get("role");
-    
-    // Only validate role - Better Auth handles the rest
-    if (!role) {
-      setRoleError("Please select a role");
-      toast.error("Please select a role");
-      return;
-    }
-    
-    setRoleError("");
-    setIsLoading(true);
-
-    try {
-      const user = Object.fromEntries(formData.entries());
-
-      const { data, error } = await authClient.signUp.email({
-        email: user.email,
-        password: user.password,
-        name: user.name,
-        image: user.image?.trim() || undefined,
-        role: role,
-      });
-
-      console.log("DATA:", data);
-      console.log("ERROR:", error);
-
-      if (error) {
-        toast.error(error.message || "Signup failed");
-        return;
-      }
-
-      toast.success("Account created successfully");
-      router.push("/signin");
-    } catch (error) {
-      console.log(error);
-      toast.error("Something went wrong");
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  // google signin
-  const handleGoogleSignin = async () => {
-    try {
-      await signIn.social({
-        provider: "google",
-        callbackURL: "/",
-      });
-    } catch (error) {
-      console.log(error);
-      toast.error("Google sign in failed");
-    }
-  };
-
-  // github signin
-  const handleGithubSignin = async () => {
-    try {
-      await signIn.social({
-        provider: "github",
-        callbackURL: "/",
-      });
-    } catch (error) {
-      console.log(error);
-      toast.error("Github sign in failed");
-    }
-  };
-
-  // If signed in, don't show signup form (will redirect via useEffect)
-  if (session) {
-    return null;
-  }
+export default function SelectRolePage() {
+  const roles = [
+    {
+      title: "I'm looking for a job",
+      description: "Find opportunities and apply to top companies.",
+      href: "/signup/form?role=seeker",
+      icon: User,
+      color: "from-cyan-500 to-blue-600",
+      border: "hover:border-cyan-500/60",
+      glow: "hover:shadow-cyan-500/20",
+      features: [
+        "Find opportunities and apply to top companies",
+        "Application tracking",
+        "Save favorite jobs",
+      ],
+    },
+    {
+      title: "I'm hiring",
+      description: "Post jobs and find the best talent for your company.",
+      href: "/signup/form?role=recruiter",
+      icon: Briefcase,
+      color: "from-purple-500 to-pink-600",
+      border: "hover:border-purple-500/60",
+      glow: "hover:shadow-purple-500/20",
+      features: [
+        "Post jobs and find the best talent",
+        "Manage applicants",
+        "Company dashboard",
+      ],
+    },
+  ];
 
   return (
-    <div className="signup-container">
-      {/* Animated Background */}
+    <div className="min-h-screen bg-[#09090b] relative overflow-hidden">
+      {/* Background */}
       <div className="animated-background">
         <div className="gradient-orb gradient-orb-1"></div>
         <div className="gradient-orb gradient-orb-2"></div>
@@ -134,205 +52,83 @@ export default function SignUpPage() {
         <div className="grid-overlay"></div>
       </div>
 
-      {/* Content */}
-      <div className="signup-content">
-        {/* Header */}
-        <div className="signup-header">
-          <h1 className="signup-title">Create Account</h1>
-          <p className="signup-subtitle">Start your journey today</p>
+      <div className="pt-25 relative z-10 mx-auto flex min-h-screen max-w-6xl flex-col justify-center px-6 py-16">
+        {/* Logo */}
+        <div className="mb-14 text-center">
+          <div className="mx-auto mb-6 flex h-16 w-16 items-center justify-center rounded-2xl bg-gradient-to-r from-cyan-500 to-blue-600 shadow-lg shadow-cyan-500/20">
+            <Briefcase className="h-8 w-8 text-white" />
+          </div>
+          <h1 className="text-5xl font-bold text-white">
+            Create an account
+          </h1>
+          <p className="mx-auto mt-4 max-w-xl text-lg text-zinc-400">
+            Join Bangladesh's leading professional network
+          </p>
         </div>
 
-        {/* Card */}
-        <Card className="signup-card">
-          <div className="signup-card-inner">
-            {/* Form */}
-            <Form onSubmit={onSubmit} className="signup-form">
-              {/* Name Field */}
-              <TextField
-                isRequired
-                name="name"
-                type="text"
-                className="custom-textfield"
-              >
-                <Label className="form-label">Full Name</Label>
-                <div className="input-wrapper">
-                  <Person className="input-icon" size={18} />
-                  <Input
-                    name="name"
-                    placeholder="Enter your full name"
-                    className="custom-input"
-                  />
-                </div>
-                <FieldError />
-              </TextField>
+        {/* Cards */}
+        <div className="grid gap-8 md:grid-cols-2">
+          {roles.map((role, index) => {
+            const Icon = role.icon;
 
-              {/* Image URL Field */}
-              <TextField name="image" type="url" className="custom-textfield">
-                <Label className="form-label">Profile Image URL</Label>
-                <div className="input-wrapper">
-                  <Camera className="input-icon" size={18} />
-                  <Input
-                    name="image"
-                    placeholder="https://example.com/avatar.jpg"
-                    className="custom-input"
-                  />
-                </div>
-                <FieldError />
-              </TextField>
-
-              {/* Email Field */}
-              <TextField
-                isRequired
-                name="email"
-                type="email"
-                className="custom-textfield"
-                validate={(value) => {
-                  if (!value) return "Email is required";
-                  if (!/^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i.test(value)) {
-                    return "Invalid email address";
-                  }
-                  return null;
+            return (
+              <motion.div
+                key={role.title}
+                initial={{ opacity: 0, y: 40 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{
+                  duration: 0.5,
+                  delay: index * 0.15,
                 }}
               >
-                <Label className="form-label">Email Address</Label>
-                <div className="input-wrapper">
-                  <Envelope className="input-icon" size={18} />
-                  <Input
-                    name="email"
-                    placeholder="you@example.com"
-                    className="custom-input"
-                  />
-                </div>
-                <FieldError />
-              </TextField>
-
-              {/* Password Field */}
-              <TextField
-                isRequired
-                name="password"
-                type={showPassword ? "text" : "password"}
-                className="custom-textfield"
-                validate={(value) => {
-                  if (!value) return "Password is required";
-                  if (value.length < 8) return "Minimum 8 characters required";
-                  if (!/[A-Z]/.test(value))
-                    return "Include at least one uppercase letter";
-                  if (!/[0-9]/.test(value))
-                    return "Include at least one number";
-                  return null;
-                }}
-              >
-                <Label className="form-label">Password</Label>
-                <div className="password-wrapper">
-                  <div className="input-wrapper">
-                    <Lock className="input-icon" size={18} />
-                    <Input
-                      name="password"
-                      type={showPassword ? "text" : "password"}
-                      placeholder="Create a strong password"
-                      className="custom-input"
-                    />
-                  </div>
-                  <button
-                    type="button"
-                    className="password-toggle"
-                    onClick={() => setShowPassword(!showPassword)}
+                <Link href={role.href}>
+                  <div
+                    className={`group h-full rounded-3xl border border-zinc-800 bg-white/[0.03] backdrop-blur-xl p-8 transition-all duration-300 hover:-translate-y-2 ${role.border} ${role.glow} hover:shadow-2xl`}
                   >
-                    {showPassword ? <EyeSlash size={18} /> : <Eye size={18} />}
-                  </button>
-                </div>
-                <Description className="password-description">
-                  Must contain 8+ characters, uppercase letter & number
-                </Description>
-                <FieldError />
-              </TextField>
+                    <div
+                      className={`mb-6 flex h-16 w-16 items-center justify-center rounded-2xl bg-gradient-to-r ${role.color}`}
+                    >
+                      <Icon className="h-8 w-8 text-white" />
+                    </div>
+                    <h2 className="text-2xl font-bold text-white">
+                      {role.title}
+                    </h2>
+                    <p className="mt-3 text-zinc-400 leading-7">
+                      {role.description}
+                    </p>
+                    <div className="mt-8 space-y-3">
+                      {role.features.map((feature) => (
+                        <div
+                          key={feature}
+                          className="flex items-center gap-3"
+                        >
+                          <CheckCircle2 className="h-5 w-5 text-emerald-400 flex-shrink-0" />
+                          <span className="text-zinc-300 text-sm">
+                            {feature}
+                          </span>
+                        </div>
+                      ))}
+                    </div>
+                    <div className="mt-10 flex items-center font-semibold text-white">
+                      Continue
+                      <ArrowRight className="ml-2 h-5 w-5 transition-transform duration-300 group-hover:translate-x-2" />
+                    </div>
+                  </div>
+                </Link>
+              </motion.div>
+            );
+          })}
+        </div>
 
-              {/* Role Field - Only validation needed */}
-              <div className="flex flex-col gap-2">
-                <Label className="form-label">
-                  Select Role <span className="text-red-400">*</span>
-                </Label>
-                <div className="flex gap-6">
-                  <label className="flex items-center gap-2 cursor-pointer group">
-                    <input
-                      type="radio"
-                      name="role"
-                      value="seeker"
-                      defaultChecked
-                      required
-                      className="w-4 h-4 cursor-pointer accent-cyan-500"
-                      onClick={() => setRoleError("")}
-                    />
-                    <span className="text-gray-300 text-sm group-hover:text-cyan-400 transition-colors">
-                      Job Seeker
-                    </span>
-                  </label>
-                  <label className="flex items-center gap-2 cursor-pointer group">
-                    <input
-                      type="radio"
-                      name="role"
-                      value="recruiter"
-                      className="w-4 h-4 cursor-pointer accent-cyan-500"
-                      onClick={() => setRoleError("")}
-                    />
-                    <span className="text-gray-300 text-sm group-hover:text-cyan-400 transition-colors">
-                      Job Recruiter
-                    </span>
-                  </label>
-                </div>
-                {roleError && (
-                  <p className="text-red-400 text-xs mt-1">{roleError}</p>
-                )}
-              </div>
-
-              {/* Submit Button */}
-              <Button
-                type="submit"
-                className="submit-button"
-                isLoading={isLoading}
-                isDisabled={isLoading}
-              >
-                {isLoading ? "Creating Account..." : "Create Account"}
-              </Button>
-            </Form>
-
-            {/* Divider */}
-            <div className="divider-container">
-              <Separator className="divider-line" />
-              <span className="divider-text">OR CONTINUE WITH</span>
-              <Separator className="divider-line" />
-            </div>
-
-            {/* Social Buttons */}
-            <div className="social-buttons">
-              <Button
-                onClick={handleGoogleSignin}
-                variant="bordered"
-                className="social-button"
-              >
-                <FcGoogle size={20} />
-                Google
-              </Button>
-
-              <Button
-                onClick={handleGithubSignin}
-                variant="bordered"
-                className="social-button"
-              >
-                <FaGithub size={18} />
-                GitHub
-              </Button>
-            </div>
-
-            {/* Sign In Link */}
-            <p className="signin-link">
-              Already have an account?{" "}
-              <Link href="/signin" className="signin-link-highlight">
-                Sign in
-              </Link>
-            </p>
-          </div>
-        </Card>
+        <p className="mt-12 text-center text-zinc-500">
+          Already have an account?{" "}
+          <Link
+            href="/signin"
+            className="font-medium text-cyan-400 hover:text-cyan-300"
+          >
+            Sign in
+          </Link>
+        </p>
       </div>
     </div>
   );
