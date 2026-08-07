@@ -85,15 +85,33 @@ const UsersPage = () => {
     seekerCount: 0,
   });
   const [pageSize, setPageSize] = useState(5);
+  const [currentAdminId, setCurrentAdminId] = useState(null);
 
   const itemsPerPage = pageSize;
 
-  // ✅ Get all users (Admin only) - Fetch ALL users for instant client side filtering
+  // ✅ Get current admin ID from session
+  useEffect(() => {
+    const getAdminId = async () => {
+      try {
+        const response = await fetch(`${API_BASE_URL}/api/auth/get-session`, {
+          credentials: 'include',
+        });
+        const data = await response.json();
+        if (data?.user?.id) {
+          setCurrentAdminId(data.user.id);
+        }
+      } catch (error) {
+        console.error('Error getting admin ID:', error);
+      }
+    };
+    getAdminId();
+  }, []);
+
+  // ✅ Get all users (Admin only)
   const getUsers = async () => {
     try {
-      // We remove pagination here to fetch all users for the dashboard
       const params = new URLSearchParams();
-      params.append('limit', '1000'); // Fetch large batch
+      params.append('limit', '1000');
 
       console.log(`📡 Fetching: ${API_BASE_URL}/api/users/admin/users?${params}`);
 
@@ -154,37 +172,6 @@ const UsersPage = () => {
     }
   };
 
-  // ✅ Delete user (Admin only)
-  const deleteUser = async (userId) => {
-    try {
-      console.log(`📡 Deleting user ${userId}`);
-      console.log(`📡 URL: ${API_BASE_URL}/api/users/admin/users/${userId}`);
-
-      const response = await fetch(`${API_BASE_URL}/api/users/admin/users/${userId}`, {
-        method: 'DELETE',
-        credentials: 'include',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-      });
-
-      console.log(`📡 Response status: ${response.status}`);
-
-      if (!response.ok) {
-        const errorData = await response.json().catch(() => ({}));
-        console.error('❌ Error response:', errorData);
-        throw new Error(errorData.message || errorData.error || `HTTP error! status: ${response.status}`);
-      }
-
-      const data = await response.json();
-      console.log('📡 Delete response:', data);
-      return data;
-    } catch (error) {
-      console.error("❌ Error deleting user:", error);
-      throw error;
-    }
-  };
-
   // ✅ Get user stats (Admin only)
   const getUserStats = async () => {
     try {
@@ -215,7 +202,7 @@ const UsersPage = () => {
     }
   };
 
-  // ✅ Fetch users from API - Only on Mount & Refresh
+  // ✅ Fetch users from API
   const fetchUsers = async () => {
     setLoading(true);
     try {
@@ -237,7 +224,6 @@ const UsersPage = () => {
         }
       }
       
-      // Normalize user data
       const normalizedUsers = userData.map(user => ({
         ...user,
         id: user._id || user.id,
@@ -260,12 +246,11 @@ const UsersPage = () => {
     }
   };
 
-  // ✅ Fetch stats - UPDATED to use real data from API
+  // ✅ Fetch stats
   const fetchStats = async () => {
     try {
       const response = await getUserStats();
       if (response.success && response.data) {
-        // ✅ Use ALL the data from the API, no hardcoding
         setStats({
           totalActive: response.data.activeUsers || 0,
           recruiterGrowth: response.data.recruiterCount || 0,
@@ -279,13 +264,12 @@ const UsersPage = () => {
     }
   };
 
-  // ✅ Only fetch stats and users on mount
   useEffect(() => {
     fetchStats();
     fetchUsers();
   }, []);
 
-  // ✅ CLIENT-SIDE FILTERING (Instant no-reload)
+  // ✅ CLIENT-SIDE FILTERING
   const filteredUsers = useMemo(() => {
     let result = [...users];
 
@@ -309,15 +293,12 @@ const UsersPage = () => {
     return result;
   }, [users, searchTerm, roleFilter, statusFilter]);
 
-  // ✅ Calculate total pages based on filtered users
   const totalPages = Math.max(1, Math.ceil(filteredUsers.length / itemsPerPage));
 
-  // ✅ Reset page to 1 on filter change
   useEffect(() => {
     setCurrentPage(1);
   }, [searchTerm, roleFilter, statusFilter]);
 
-  // ✅ Handle page change
   const handlePageChange = (page) => {
     if (page !== currentPage && page >= 1 && page <= totalPages) {
       console.log(`🔄 Changing to page ${page}`);
@@ -325,14 +306,12 @@ const UsersPage = () => {
     }
   };
 
-  // Handle page size change
   const handlePageSizeChange = (e) => {
     const newSize = Number(e.target.value);
     setPageSize(newSize);
     setCurrentPage(1);
   };
 
-  // ✅ Calculate display range for "Showing X to Y of Z"
   const getDisplayRange = () => {
     if (filteredUsers.length === 0) {
       return { start: 0, end: 0 };
@@ -344,19 +323,42 @@ const UsersPage = () => {
 
   const { start, end } = getDisplayRange();
 
-  // ✅ CURRENT PAGE SLICE (THE FIX!)
   const currentUsers = useMemo(() => {
     const indexOfLastItem = currentPage * itemsPerPage;
     const indexOfFirstItem = indexOfLastItem - itemsPerPage;
     return filteredUsers.slice(indexOfFirstItem, indexOfLastItem);
   }, [filteredUsers, currentPage, itemsPerPage]);
 
-  // Handle user actions
+  // ✅ Handle user actions
   const handleUserAction = (userId, action) => {
     const user = users.find((u) => u._id === userId || u.id === userId);
     if (!user) {
       toast.error("User not found");
       return;
+    }
+
+    const isCurrentUser = user.id === currentAdminId || user._id === currentAdminId;
+
+    // ✅ ADMIN CANNOT SUSPEND/ACTIVATE ANOTHER ADMIN
+    if (user.role === 'admin' && (action === 'suspend' || action === 'activate')) {
+      if (!isCurrentUser) {
+        toast.error("❌ You cannot suspend or activate another admin. Only the admin can manage their own status.");
+        return;
+      }
+    }
+
+    // ✅ ADMIN CANNOT CHANGE ANOTHER ADMIN'S ROLE
+    if (user.role === 'admin') {
+      if (action === 'make_seeker' || action === 'make_recruiter' || action === 'make_admin') {
+        if (!isCurrentUser) {
+          toast.error("❌ You cannot change another admin's role. Only the admin can change their own role.");
+          return;
+        }
+        if (action === 'make_admin' && isCurrentUser) {
+          toast.info("You are already an admin.");
+          return;
+        }
+      }
     }
 
     setSelectedUser(user);
@@ -371,23 +373,12 @@ const UsersPage = () => {
     setUpdating(true);
 
     try {
-      let result;
-      
-      if (actionType === "delete") {
-        result = await deleteUser(userId);
-      } else {
-        result = await updateUser(userId, actionType);
-      }
+      const result = await updateUser(userId, actionType);
 
       if (result && result.success) {
-        if (actionType === "delete") {
-          toast.success(result.message || "User deleted successfully");
-        } else {
-          toast.success(result.message || `User ${actionType.replace('_', ' ')}d successfully`);
-        }
-
+        toast.success(result.message || `User ${actionType.replace('_', ' ')}d successfully`);
         await fetchStats();
-        await fetchUsers(); // Re-fetch user list to sync changes
+        await fetchUsers();
       } else {
         toast.error(result?.error || "Failed to update user");
       }
@@ -421,7 +412,6 @@ const UsersPage = () => {
     };
   };
 
-  // Get status badge styles
   const getStatusBadge = (status) => {
     const styles = {
       active: "bg-emerald-500/10 text-emerald-400 border-emerald-500/30",
@@ -443,7 +433,6 @@ const UsersPage = () => {
     };
   };
 
-  // Format date
   const formatDate = (dateString) => {
     if (!dateString) return "N/A";
     try {
@@ -457,12 +446,36 @@ const UsersPage = () => {
     }
   };
 
-  // ✅ Get user avatar with fallback
   const getUserAvatar = (user) => {
     if (user?.image) {
       return user.image;
     }
     return null;
+  };
+
+  // ✅ Check if a user is the current admin
+  const isCurrentAdminUser = (user) => {
+    return user.id === currentAdminId || user._id === currentAdminId;
+  };
+
+  // ✅ Check if user is admin
+  const isAdminUser = (user) => {
+    return user?.role?.toLowerCase() === 'admin';
+  };
+
+  // ✅ Check if actions should be disabled for this user
+  const isActionDisabled = (user, action) => {
+    if (!isAdminUser(user)) return false;
+    if (isCurrentAdminUser(user)) return false;
+    return true;
+  };
+
+  // ✅ Check if role change should be disabled for this user
+  const isRoleChangeDisabled = (user) => {
+    if (isAdminUser(user) && !isCurrentAdminUser(user)) {
+      return true;
+    }
+    return false;
   };
 
   // ✅ Use LoadingPage component
@@ -695,7 +708,7 @@ const UsersPage = () => {
           </div>
         </motion.div>
 
-        {/* Users Table - Mobile Responsive */}
+        {/* Users Table */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
@@ -739,6 +752,11 @@ const UsersPage = () => {
                       const roleBadge = getRoleBadge(user.role);
                       const statusBadge = getStatusBadge(user.status);
                       const avatar = getUserAvatar(user);
+                      const isAdmin = isAdminUser(user);
+                      const isCurrentAdmin = isCurrentAdminUser(user);
+                      const roleChangeDisabled = isRoleChangeDisabled(user);
+                      const actionsDisabled = isActionDisabled(user);
+                      
                       return (
                         <motion.tr
                           key={userId}
@@ -768,6 +786,11 @@ const UsersPage = () => {
                               )}
                               <span className="text-sm font-medium text-white truncate max-w-[100px] sm:max-w-none">
                                 {user.name || "Unnamed User"}
+                                {isAdmin && (
+                                  <span className="ml-2 text-[10px] bg-purple-500/20 text-purple-400 px-1.5 py-0.5 rounded-full border border-purple-500/30">
+                                    {isCurrentAdmin ? "You (Admin)" : "Admin"}
+                                  </span>
+                                )}
                               </span>
                             </div>
                           </td>
@@ -807,14 +830,21 @@ const UsersPage = () => {
                           </td>
                           <td className="px-4 sm:px-6 py-3 sm:py-4">
                             <div className="flex items-center justify-end gap-1 sm:gap-2 flex-wrap">
+                              {/* ✅ Role buttons - Disabled for other admins */}
                               {(user.role || '').toLowerCase() !== "seeker" && (
                                 <motion.button
                                   whileHover={{ scale: 1.05 }}
                                   whileTap={{ scale: 0.95 }}
                                   onClick={() => handleUserAction(userId, "make_seeker")}
-                                  className="px-1.5 py-1 sm:px-2.5 sm:py-1.5 text-[8px] sm:text-[10px] bg-emerald-500/10 text-emerald-400 hover:bg-emerald-500/20 rounded-lg transition-all duration-300 border border-emerald-500/20 hover:border-emerald-500/40 whitespace-nowrap"
+                                  disabled={roleChangeDisabled}
+                                  className={`px-1.5 py-1 sm:px-2.5 sm:py-1.5 text-[8px] sm:text-[10px] rounded-lg transition-all duration-300 border whitespace-nowrap ${
+                                    roleChangeDisabled
+                                      ? "bg-zinc-700/30 text-zinc-500 cursor-not-allowed border-zinc-700/30"
+                                      : "bg-emerald-500/10 text-emerald-400 hover:bg-emerald-500/20 border-emerald-500/20 hover:border-emerald-500/40"
+                                  }`}
+                                  title={roleChangeDisabled ? "Cannot change another admin's role" : ""}
                                 >
-                                  Make Seeker
+                                  {isCurrentAdmin && isAdmin ? "Demote to Seeker" : "Make Seeker"}
                                 </motion.button>
                               )}
                               {(user.role || '').toLowerCase() !== "recruiter" && (
@@ -822,12 +852,18 @@ const UsersPage = () => {
                                   whileHover={{ scale: 1.05 }}
                                   whileTap={{ scale: 0.95 }}
                                   onClick={() => handleUserAction(userId, "make_recruiter")}
-                                  className="px-1.5 py-1 sm:px-2.5 sm:py-1.5 text-[8px] sm:text-[10px] bg-blue-500/10 text-blue-400 hover:bg-blue-500/20 rounded-lg transition-all duration-300 border border-blue-500/20 hover:border-blue-500/40 whitespace-nowrap"
+                                  disabled={roleChangeDisabled}
+                                  className={`px-1.5 py-1 sm:px-2.5 sm:py-1.5 text-[8px] sm:text-[10px] rounded-lg transition-all duration-300 border whitespace-nowrap ${
+                                    roleChangeDisabled
+                                      ? "bg-zinc-700/30 text-zinc-500 cursor-not-allowed border-zinc-700/30"
+                                      : "bg-blue-500/10 text-blue-400 hover:bg-blue-500/20 border-blue-500/20 hover:border-blue-500/40"
+                                  }`}
+                                  title={roleChangeDisabled ? "Cannot change another admin's role" : ""}
                                 >
-                                  Make Recruiter
+                                  {isCurrentAdmin && isAdmin ? "Demote to Recruiter" : "Make Recruiter"}
                                 </motion.button>
                               )}
-                              {(user.role || '').toLowerCase() !== "admin" && (
+                              {(user.role || '').toLowerCase() !== "admin" && !isAdmin && (
                                 <motion.button
                                   whileHover={{ scale: 1.05 }}
                                   whileTap={{ scale: 0.95 }}
@@ -837,13 +873,20 @@ const UsersPage = () => {
                                   Make Admin
                                 </motion.button>
                               )}
+                              
+                              {/* ✅ Suspend/Activate - Disabled for other admins */}
                               {(user.status || '').toLowerCase() === "active" ? (
                                 <motion.button
                                   whileHover={{ scale: 1.1, rotate: 5 }}
                                   whileTap={{ scale: 0.9 }}
                                   onClick={() => handleUserAction(userId, "suspend")}
-                                  className="p-1 sm:p-1.5 rounded-lg hover:bg-red-500/10 transition-all duration-300 text-red-400 hover:text-red-300"
-                                  title="Suspend User"
+                                  disabled={actionsDisabled}
+                                  className={`p-1 sm:p-1.5 rounded-lg transition-all duration-300 ${
+                                    actionsDisabled
+                                      ? "text-zinc-600 cursor-not-allowed"
+                                      : "hover:bg-red-500/10 text-red-400 hover:text-red-300"
+                                  }`}
+                                  title={actionsDisabled ? "Cannot suspend another admin" : "Suspend User"}
                                 >
                                   <Ban className="w-3 h-3 sm:w-4 sm:h-4" />
                                 </motion.button>
@@ -852,8 +895,13 @@ const UsersPage = () => {
                                   whileHover={{ scale: 1.1, rotate: -5 }}
                                   whileTap={{ scale: 0.9 }}
                                   onClick={() => handleUserAction(userId, "activate")}
-                                  className="p-1 sm:p-1.5 rounded-lg hover:bg-emerald-500/10 transition-all duration-300 text-emerald-400 hover:text-emerald-300"
-                                  title="Activate User"
+                                  disabled={actionsDisabled}
+                                  className={`p-1 sm:p-1.5 rounded-lg transition-all duration-300 ${
+                                    actionsDisabled
+                                      ? "text-zinc-600 cursor-not-allowed"
+                                      : "hover:bg-emerald-500/10 text-emerald-400 hover:text-emerald-300"
+                                  }`}
+                                  title={actionsDisabled ? "Cannot activate another admin" : "Activate User"}
                                 >
                                   <UserCheck className="w-3 h-3 sm:w-4 sm:h-4" />
                                 </motion.button>
@@ -883,6 +931,11 @@ const UsersPage = () => {
                 const roleBadge = getRoleBadge(user.role);
                 const statusBadge = getStatusBadge(user.status);
                 const avatar = getUserAvatar(user);
+                const isAdmin = isAdminUser(user);
+                const isCurrentAdmin = isCurrentAdminUser(user);
+                const roleChangeDisabled = isRoleChangeDisabled(user);
+                const actionsDisabled = isActionDisabled(user);
+                
                 return (
                   <motion.div
                     key={userId}
@@ -912,6 +965,11 @@ const UsersPage = () => {
                       <div className="flex-1 min-w-0">
                         <p className="text-sm font-medium text-white truncate">
                           {user.name || "Unnamed User"}
+                          {isAdmin && (
+                            <span className="ml-2 text-[10px] bg-purple-500/20 text-purple-400 px-1.5 py-0.5 rounded-full border border-purple-500/30">
+                              {isCurrentAdmin ? "You (Admin)" : "Admin"}
+                            </span>
+                          )}
                         </p>
                         <p className="text-xs text-zinc-500 truncate">
                           {user.email || "No email"}
@@ -938,20 +996,32 @@ const UsersPage = () => {
                         {(user.role || '').toLowerCase() !== "seeker" && (
                           <button
                             onClick={() => handleUserAction(userId, "make_seeker")}
-                            className="px-2 py-1 text-[8px] bg-emerald-500/10 text-emerald-400 hover:bg-emerald-500/20 rounded-lg transition-all duration-300 border border-emerald-500/20 hover:border-emerald-500/40 whitespace-nowrap"
+                            disabled={roleChangeDisabled}
+                            className={`px-2 py-1 text-[8px] rounded-lg transition-all duration-300 border whitespace-nowrap ${
+                              roleChangeDisabled
+                                ? "bg-zinc-700/30 text-zinc-500 cursor-not-allowed border-zinc-700/30"
+                                : "bg-emerald-500/10 text-emerald-400 hover:bg-emerald-500/20 border-emerald-500/20 hover:border-emerald-500/40"
+                            }`}
+                            title={roleChangeDisabled ? "Cannot change another admin's role" : ""}
                           >
-                            Make Seeker
+                            {isCurrentAdmin && isAdmin ? "Demote Seeker" : "Make Seeker"}
                           </button>
                         )}
                         {(user.role || '').toLowerCase() !== "recruiter" && (
                           <button
                             onClick={() => handleUserAction(userId, "make_recruiter")}
-                            className="px-2 py-1 text-[8px] bg-blue-500/10 text-blue-400 hover:bg-blue-500/20 rounded-lg transition-all duration-300 border border-blue-500/20 hover:border-blue-500/40 whitespace-nowrap"
+                            disabled={roleChangeDisabled}
+                            className={`px-2 py-1 text-[8px] rounded-lg transition-all duration-300 border whitespace-nowrap ${
+                              roleChangeDisabled
+                                ? "bg-zinc-700/30 text-zinc-500 cursor-not-allowed border-zinc-700/30"
+                                : "bg-blue-500/10 text-blue-400 hover:bg-blue-500/20 border-blue-500/20 hover:border-blue-500/40"
+                            }`}
+                            title={roleChangeDisabled ? "Cannot change another admin's role" : ""}
                           >
-                            Make Recruiter
+                            {isCurrentAdmin && isAdmin ? "Demote Recruiter" : "Make Recruiter"}
                           </button>
                         )}
-                        {(user.role || '').toLowerCase() !== "admin" && (
+                        {(user.role || '').toLowerCase() !== "admin" && !isAdmin && (
                           <button
                             onClick={() => handleUserAction(userId, "make_admin")}
                             className="px-2 py-1 text-[8px] bg-purple-500/10 text-purple-400 hover:bg-purple-500/20 rounded-lg transition-all duration-300 border border-purple-500/20 hover:border-purple-500/40 whitespace-nowrap"
@@ -962,16 +1032,26 @@ const UsersPage = () => {
                         {(user.status || '').toLowerCase() === "active" ? (
                           <button
                             onClick={() => handleUserAction(userId, "suspend")}
-                            className="p-1 rounded-lg hover:bg-red-500/10 transition-all duration-300 text-red-400 hover:text-red-300"
-                            title="Suspend User"
+                            disabled={actionsDisabled}
+                            className={`p-1 rounded-lg transition-all duration-300 ${
+                              actionsDisabled
+                                ? "text-zinc-600 cursor-not-allowed"
+                                : "hover:bg-red-500/10 text-red-400 hover:text-red-300"
+                            }`}
+                            title={actionsDisabled ? "Cannot suspend another admin" : "Suspend User"}
                           >
                             <Ban className="w-3 h-3" />
                           </button>
                         ) : (
                           <button
                             onClick={() => handleUserAction(userId, "activate")}
-                            className="p-1 rounded-lg hover:bg-emerald-500/10 transition-all duration-300 text-emerald-400 hover:text-emerald-300"
-                            title="Activate User"
+                            disabled={actionsDisabled}
+                            className={`p-1 rounded-lg transition-all duration-300 ${
+                              actionsDisabled
+                                ? "text-zinc-600 cursor-not-allowed"
+                                : "hover:bg-emerald-500/10 text-emerald-400 hover:text-emerald-300"
+                            }`}
+                            title={actionsDisabled ? "Cannot activate another admin" : "Activate User"}
                           >
                             <UserCheck className="w-3 h-3" />
                           </button>
@@ -984,7 +1064,7 @@ const UsersPage = () => {
             )}
           </div>
 
-          {/* ✅ Pagination - Mobile Responsive */}
+          {/* ✅ Pagination */}
           <motion.div 
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
@@ -1006,7 +1086,7 @@ const UsersPage = () => {
         </motion.div>
       </div>
 
-      {/* Confirmation Modal - Mobile Responsive */}
+      {/* Confirmation Modal */}
       <AnimatePresence>
         {showConfirmModal && selectedUser && (
           <motion.div
@@ -1030,7 +1110,12 @@ const UsersPage = () => {
                 <div>
                   <h3 className="text-base sm:text-lg font-semibold text-white">Confirm Action</h3>
                   <p className="text-xs sm:text-sm text-zinc-400">
-                    Are you sure you want to {actionType?.replace(/_/g, " ")} {selectedUser.name || selectedUser.email}?
+                    {selectedUser.role === 'admin' && !isCurrentAdminUser(selectedUser) && 
+                      (actionType === 'make_seeker' || actionType === 'make_recruiter' || actionType === 'make_admin' || 
+                       actionType === 'suspend' || actionType === 'activate')
+                      ? "⚠️ You cannot perform this action on another admin. Only the admin can manage their own account."
+                      : `Are you sure you want to ${actionType?.replace(/_/g, " ")} ${selectedUser.name || selectedUser.email}?`
+                    }
                   </p>
                 </div>
               </div>
@@ -1058,8 +1143,18 @@ const UsersPage = () => {
                   whileHover={{ scale: 1.02 }}
                   whileTap={{ scale: 0.98 }}
                   onClick={handleConfirmAction}
-                  disabled={updating}
-                  className="flex-1 px-4 py-2.5 bg-gradient-to-r from-cyan-500 to-blue-500 hover:from-cyan-600 hover:to-blue-600 text-white rounded-xl text-sm font-medium transition-all duration-300 disabled:opacity-50 flex items-center justify-center gap-2 shadow-lg shadow-cyan-500/20 order-1 sm:order-2"
+                  disabled={updating || (
+                    selectedUser.role === 'admin' && !isCurrentAdminUser(selectedUser) && 
+                    (actionType === 'make_seeker' || actionType === 'make_recruiter' || actionType === 'make_admin' || 
+                     actionType === 'suspend' || actionType === 'activate')
+                  )}
+                  className={`flex-1 px-4 py-2.5 rounded-xl text-sm font-medium transition-all duration-300 disabled:opacity-50 flex items-center justify-center gap-2 shadow-lg ${
+                    selectedUser.role === 'admin' && !isCurrentAdminUser(selectedUser) && 
+                    (actionType === 'make_seeker' || actionType === 'make_recruiter' || actionType === 'make_admin' || 
+                     actionType === 'suspend' || actionType === 'activate')
+                      ? "bg-zinc-700/50 text-zinc-400 cursor-not-allowed"
+                      : "bg-gradient-to-r from-cyan-500 to-blue-500 hover:from-cyan-600 hover:to-blue-600 text-white shadow-cyan-500/20"
+                  } order-1 sm:order-2`}
                 >
                   {updating ? (
                     <>
