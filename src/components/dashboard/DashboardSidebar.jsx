@@ -41,6 +41,7 @@ import {
   PieChart,
   TrendingUp,
   Activity,
+  FileCheck,
 } from "lucide-react";
 
 // 🎨 Animation Variants
@@ -137,6 +138,11 @@ export function DashboardSidebar() {
       icon: ListChecks,
       label: "Manage All Jobs",
       href: "/dashboard/recruiter/jobs",
+    },
+    {
+      icon: FileCheck,
+      label: "Manage All Applications",
+      href: "/dashboard/recruiter/applications",
     },
     { icon: CreditCard, label: "Billing", href: "/dashboard/billing" },
     { icon: Settings, label: "Settings", href: "/dashboard/settings" },

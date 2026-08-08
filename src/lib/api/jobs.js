@@ -122,15 +122,46 @@ export const getRecentJobs = async (limit = 10) => {
     }
 };
 
+// src/lib/api/jobs.js
+
 export const getMyJobs = async () => {
     try {
+        console.log('🔍 [getMyJobs] Fetching my jobs...');
         const data = await serverFetch('/api/jobs/my-jobs');
-        if (data === null) return [];
-        if (Array.isArray(data)) return data;
-        if (data && data.data && Array.isArray(data.data)) return data.data;
+        console.log('📊 [getMyJobs] Response data:', data);
+        
+        // ✅ Check for null/undefined
+        if (!data) {
+            console.log('⚠️ [getMyJobs] No data returned');
+            return [];
+        }
+        
+        // ✅ Check for error response
+        if (data.success === false) {
+            console.error('❌ [getMyJobs] API Error:', data.error);
+            // For auth errors, return empty array gracefully
+            if (data.error === 'Unauthorized' || data.error === 'Authentication required') {
+                console.log('⚠️ [getMyJobs] Authentication error, returning empty array');
+                return [];
+            }
+            return [];
+        }
+        
+        // ✅ Handle different response formats
+        if (Array.isArray(data)) {
+            console.log(`✅ [getMyJobs] Found ${data.length} jobs (array format)`);
+            return data;
+        }
+        
+        if (data && data.data && Array.isArray(data.data)) {
+            console.log(`✅ [getMyJobs] Found ${data.data.length} jobs (data.data format)`);
+            return data.data;
+        }
+        
+        console.log('ℹ️ [getMyJobs] No jobs found, returning empty array');
         return [];
     } catch (error) {
-        console.error('❌ getMyJobs error:', error);
+        console.error('❌ [getMyJobs] Error:', error);
         return [];
     }
 };
@@ -165,7 +196,6 @@ export const getSavedJobIds = async () => {
 
 export const checkJobSaved = async (jobId, userId) => {
     try {
-        // ✅ Pass userId as query param so backend can use req.query.userId
         const data = await serverFetch(`/api/saved-jobs/check/${jobId}?userId=${userId}`);
         if (data === null) return false;
         return data?.saved || false;
@@ -177,7 +207,6 @@ export const checkJobSaved = async (jobId, userId) => {
 
 export const saveJob = async (jobId, userId) => {
     try {
-        // ✅ Send BOTH to the backend. Backend uses req.user.id, but this is safe.
         const data = await serverFetch('/api/saved-jobs', {
             method: 'POST',
             body: JSON.stringify({ jobId, userId }),
@@ -220,7 +249,6 @@ export const createJob = async (jobData) => {
     }
 };
 
-
 export const updateJob = async (jobId, jobData) => {
   try {
     const result = await serverFetch(`/api/jobs/${jobId}`, {
@@ -234,14 +262,19 @@ export const updateJob = async (jobId, jobData) => {
   }
 };
 
-
 // ==========================================
 // ✅ ADMIN API HELPERS
 // ==========================================
 
-export const getAdminJobs = async () => {
+export const getAdminJobs = async (filters = {}) => {
     try {
-        const data = await serverFetch('/api/jobs/admin/jobs');
+        const params = new URLSearchParams();
+        if (filters.status) params.append('status', filters.status);
+        if (filters.adminApproval) params.append('adminApproval', filters.adminApproval);
+        if (filters.jobCategory) params.append('jobCategory', filters.jobCategory);
+        
+        const url = `/api/jobs/admin/jobs?${params.toString()}`;
+        const data = await serverFetch(url);
         if (data === null) return [];
         if (data && data.success && Array.isArray(data.data)) return data.data;
         if (Array.isArray(data)) return data;
@@ -271,6 +304,45 @@ export const deleteAdminJob = async (jobId) => {
         return result;
     } catch (error) {
         console.error('❌ deleteAdminJob error:', error);
+        return { success: false, error: error.message };
+    }
+};
+
+// ✅ NEW: Admin approve/reject job
+export const adminApproveJob = async (jobId) => {
+    try {
+        const result = await serverFetch(`/api/jobs/admin/jobs/${jobId}/approve`, {
+            method: 'PATCH',
+        });
+        return result;
+    } catch (error) {
+        console.error('❌ adminApproveJob error:', error);
+        return { success: false, error: error.message };
+    }
+};
+
+export const adminRejectJob = async (jobId, reason) => {
+    try {
+        const result = await serverFetch(`/api/jobs/admin/jobs/${jobId}/reject`, {
+            method: 'PATCH',
+            body: JSON.stringify({ reason }),
+        });
+        return result;
+    } catch (error) {
+        console.error('❌ adminRejectJob error:', error);
+        return { success: false, error: error.message };
+    }
+};
+
+export const requestReReview = async (jobId, message) => {
+    try {
+        const result = await serverFetch(`/api/jobs/${jobId}/re-review`, {
+            method: 'POST',
+            body: JSON.stringify({ message }),
+        });
+        return result;
+    } catch (error) {
+        console.error('❌ requestReReview error:', error);
         return { success: false, error: error.message };
     }
 };

@@ -20,11 +20,14 @@ import {
   FileSearch,
   Filter,
   X,
+  Clock,
+  XCircle,
+  MessageSquare,
 } from "lucide-react";
 import { Button } from "@heroui/react";
 import { ArrowDownToSquare } from "@gravity-ui/icons";
 import { motion, AnimatePresence } from "framer-motion";
-import { getApplicationsByApplicant } from "@/lib/api/applications";
+import { getMyApplications } from "@/lib/api/applications";
 import { authClient } from "@/lib/auth-client";
 import Pagination from "@/components/Pagination";
 import toast from "react-hot-toast";
@@ -75,24 +78,27 @@ const ApplicationPage = () => {
     dateRange: searchParams?.get("dateRange") || "",
   });
 
-  // ✅ NEW: Instant visual tab state
   const [currentTab, setCurrentTab] = useState(searchParams?.get("tab") || "active");
-  const tab = currentTab; // Use state for instant UI updates
+  const tab = currentTab;
 
   const page = parseInt(searchParams?.get("page")) || 1;
   const itemsPerPage = 5;
+
+  // ✅ NEW: State for notes modal
+  const [selectedApplication, setSelectedApplication] = useState(null);
+  const [showNotesModal, setShowNotesModal] = useState(false);
 
   // Fetch applications
   useEffect(() => {
     const fetchApplications = async () => {
       try {
         setLoading(true);
-        const data = await getApplicationsByApplicant(user?.id);
+        const data = await getMyApplications();
         console.log("📋 Fetched applications:", data);
         
         const sortedData = (data || []).sort((a, b) => {
-          const dateA = new Date(a.createdAt || a.appliedAt || 0);
-          const dateB = new Date(b.createdAt || b.appliedAt || 0);
+          const dateA = new Date(a.appliedAt || a.createdAt || 0);
+          const dateB = new Date(b.appliedAt || b.createdAt || 0);
           return dateB - dateA;
         });
         
@@ -107,6 +113,8 @@ const ApplicationPage = () => {
 
     if (user?.id) {
       fetchApplications();
+    } else {
+      setLoading(false);
     }
   }, [user?.id]);
 
@@ -114,7 +122,6 @@ const ApplicationPage = () => {
   const filteredApplications = useMemo(() => {
     let result = applications || [];
 
-    // 1. Search filter
     if (searchQuery.trim()) {
       const query = searchQuery.toLowerCase().trim();
       result = result.filter((app) => {
@@ -142,21 +149,18 @@ const ApplicationPage = () => {
       });
     }
 
-    // 2. Status filter
     if (filters.status) {
       result = result.filter((app) => 
         app.status?.toLowerCase() === filters.status.toLowerCase()
       );
     }
 
-    // 3. Job Type filter
     if (filters.jobType) {
       result = result.filter((app) => 
         app.jobType?.toLowerCase() === filters.jobType.toLowerCase()
       );
     }
 
-    // 4. Date range filter
     if (filters.dateRange) {
       const now = new Date();
       const cutoff = new Date();
@@ -179,12 +183,11 @@ const ApplicationPage = () => {
       }
       
       result = result.filter((app) => {
-        const appDate = new Date(app.createdAt || app.appliedAt);
+        const appDate = new Date(app.appliedAt || app.createdAt);
         return appDate >= cutoff;
       });
     }
 
-    // 5. Tab filter: Active vs Archived
     const archivedStatuses = ["rejected", "closed", "withdrawn"];
     if (tab === "archived") {
       result = result.filter((app) => 
@@ -208,16 +211,13 @@ const ApplicationPage = () => {
 
   // Stats calculations
   const totalApplied = applications?.length || 0;
-  const shortlisted =
-    applications?.filter(
-      (item) => item.status === "shortlisted" || item.status === "review",
-    ).length || 0;
-  const interviews =
-    applications?.filter(
-      (item) => item.status === "interview" || item.status === "interviewing",
-    ).length || 0;
-  const successRate =
-    totalApplied === 0 ? 0 : Math.round((shortlisted / totalApplied) * 100);
+  const pending = applications?.filter(
+    (item) => item.status === "pending" || item.status === "applied"
+  ).length || 0;
+  const rejected = applications?.filter(
+    (item) => item.status === "rejected"
+  ).length || 0;
+  const successRate = totalApplied === 0 ? 0 : Math.round(((totalApplied - rejected) / totalApplied) * 100);
 
   // Helper functions
   const getStatusColor = (status) => {
@@ -232,8 +232,50 @@ const ApplicationPage = () => {
       accepted: "bg-cyan-500/15 text-cyan-400 border-cyan-500/20",
       offered: "bg-cyan-500/15 text-cyan-400 border-cyan-500/20",
       rejected: "bg-red-500/15 text-red-400 border-red-500/20",
+      hired: "bg-emerald-500/15 text-emerald-400 border-emerald-500/20",
+      success: "bg-emerald-500/15 text-emerald-400 border-emerald-500/20",
     };
     return statusMap[status?.toLowerCase()] || statusMap.pending;
+  };
+
+  const getStatusBadge = (status) => {
+    if (status === "success" || status === "hired" || status === "accepted" || status === "offered") {
+      return {
+        label: "Success",
+        icon: <CheckCircle2 className="w-3 h-3" />,
+        color: "bg-emerald-500/15 text-emerald-400 border-emerald-500/20"
+      };
+    } else if (status === "rejected") {
+      return {
+        label: "Rejected",
+        icon: <XCircle className="w-3 h-3" />,
+        color: "bg-red-500/15 text-red-400 border-red-500/20"
+      };
+    } else if (status === "shortlisted") {
+      return {
+        label: "Shortlisted",
+        icon: <CheckCircle2 className="w-3 h-3" />,
+        color: "bg-green-500/15 text-green-400 border-green-500/20"
+      };
+    } else if (status === "review" || status === "reviewed") {
+      return {
+        label: "Under Review",
+        icon: <Clock className="w-3 h-3" />,
+        color: "bg-blue-500/15 text-blue-400 border-blue-500/20"
+      };
+    } else if (status === "interview" || status === "interviewing") {
+      return {
+        label: "Interview",
+        icon: <CalendarDays className="w-3 h-3" />,
+        color: "bg-purple-500/15 text-purple-400 border-purple-500/20"
+      };
+    } else {
+      return {
+        label: "Pending",
+        icon: <Clock className="w-3 h-3" />,
+        color: "bg-yellow-500/15 text-yellow-400 border-yellow-500/20"
+      };
+    }
   };
 
   const formatDate = (dateString) => {
@@ -306,11 +348,10 @@ const ApplicationPage = () => {
     router.push(url);
   };
 
-  // ✅ UPDATED: Instantly updates the visual tab when clicked
   const handleTabChange = (newTab) => {
-    setCurrentTab(newTab); // Instant visual feedback
+    setCurrentTab(newTab);
     const url = buildUrl({ tab: newTab, page: 1 });
-    router.push(url);       // Updates URL for refreshes
+    router.push(url);
   };
 
   const handleViewJobDetails = (application) => {
@@ -318,14 +359,19 @@ const ApplicationPage = () => {
                   application?.job_id || 
                   application?.job?._id || 
                   application?.job?.id ||
-                  application?.jobID ||
-                  application?._id;
+                  application?.jobID;
     
     if (jobId) {
       router.push(`/browse-jobs/${jobId}`);
     } else {
       toast.error("Job ID not found for this application");
     }
+  };
+
+  // ✅ NEW: Handle opening notes modal
+  const handleOpenNotes = (application) => {
+    setSelectedApplication(application);
+    setShowNotesModal(true);
   };
 
   // Get unique statuses for filter
@@ -363,10 +409,8 @@ const ApplicationPage = () => {
 
   return (
     <div className="min-h-screen bg-[#090a0f]">
-      {/* Glowing Background Ambient */}
       <div className="absolute top-0 right-0 w-[600px] h-[600px] bg-cyan-500/5 blur-[120px] rounded-full pointer-events-none -z-10" />
 
-      {/* Header */}
       <div className="border-b border-white/5 bg-[#090a0f]/80 backdrop-blur-xl sticky top-0 z-20 shadow-lg shadow-black/20">
         <div className="max-w-7xl mx-auto px-6 py-4 flex flex-col sm:flex-row items-center justify-between gap-4">
           <form onSubmit={handleSearch} className="w-full max-w-sm relative group">
@@ -443,7 +487,6 @@ const ApplicationPage = () => {
           </div>
         </div>
 
-        {/* Filter Bar */}
         <AnimatePresence>
           {showFilters && (
             <motion.div
@@ -519,7 +562,6 @@ const ApplicationPage = () => {
       </div>
 
       <div className="max-w-7xl mx-auto px-6 py-8 relative">
-        {/* Header Title & Actions */}
         <motion.div
           initial={{ y: -20, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
@@ -573,7 +615,7 @@ const ApplicationPage = () => {
           </div>
         </motion.div>
 
-        {/* Stats Grid */}
+        {/* Stats Grid - Updated: Total Applied, Pending, Rejected, Success Rate */}
         <motion.div
           variants={containerVariants}
           initial="hidden"
@@ -588,22 +630,22 @@ const ApplicationPage = () => {
               color: "cyan",
             },
             {
-              label: "Shortlisted",
-              value: shortlisted,
-              icon: CheckCircle2,
-              color: "green",
+              label: "Pending",
+              value: pending,
+              icon: Clock,
+              color: "yellow",
             },
             {
-              label: "Interviews",
-              value: interviews,
-              icon: CalendarDays,
-              color: "yellow",
+              label: "Rejected",
+              value: rejected,
+              icon: XCircle,
+              color: "red",
             },
             {
               label: "Success Rate",
               value: `${successRate}%`,
               icon: TrendingUp,
-              color: "purple",
+              color: "emerald",
             },
           ].map((stat, idx) => {
             const Icon = stat.icon;
@@ -745,6 +787,8 @@ const ApplicationPage = () => {
                           application.companyImage ||
                           application.image;
 
+                        const badge = getStatusBadge(application.status);
+
                         return (
                           <motion.tr
                             key={application._id || index}
@@ -809,14 +853,24 @@ const ApplicationPage = () => {
                               </p>
                             </td>
                             <td className="px-6 py-4">
-                              <span
-                                className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[11px] font-medium border ${getStatusColor(
-                                  application.status,
-                                )}`}
-                              >
-                                <span className="w-1.5 h-1.5 rounded-full bg-current opacity-50" />
-                                {application.status || "Pending"}
-                              </span>
+                              <div className="flex flex-col gap-1">
+                                <span
+                                  className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[11px] font-medium border ${badge.color}`}
+                                >
+                                  {badge.icon}
+                                  {badge.label}
+                                </span>
+                                {/* ✅ NEW: Show recruiter notes if they exist */}
+                                {application.recruiterNotes && (
+                                  <button
+                                    onClick={() => handleOpenNotes(application)}
+                                    className="flex items-center gap-1 text-[10px] text-blue-400 hover:text-blue-300 transition-colors hover:underline w-fit"
+                                  >
+                                    <MessageSquare className="w-3 h-3" />
+                                    <span>Note from recruiter</span>
+                                  </button>
+                                )}
+                              </div>
                             </td>
                             <td className="px-6 py-4 text-right">
                               <motion.button
@@ -860,6 +914,61 @@ const ApplicationPage = () => {
           )}
         </motion.div>
       </div>
+
+      {/* ✅ NEW: Notes Modal */}
+      <AnimatePresence>
+        {showNotesModal && selectedApplication && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4"
+            onClick={() => setShowNotesModal(false)}
+          >
+            <motion.div
+              initial={{ scale: 0.9, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.9, opacity: 0 }}
+              className="bg-[#121214] border border-zinc-800 rounded-2xl max-w-md w-full p-6 shadow-2xl"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <div className="flex items-center justify-between mb-4">
+                <h3 className="text-lg font-semibold text-white">
+                  Recruiter's Note
+                </h3>
+                <button
+                  onClick={() => setShowNotesModal(false)}
+                  className="p-1 hover:bg-zinc-800 rounded-lg text-zinc-400 hover:text-white transition-colors"
+                >
+                  <X className="w-5 h-5" />
+                </button>
+              </div>
+              <div className="mb-4">
+                <p className="text-sm text-zinc-400">
+                  <span className="text-zinc-500">Job:</span> {selectedApplication.jobTitle}
+                </p>
+                <p className="text-sm text-zinc-400">
+                  <span className="text-zinc-500">Company:</span> {selectedApplication.companyName}
+                </p>
+                <p className="text-sm text-zinc-400 mb-3">
+                  <span className="text-zinc-500">Status:</span> {getStatusBadge(selectedApplication.status).label}
+                </p>
+                <div className="p-4 bg-blue-500/5 border border-blue-500/20 rounded-lg">
+                  <p className="text-sm text-zinc-300 whitespace-pre-wrap">
+                    {selectedApplication.recruiterNotes || "No notes from recruiter yet."}
+                  </p>
+                </div>
+              </div>
+              <button
+                onClick={() => setShowNotesModal(false)}
+                className="w-full px-4 py-2 bg-gradient-to-r from-cyan-600 to-blue-600 hover:from-cyan-500 hover:to-blue-500 text-white rounded-lg text-sm font-medium transition-all"
+              >
+                Close
+              </button>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   );
 };

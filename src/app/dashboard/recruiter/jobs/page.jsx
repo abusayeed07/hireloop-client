@@ -1,3 +1,5 @@
+// src/app/dashboard/recruiter/jobs/page.jsx (Manage All Jobs)
+
 "use client";
 
 import React, { useState, useEffect, useMemo } from "react";
@@ -8,11 +10,31 @@ import { authClient } from "@/lib/auth-client";
 import { getLoggedInRecruiterCompany } from "@/lib/api/companies";
 import { getMyJobs } from "@/lib/api/jobs";
 import { useRouter } from "next/navigation";
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import toast from "react-hot-toast";
-import { AlertTriangle, Loader2, Search, X } from "lucide-react";
+import { AlertTriangle, Loader2, Search, Sparkles, ChevronDown, X } from "lucide-react";
 import Pagination from "@/components/Pagination";
 import Metadata from "@/components/Metadata";
+
+// ✅ Animation variants
+const fadeInUp = {
+  initial: { opacity: 0, y: 20 },
+  animate: { opacity: 1, y: 0 },
+  exit: { opacity: 0, y: -20 }
+};
+
+const fadeIn = {
+  initial: { opacity: 0 },
+  animate: { opacity: 1 }
+};
+
+const staggerContainer = {
+  animate: {
+    transition: {
+      staggerChildren: 0.05
+    }
+  }
+};
 
 export default function RecruiterJobs() {
   const router = useRouter();
@@ -22,12 +44,15 @@ export default function RecruiterJobs() {
   const [loading, setLoading] = useState(true);
   const [isRedirecting, setIsRedirecting] = useState(false);
   
-  // Search & Pagination States
+  // Search & Filter State
   const [searchQuery, setSearchQuery] = useState("");
+  const [statusFilter, setStatusFilter] = useState("all");
+  
+  // Pagination State
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 5;
 
-  // Delete Modal States
+  // Delete Modal State
   const [deleteModalOpen, setDeleteModalOpen] = useState(false);
   const [jobToDelete, setJobToDelete] = useState(null);
   const [isDeleting, setIsDeleting] = useState(false);
@@ -36,11 +61,9 @@ export default function RecruiterJobs() {
     let isMounted = true;
 
     const fetchData = async () => {
-      // ✅ Check session first
       if (!session?.user?.id) {
         if (isMounted) {
           setLoading(false);
-          // ✅ Redirect inside useEffect, not during render
           if (!isRedirecting) {
             setIsRedirecting(true);
             router.replace('/signin');
@@ -50,21 +73,52 @@ export default function RecruiterJobs() {
       }
 
       try {
+        console.log('🔍 Fetching company for user:', session.user.id);
         const companyData = await getLoggedInRecruiterCompany();
-        if (!companyData || Object.keys(companyData).length === 0) {
+        console.log('🔍 Company data received:', companyData);
+
+        if (!companyData || Object.keys(companyData).length === 0 || !companyData._id) {
+          console.log('❌ No company found for this recruiter.');
+          
+          toast.error('⚠️ Please create a company profile first before managing jobs!', {
+            duration: 5000,
+            position: 'top-right',
+          });
+          
           if (isMounted) {
-            // ✅ Redirect inside useEffect
             if (!isRedirecting) {
               setIsRedirecting(true);
-              router.replace('/dashboard/recruiter/company');
+              setTimeout(() => {
+                router.replace('/dashboard/recruiter/company');
+              }, 1000);
             }
           }
           return;
         }
 
-        let jobsData = await getMyJobs() || [];
+        console.log('🔍 Fetching jobs for company:', companyData._id);
+        const jobsResponse = await getMyJobs();
+        console.log('🔍 Jobs response:', jobsResponse);
         
-        // Sort jobs by newest first
+        let jobsData = [];
+        if (Array.isArray(jobsResponse)) {
+          jobsData = jobsResponse;
+        } else if (jobsResponse && typeof jobsResponse === 'object') {
+          if (jobsResponse.success === false) {
+            console.error('❌ Error fetching jobs:', jobsResponse.error);
+            toast.error(jobsResponse.error || 'Failed to fetch jobs');
+            jobsData = [];
+          } else if (jobsResponse.data && Array.isArray(jobsResponse.data)) {
+            jobsData = jobsResponse.data;
+          } else {
+            jobsData = [];
+          }
+        } else {
+          jobsData = [];
+        }
+        
+        console.log(`📊 Found ${jobsData.length} jobs`);
+        
         jobsData = jobsData.sort((a, b) => {
           const dateA = new Date(a.createdAt || a.updatedAt || 0);
           const dateB = new Date(b.createdAt || b.updatedAt || 0);
@@ -77,6 +131,7 @@ export default function RecruiterJobs() {
         }
       } catch (error) {
         console.error("❌ Error fetching data:", error);
+        toast.error('Failed to load data. Please refresh the page.');
         if (isMounted) {
           if (!isRedirecting) {
             setIsRedirecting(true);
@@ -97,20 +152,51 @@ export default function RecruiterJobs() {
     };
   }, [session?.user?.id, isPending, router, isRedirecting]);
 
-  // Filter Jobs based on Search Query
+  // Filter Jobs based on Search Query & Status
   const filteredJobs = useMemo(() => {
-    if (!searchQuery.trim()) return jobs;
+    let result = jobs;
 
-    const query = searchQuery.toLowerCase().trim();
-    return jobs.filter((job) => {
-      return (
-        job.jobTitle?.toLowerCase().includes(query) ||
-        job.companyName?.toLowerCase().includes(query) ||
-        job.location?.toLowerCase().includes(query) ||
-        job.jobCategory?.toLowerCase().includes(query)
-      );
-    });
-  }, [jobs, searchQuery]);
+    // ✅ Status filter
+    if (statusFilter !== "all") {
+      result = result.filter((job) => {
+        const status = job.status?.toLowerCase() || '';
+        const adminApproval = job.adminApproval?.toLowerCase() || '';
+        
+        if (statusFilter === "pending") {
+          return status === 'pending' || adminApproval === 'pending';
+        }
+        if (statusFilter === "approved") {
+          return adminApproval === 'approved' && status === 'active';
+        }
+        if (statusFilter === "rejected") {
+          return adminApproval === 'rejected' || status === 'rejected';
+        }
+        if (statusFilter === "active") {
+          return status === 'active' && adminApproval === 'approved';
+        }
+        if (statusFilter === "inactive") {
+          return status === 'inactive' || status === 'closed';
+        }
+        return true;
+      });
+    }
+
+    // ✅ Search filter
+    if (searchQuery.trim()) {
+      const query = searchQuery.toLowerCase().trim();
+      result = result.filter((job) => {
+        return (
+          job.jobTitle?.toLowerCase().includes(query) ||
+          job.companyName?.toLowerCase().includes(query) ||
+          job.location?.toLowerCase().includes(query) ||
+          job.jobCategory?.toLowerCase().includes(query) ||
+          job.jobType?.toLowerCase().includes(query)
+        );
+      });
+    }
+
+    return result;
+  }, [jobs, searchQuery, statusFilter]);
 
   // Pagination Calculations
   const totalItems = filteredJobs.length;
@@ -119,18 +205,20 @@ export default function RecruiterJobs() {
   const endIndex = startIndex + itemsPerPage;
   const currentJobs = filteredJobs.slice(startIndex, endIndex);
 
-  // Handle Page Change
+  // Reset to page 1 when filters change
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [searchQuery, statusFilter]);
+
   const handlePageChange = (newPage) => {
     setCurrentPage(newPage);
   };
 
-  // Open Delete Modal
   const openDeleteModal = (job) => {
     setJobToDelete(job);
     setDeleteModalOpen(true);
   };
 
-  // Actually Delete the Job
   const confirmDelete = async () => {
     if (!jobToDelete) return;
 
@@ -143,6 +231,18 @@ export default function RecruiterJobs() {
         headers: { "Content-Type": "application/json" },
         credentials: "include",
       });
+
+      if (!response.ok) {
+        let errorMessage = `Failed to delete job (${response.status})`;
+        try {
+          const errorData = await response.json();
+          errorMessage = errorData.error || errorMessage;
+        } catch (e) {
+          errorMessage = response.statusText || errorMessage;
+        }
+        toast.error(errorMessage);
+        return;
+      }
 
       const result = await response.json();
 
@@ -165,42 +265,20 @@ export default function RecruiterJobs() {
     }
   };
 
-  // ✅ Handle Edit navigation with event handler
   const handleEditJob = (jobId) => {
     router.push(`/dashboard/recruiter/jobs/${jobId}/edit`);
   };
 
-  // ✅ Handle View navigation with event handler
   const handleViewJob = (jobId) => {
     router.push(`/browse-jobs/${jobId}`);
   };
-
-  // ✅ Show loading state
-  if (isPending || loading) {
-    return (
-      <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="min-h-[85vh] flex items-center justify-center">
-        <div className="text-center">
-          <div className="w-16 h-16 border-4 border-cyan-500 border-t-transparent rounded-full animate-spin mx-auto mb-4" />
-          <p className="text-zinc-400 text-sm font-medium tracking-wide">Loading your workspace...</p>
-        </div>
-      </motion.div>
-    );
-  }
-
-  // ✅ Don't render anything if redirecting
-  if (isRedirecting) {
-    return null;
-  }
-
-  // ✅ If no session, show nothing (useEffect handles redirect)
-  if (!session?.user) {
-    return null;
-  }
 
   const getStatusColor = (status) => {
     switch (status?.toLowerCase()) {
       case "active": return "success";
       case "closed": case "inactive": return "danger";
+      case "pending": return "warning";
+      case "rejected": return "danger";
       default: return "warning";
     }
   };
@@ -210,17 +288,82 @@ export default function RecruiterJobs() {
       case "active": return "Active";
       case "closed": return "Closed";
       case "inactive": return "Inactive";
+      case "pending": return "Pending";
+      case "rejected": return "Rejected";
       default: return status || "Unknown";
     }
   };
 
-  // ✅ No jobs state
+  // Show loading state with animation
+  if (isPending || loading) {
+    return (
+      <motion.div 
+        initial={{ opacity: 0 }} 
+        animate={{ opacity: 1 }} 
+        className="min-h-[85vh] flex items-center justify-center bg-gradient-to-br from-[#0d0d0e] via-[#0f0f11] to-[#0d0d0e]"
+      >
+        <div className="text-center">
+          <motion.div 
+            animate={{ rotate: 360 }}
+            transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
+            className="w-16 h-16 border-4 border-purple-500 border-t-transparent rounded-full mx-auto mb-4"
+          />
+          <p className="text-zinc-400 text-sm font-medium tracking-wide">Loading your workspace...</p>
+        </div>
+      </motion.div>
+    );
+  }
+
+  // If redirecting, return null
+  if (isRedirecting) {
+    return null;
+  }
+
+  // If no session, show nothing
+  if (!session?.user) {
+    return null;
+  }
+
+  // If no company
+  if (!company) {
+    return (
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        className="min-h-[85vh] flex items-center justify-center p-8 bg-gradient-to-br from-[#0d0d0e] via-[#0f0f11] to-[#0d0d0e]"
+      >
+        <div className="bg-[#121214]/80 backdrop-blur-sm border border-zinc-800/50 rounded-2xl p-8 text-center max-w-md">
+          <div className="w-16 h-16 bg-amber-500/10 rounded-full flex items-center justify-center mx-auto mb-4">
+            <span className="text-3xl">🏢</span>
+          </div>
+          <h3 className="text-xl font-semibold text-white mb-2">Company Required</h3>
+          <p className="text-zinc-400 text-sm mb-6">
+            You need to set up your company profile before you can manage jobs.
+          </p>
+          <motion.button
+            whileHover={{ scale: 1.02 }}
+            whileTap={{ scale: 0.98 }}
+            onClick={() => router.push('/dashboard/recruiter/company')}
+            className="bg-gradient-to-r from-purple-600 to-purple-700 text-white font-semibold hover:from-purple-700 hover:to-purple-800 rounded-xl px-6 py-2.5 transition-all shadow-lg shadow-purple-500/20"
+          >
+            Set Up Company
+          </motion.button>
+        </div>
+      </motion.div>
+    );
+  }
+
+  // No jobs state with animation
   if (!jobs || !Array.isArray(jobs) || jobs.length === 0) {
     return (
       <>
         <Metadata page="recruiter-manage-jobs" />
         <div className="min-h-screen bg-gradient-to-br from-[#0d0d0e] via-[#0f0f11] to-[#0d0d0e] p-8">
-          <div className="max-w-7xl mx-auto">
+          <motion.div 
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="max-w-7xl mx-auto"
+          >
             <div className="mb-8">
               <div className="flex items-center justify-between flex-wrap gap-4">
                 <div>
@@ -228,25 +371,39 @@ export default function RecruiterJobs() {
                   <p className="text-zinc-400 text-sm mt-1">Manage and monitor all your job postings</p>
                 </div>
                 <Link href="/dashboard/recruiter/jobs/new">
-                  <Button className="bg-gradient-to-r from-purple-600 to-purple-700 text-white font-semibold hover:from-purple-700 hover:to-purple-800 rounded-xl px-6 h-11">
+                  <motion.button 
+                    whileHover={{ scale: 1.02 }}
+                    whileTap={{ scale: 0.98 }}
+                    className="bg-gradient-to-r from-purple-600 to-purple-700 text-white font-semibold hover:from-purple-700 hover:to-purple-800 rounded-xl px-6 h-11 shadow-lg shadow-purple-500/20 flex items-center gap-2"
+                  >
                     <Plus size={18} /> Post New Job
-                  </Button>
+                  </motion.button>
                 </Link>
               </div>
             </div>
-            <div className="bg-[#121214]/80 backdrop-blur-sm border border-zinc-800/50 rounded-2xl p-12 text-center">
-              <div className="w-20 h-20 bg-zinc-900/50 rounded-full flex items-center justify-center mx-auto mb-4">
-                <Briefcase size={32} className="text-zinc-500" />
+            
+            <motion.div 
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.2 }}
+              className="bg-[#121214]/80 backdrop-blur-sm border border-zinc-800/50 rounded-2xl p-12 text-center"
+            >
+              <div className="w-20 h-20 bg-gradient-to-br from-purple-500/10 to-purple-600/5 rounded-full flex items-center justify-center mx-auto mb-4">
+                <Briefcase size={32} className="text-purple-400" />
               </div>
               <h3 className="text-xl font-semibold text-white mb-2">No jobs yet</h3>
               <p className="text-zinc-400 mb-6">Get started by posting your first job opening</p>
               <Link href="/dashboard/recruiter/jobs/new">
-                <Button className="bg-gradient-to-r from-purple-600 to-purple-700 text-white font-semibold hover:from-purple-700 hover:to-purple-800 rounded-xl px-6 h-11">
+                <motion.button 
+                  whileHover={{ scale: 1.02 }}
+                  whileTap={{ scale: 0.98 }}
+                  className="bg-gradient-to-r from-purple-600 to-purple-700 text-white font-semibold hover:from-purple-700 hover:to-purple-800 rounded-xl px-6 h-11 shadow-lg shadow-purple-500/20"
+                >
                   Post a Job
-                </Button>
+                </motion.button>
               </Link>
-            </div>
-          </div>
+            </motion.div>
+          </motion.div>
         </div>
       </>
     );
@@ -256,149 +413,282 @@ export default function RecruiterJobs() {
     <>
       <Metadata page="recruiter-manage-jobs" />
       <div className="min-h-screen bg-gradient-to-br from-[#0d0d0e] via-[#0f0f11] to-[#0d0d0e] p-8">
-        <div className="p-6 max-w-7xl mx-auto space-y-4">
-          
-          {/* Header with Search and Actions */}
-          <div className="mb-8 flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+        <motion.div 
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="p-6 max-w-7xl mx-auto space-y-6"
+        >
+          {/* Header Section */}
+          <div className="mb-6 flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
             <div className="flex flex-col gap-1 w-full md:w-auto">
-              <h2 className="text-2xl font-bold tracking-tight text-white">Manage All Jobs</h2>
+              <motion.h2 
+                initial={{ opacity: 0, x: -20 }}
+                animate={{ opacity: 1, x: 0 }}
+                className="text-2xl font-bold tracking-tight text-white flex items-center gap-2"
+              >
+                Manage All Jobs
+                <Sparkles className="w-5 h-5 text-purple-400" />
+              </motion.h2>
               <p className="text-sm text-zinc-400">View, update, and manage your current job postings.</p>
             </div>
             
             <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 w-full md:w-auto">
-              
-              {/* Search Bar */}
-              <div className="relative w-full sm:w-64 group">
-                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                  <Search className="w-4 h-4 text-zinc-500 group-hover:text-zinc-300 transition-colors" />
-                </div>
-                <input
-                  type="text"
-                  placeholder="Search by title, location..."
-                  value={searchQuery}
-                  onChange={(e) => {
-                    setSearchQuery(e.target.value);
-                    setCurrentPage(1);
-                  }}
-                  className="w-full bg-zinc-900/50 border border-zinc-800 hover:border-zinc-600 focus:border-blue-500/50 rounded-xl pl-10 pr-10 py-2.5 text-white placeholder:text-zinc-500 outline-none transition-all"
-                />
-                {searchQuery && (
-                  <button
-                    onClick={() => setSearchQuery("")}
-                    className="absolute inset-y-0 right-0 pr-3 flex items-center text-zinc-500 hover:text-zinc-300 transition-colors"
-                  >
-                    <X className="w-4 h-4" />
-                  </button>
-                )}
-              </div>
-
-              {/* Post New Job Button */}
               <Link href="/dashboard/recruiter/jobs/new" className="w-full sm:w-auto">
-                <Button className="w-full bg-gradient-to-r from-purple-600 to-purple-700 text-white font-semibold hover:from-purple-700 hover:to-purple-800 rounded-xl px-6 h-10 shadow-lg shadow-purple-500/20">
+                <motion.button 
+                  whileHover={{ scale: 1.02 }}
+                  whileTap={{ scale: 0.98 }}
+                  className="w-full bg-gradient-to-r from-purple-600 to-purple-700 text-white font-semibold hover:from-purple-700 hover:to-purple-800 rounded-xl px-6 h-10 shadow-lg shadow-purple-500/20 flex items-center justify-center gap-2"
+                >
                   <Plus size={18} />
                   Post New Job
-                </Button>
+                </motion.button>
               </Link>
-              
             </div>
           </div>
 
-          <Table aria-label="Company jobs management table" className="dark">
-            <Table.ScrollContainer className="max-h-[70vh]">
-              <Table.Content className="min-w-[800px]">
-                <Table.Header className="bg-dark-950/80 sticky top-0 z-10">
-                  <Table.Column isRowHeader className="text-zinc-300 font-medium">Job Title</Table.Column>
-                  <Table.Column className="text-zinc-300 font-medium">Type & Category</Table.Column>
-                  <Table.Column className="text-zinc-300 font-medium">Location</Table.Column>
-                  <Table.Column className="text-zinc-300 font-medium">Deadline</Table.Column>
-                  <Table.Column className="text-zinc-300 font-medium">Status</Table.Column>
-                  <Table.Column className="text-zinc-300 font-medium">Actions</Table.Column>
-                </Table.Header>
-                <Table.Body>
-                  {currentJobs.map((job) => (
-                    <Table.Row key={job._id} className="border-b border-zinc-800/50 hover:bg-zinc-900/30 transition-colors">
-                      <Table.Cell className="py-4">
-                        <div className="font-medium text-white">{job.jobTitle || "N/A"}</div>
-                      </Table.Cell>
-                      <Table.Cell className="py-4">
-                        <div className="flex flex-col gap-0.5">
-                          <span className="text-sm capitalize font-medium text-zinc-300">{job.jobType || "N/A"}</span>
-                          <span className="text-xs text-zinc-500 capitalize">{job.jobCategory || "N/A"}</span>
-                        </div>
-                      </Table.Cell>
-                      <Table.Cell className="py-4">
-                        {job.isRemote ? (
-                          <span className="flex items-center gap-1 text-zinc-300"><span>🌍</span> Remote</span>
-                        ) : (
-                          <span className="text-zinc-300">{job.location || "N/A"}</span>
-                        )}
-                      </Table.Cell>
-                      <Table.Cell className="py-4">
-                        <span className="text-zinc-300">{job.deadline ? new Date(job.deadline).toLocaleDateString() : "N/A"}</span>
-                      </Table.Cell>
-                      <Table.Cell className="py-4">
-                        <Chip color={getStatusColor(job.status)} size="sm" variant="flat" className="capitalize">
-                          {getStatusText(job.status)}
-                        </Chip>
-                      </Table.Cell>
-                      <Table.Cell className="py-4">
-                        <div className="flex items-center gap-2">
-                          
-                          {/* 👁️ VIEW BUTTON - Using onClick handler */}
-                          <Tooltip content="View Details">
-                            <Button 
-                              isIconOnly 
-                              size="sm" 
-                              variant="light" 
-                              className="text-zinc-400 hover:text-white min-w-8 w-8 h-8"
-                              onPress={() => handleViewJob(job._id)}
+          {/* Search & Filter Section */}
+          <motion.div 
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.1 }}
+            className="flex flex-col sm:flex-row gap-3 items-stretch sm:items-center"
+          >
+            {/* Search Input */}
+            <div className="relative flex-1 group">
+              <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                <Search className="w-4 h-4 text-zinc-500 group-hover:text-zinc-300 transition-colors" />
+              </div>
+              <input
+                type="text"
+                placeholder="Search by title, location, category..."
+                value={searchQuery}
+                onChange={(e) => {
+                  setSearchQuery(e.target.value);
+                  setCurrentPage(1);
+                }}
+                className="w-full bg-zinc-900/50 border border-zinc-800 hover:border-zinc-600 focus:border-purple-500/50 rounded-xl pl-10 pr-10 py-2.5 text-white placeholder:text-zinc-500 outline-none transition-all focus:ring-2 focus:ring-purple-500/20"
+              />
+              {searchQuery && (
+                <motion.button
+                  initial={{ opacity: 0, scale: 0.8 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  onClick={() => setSearchQuery("")}
+                  className="absolute inset-y-0 right-0 pr-3 flex items-center text-zinc-500 hover:text-zinc-300 transition-colors"
+                >
+                  <X className="w-4 h-4" />
+                </motion.button>
+              )}
+            </div>
+
+            {/* Status Filter - Native Select with Custom Styling */}
+            <div className="relative min-w-[180px]">
+              <select
+                value={statusFilter}
+                onChange={(e) => {
+                  setStatusFilter(e.target.value);
+                  setCurrentPage(1);
+                }}
+                className="w-full bg-zinc-900/50 border border-zinc-800 hover:border-zinc-600 focus:border-purple-500/50 rounded-xl px-4 py-2.5 pr-10 text-white placeholder:text-zinc-500 outline-none transition-all appearance-none cursor-pointer focus:ring-2 focus:ring-purple-500/20"
+              >
+                <option value="all" className="bg-zinc-900">📋 All Status</option>
+                <option value="pending" className="bg-zinc-900">⏳ Pending</option>
+                <option value="approved" className="bg-zinc-900">✅ Approved</option>
+                <option value="rejected" className="bg-zinc-900">❌ Rejected</option>
+                <option value="active" className="bg-zinc-900">🟢 Active</option>
+                <option value="inactive" className="bg-zinc-900">🔴 Inactive</option>
+              </select>
+              <div className="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
+                <ChevronDown className="w-4 h-4 text-zinc-500" />
+              </div>
+            </div>
+
+            {/* Clear Filters */}
+            {(searchQuery || statusFilter !== "all") && (
+              <motion.button
+                initial={{ opacity: 0, scale: 0.9 }}
+                animate={{ opacity: 1, scale: 1 }}
+                onClick={() => {
+                  setSearchQuery("");
+                  setStatusFilter("all");
+                  setCurrentPage(1);
+                }}
+                className="text-zinc-400 hover:text-white text-sm font-medium transition-colors px-3 py-2 hover:bg-zinc-800/50 rounded-lg whitespace-nowrap"
+              >
+                Clear Filters ✕
+              </motion.button>
+            )}
+          </motion.div>
+
+          {/* Results Count */}
+          <div className="flex justify-between items-center text-sm text-zinc-500">
+            <span>Showing {totalItems} job{totalItems !== 1 ? 's' : ''}</span>
+          </div>
+
+          {/* Table Section */}
+          <motion.div 
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.2 }}
+            className="bg-[#121214]/60 backdrop-blur-sm border border-zinc-800/50 rounded-2xl overflow-hidden"
+          >
+            <Table aria-label="Company jobs management table" className="dark">
+              <Table.ScrollContainer className="max-h-[70vh]">
+                <Table.Content className="min-w-[800px]">
+                  <Table.Header className="bg-[#1a1a1e]/90 sticky top-0 z-10 backdrop-blur-sm">
+                    <Table.Column isRowHeader className="text-zinc-300 font-medium">Job Title</Table.Column>
+                    <Table.Column className="text-zinc-300 font-medium">Type & Category</Table.Column>
+                    <Table.Column className="text-zinc-300 font-medium">Location</Table.Column>
+                    <Table.Column className="text-zinc-300 font-medium">Deadline</Table.Column>
+                    <Table.Column className="text-zinc-300 font-medium">Status</Table.Column>
+                    <Table.Column className="text-zinc-300 font-medium">Actions</Table.Column>
+                  </Table.Header>
+                  <Table.Body>
+                    <AnimatePresence mode="wait">
+                      {currentJobs.map((job, index) => (
+                        <Table.Row 
+                          key={job._id} 
+                          className="border-b border-zinc-800/50 hover:bg-zinc-900/40 transition-all duration-300 group"
+                        >
+                          <Table.Cell className="py-4">
+                            <motion.div 
+                              initial={{ opacity: 0, x: -10 }}
+                              animate={{ opacity: 1, x: 0 }}
+                              transition={{ delay: index * 0.05 }}
+                              className="font-medium text-white group-hover:text-purple-400 transition-colors"
                             >
-                              <Eye size={16} />
-                            </Button>
-                          </Tooltip>
-
-                          {/* ✏️ EDIT BUTTON - Using onClick handler */}
-                          <Tooltip content="Edit Job">
-                            <Button
-                              isIconOnly
-                              size="sm"
-                              variant="light"
-                              className="text-zinc-400 hover:text-purple-400 min-w-8 w-8 h-8"
-                              onPress={() => handleEditJob(job._id)}
+                              {job.jobTitle || "N/A"}
+                            </motion.div>
+                          </Table.Cell>
+                          <Table.Cell className="py-4">
+                            <motion.div 
+                              initial={{ opacity: 0 }}
+                              animate={{ opacity: 1 }}
+                              transition={{ delay: index * 0.05 + 0.05 }}
+                              className="flex flex-col gap-0.5"
                             >
-                              <Pencil size={16} />
-                            </Button>
-                          </Tooltip>
-
-                          {/* 🗑️ DELETE BUTTON */}
-                          <Tooltip content="Delete Job">
-                            <Button 
-                              isIconOnly 
-                              size="sm" 
-                              variant="light" 
-                              className="text-red-400 hover:text-red-300 min-w-8 w-8 h-8" 
-                              onPress={() => openDeleteModal(job)}
+                              <span className="text-sm capitalize font-medium text-zinc-300">{job.jobType || "N/A"}</span>
+                              <span className="text-xs text-zinc-500 capitalize">{job.jobCategory || "N/A"}</span>
+                            </motion.div>
+                          </Table.Cell>
+                          <Table.Cell className="py-4">
+                            <motion.div 
+                              initial={{ opacity: 0 }}
+                              animate={{ opacity: 1 }}
+                              transition={{ delay: index * 0.05 + 0.1 }}
                             >
-                              <TrashBin size={16} />
-                            </Button>
-                          </Tooltip>
+                              {job.isRemote ? (
+                                <span className="flex items-center gap-1 text-zinc-300">
+                                  <span>🌍</span> Remote
+                                </span>
+                              ) : (
+                                <span className="text-zinc-300">{job.location || "N/A"}</span>
+                              )}
+                            </motion.div>
+                          </Table.Cell>
+                          <Table.Cell className="py-4">
+                            <motion.div 
+                              initial={{ opacity: 0 }}
+                              animate={{ opacity: 1 }}
+                              transition={{ delay: index * 0.05 + 0.15 }}
+                              className="text-zinc-300"
+                            >
+                              {job.deadline ? new Date(job.deadline).toLocaleDateString() : "N/A"}
+                            </motion.div>
+                          </Table.Cell>
+                          <Table.Cell className="py-4">
+                            <motion.div 
+                              initial={{ opacity: 0, scale: 0.8 }}
+                              animate={{ opacity: 1, scale: 1 }}
+                              transition={{ delay: index * 0.05 + 0.2 }}
+                              className="flex flex-wrap items-center gap-1"
+                            >
+                              <Chip 
+                                color={getStatusColor(job.status)} 
+                                size="sm" 
+                                variant="flat" 
+                                className="capitalize font-medium"
+                              >
+                                {getStatusText(job.status)}
+                              </Chip>
+                              {job.adminApproval === 'pending' && (
+                                <Chip 
+                                  color="warning" 
+                                  size="sm" 
+                                  variant="flat" 
+                                  className="capitalize text-xs"
+                                >
+                                  ⏳ Pending
+                                </Chip>
+                              )}
+                              {job.adminApproval === 'rejected' && (
+                                <Chip 
+                                  color="danger" 
+                                  size="sm" 
+                                  variant="flat" 
+                                  className="capitalize text-xs"
+                                >
+                                  ❌ Rejected
+                                </Chip>
+                              )}
+                            </motion.div>
+                          </Table.Cell>
+                          <Table.Cell className="py-4">
+                            <motion.div 
+                              initial={{ opacity: 0, scale: 0.8 }}
+                              animate={{ opacity: 1, scale: 1 }}
+                              transition={{ delay: index * 0.05 + 0.25 }}
+                              className="flex items-center gap-2"
+                            >
+                              <Tooltip content="View Details">
+                                <motion.button 
+                                  whileHover={{ scale: 1.1 }}
+                                  whileTap={{ scale: 0.9 }}
+                                  className="text-zinc-400 hover:text-white p-1.5 rounded-lg hover:bg-zinc-800/50 transition-all"
+                                  onClick={() => handleViewJob(job._id)}
+                                >
+                                  <Eye size={16} />
+                                </motion.button>
+                              </Tooltip>
 
-                        </div>
-                      </Table.Cell>
-                    </Table.Row>
-                  ))}
-                </Table.Body>
-              </Table.Content>
-            </Table.ScrollContainer>
-          </Table>
+                              <Tooltip content="Edit Job">
+                                <motion.button
+                                  whileHover={{ scale: 1.1 }}
+                                  whileTap={{ scale: 0.9 }}
+                                  className="text-zinc-400 hover:text-purple-400 p-1.5 rounded-lg hover:bg-purple-500/10 transition-all"
+                                  onClick={() => handleEditJob(job._id)}
+                                >
+                                  <Pencil size={16} />
+                                </motion.button>
+                              </Tooltip>
 
-          {/* Pagination Component */}
+                              <Tooltip content="Delete Job">
+                                <motion.button
+                                  whileHover={{ scale: 1.1 }}
+                                  whileTap={{ scale: 0.9 }}
+                                  className="text-red-400 hover:text-red-300 p-1.5 rounded-lg hover:bg-red-500/10 transition-all"
+                                  onClick={() => openDeleteModal(job)}
+                                >
+                                  <TrashBin size={16} />
+                                </motion.button>
+                              </Tooltip>
+                            </motion.div>
+                          </Table.Cell>
+                        </Table.Row>
+                      ))}
+                    </AnimatePresence>
+                  </Table.Body>
+                </Table.Content>
+              </Table.ScrollContainer>
+            </Table>
+          </motion.div>
+
+          {/* Pagination */}
           {totalPages > 1 && (
             <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ delay: 0.4 }}
-              className="pt-6 flex justify-center"
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.3 }}
+              className="pt-4 flex justify-center"
             >
               <Pagination
                 currentPage={currentPage}
@@ -413,14 +703,19 @@ export default function RecruiterJobs() {
             </motion.div>
           )}
 
-          {/* Delete Confirmation Modal */}
+          {/* Delete Modal */}
           <Modal isOpen={deleteModalOpen} onOpenChange={setDeleteModalOpen}>
             <Modal.Backdrop>
               <Modal.Container>
-                <Modal.Dialog className="sm:max-w-[420px] bg-zinc-900 border border-zinc-800 rounded-2xl">
+                <motion.div 
+                  initial={{ opacity: 0, scale: 0.9 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  exit={{ opacity: 0, scale: 0.9 }}
+                  className="sm:max-w-[420px] bg-gradient-to-br from-zinc-900 to-[#1a1a1e] border border-zinc-800 rounded-2xl p-6"
+                >
                   <Modal.CloseTrigger />
                   <Modal.Header>
-                    <Modal.Icon className="bg-red-500/10 text-red-400 rounded-full p-1">
+                    <Modal.Icon className="bg-red-500/10 text-red-400 rounded-full p-2">
                       <AlertTriangle className="size-5" />
                     </Modal.Icon>
                     <Modal.Heading className="text-white text-lg font-semibold">
@@ -436,29 +731,44 @@ export default function RecruiterJobs() {
                       ?
                     </p>
                     <div className="p-3 bg-red-500/10 border border-red-500/20 rounded-xl">
-                      <p className="text-sm text-red-400">
-                        ⚠️ This action cannot be undone. All applications associated with this job will also be permanently removed.
+                      <p className="text-sm text-red-400 flex items-start gap-2">
+                        <span>⚠️</span>
+                        <span>This action cannot be undone. All applications associated with this job will also be permanently removed.</span>
                       </p>
                     </div>
                   </Modal.Body>
-                  <Modal.Footer className="flex gap-3">
-                    <Button variant="flat" className="flex-1 bg-zinc-800 hover:bg-zinc-700 text-white rounded-xl font-medium" onPress={() => setDeleteModalOpen(false)} disabled={isDeleting}>
+                  <Modal.Footer className="flex gap-3 mt-4">
+                    <motion.button 
+                      whileHover={{ scale: 1.02 }}
+                      whileTap={{ scale: 0.98 }}
+                      className="flex-1 bg-zinc-800 hover:bg-zinc-700 text-white rounded-xl font-medium px-4 py-2 transition-all" 
+                      onClick={() => setDeleteModalOpen(false)} 
+                      disabled={isDeleting}
+                    >
                       Cancel
-                    </Button>
-                    <Button variant="flat" className="flex-1 bg-red-500/10 hover:bg-red-500/20 text-red-400 border border-red-500/20 rounded-xl font-medium disabled:opacity-50" onPress={confirmDelete} disabled={isDeleting}>
+                    </motion.button>
+                    <motion.button 
+                      whileHover={{ scale: 1.02 }}
+                      whileTap={{ scale: 0.98 }}
+                      className="flex-1 bg-red-500/10 hover:bg-red-500/20 text-red-400 border border-red-500/20 rounded-xl font-medium px-4 py-2 transition-all disabled:opacity-50 flex items-center justify-center gap-2" 
+                      onClick={confirmDelete} 
+                      disabled={isDeleting}
+                    >
                       {isDeleting ? (
-                        <span className="flex items-center justify-center gap-2"><Loader2 className="w-4 h-4 animate-spin" /> Deleting...</span>
+                        <>
+                          <Loader2 className="w-4 h-4 animate-spin" /> Deleting...
+                        </>
                       ) : (
                         "Yes, Delete"
                       )}
-                    </Button>
+                    </motion.button>
                   </Modal.Footer>
-                </Modal.Dialog>
+                </motion.div>
               </Modal.Container>
             </Modal.Backdrop>
           </Modal>
 
-        </div>
+        </motion.div>
       </div>
     </>
   );

@@ -1,6 +1,6 @@
-// src/lib/api/applications.js
 import { serverFetch } from "../core/server";
 
+// ✅ Get applications by applicant (Seeker)
 export const getApplicationsByApplicant = async (userId) => {
     try {
         const query = userId ? `?userId=${encodeURIComponent(userId)}` : "";
@@ -16,7 +16,7 @@ export const getApplicationsByApplicant = async (userId) => {
     }
 };
 
-// ✅ NEW: Added for Recruiters to fetch applications by Company ID
+// ✅ Get applications by Company ID (Recruiter)
 export const getApplicationsByCompany = async (companyId) => {
     try {
         const query = companyId ? `?companyId=${encodeURIComponent(companyId)}` : "";
@@ -32,6 +32,7 @@ export const getApplicationsByCompany = async (companyId) => {
     }
 };
 
+// ✅ Submit application (Seeker)
 export const submitApplication = async (applicationData) => {
     try {
         const result = await serverFetch('/api/applications', {
@@ -42,5 +43,73 @@ export const submitApplication = async (applicationData) => {
     } catch (error) {
         console.error('❌ submitApplication error:', error);
         return { success: false, error: error.message };
+    }
+};
+
+// ✅ Get recruiter's applications (Recruiter)
+export const getRecruiterApplications = async () => {
+    try {
+        const data = await serverFetch('/api/applications/recruiter');
+        if (data === null) return [];
+        if (data && data.success && Array.isArray(data.data)) return data.data;
+        if (Array.isArray(data)) return data;
+        return [];
+    } catch (error) {
+        console.error('❌ getRecruiterApplications error:', error);
+        return [];
+    }
+};
+
+// ✅ Get applications for a specific job (Recruiter)
+export const getJobApplications = async (jobId) => {
+    try {
+        const data = await serverFetch(`/api/applications/job/${jobId}`);
+        if (data === null) return [];
+        if (data && data.success && Array.isArray(data.data)) return data.data;
+        if (Array.isArray(data)) return data;
+        return [];
+    } catch (error) {
+        console.error('❌ getJobApplications error:', error);
+        return [];
+    }
+};
+
+// ✅ Update application status (Recruiter)
+export const updateApplicationStatus = async (applicationId, status, recruiterNotes = '') => {
+    try {
+        const result = await serverFetch(`/api/applications/${applicationId}/status`, {
+            method: 'PATCH',
+            body: JSON.stringify({ status, recruiterNotes }),
+        });
+        return result;
+    } catch (error) {
+        console.error('❌ updateApplicationStatus error:', error);
+        return { success: false, error: error.message };
+    }
+};
+
+// ✅ Get application stats (Recruiter)
+export const getApplicationStats = async () => {
+    try {
+        const data = await serverFetch('/api/applications/recruiter/stats');
+        if (data === null) return {};
+        return data?.data || {};
+    } catch (error) {
+        console.error('❌ getApplicationStats error:', error);
+        return {};
+    }
+};
+
+// ✅ Get my applications (Seeker)
+export const getMyApplications = async () => {
+    try {
+        const data = await serverFetch('/api/applications/my');
+        if (data === null) return [];
+        if (data && data.success && Array.isArray(data.data)) return data.data;
+        if (Array.isArray(data)) return data;
+        return [];
+    } catch (error) {
+        console.error('❌ getMyApplications error:', error);
+        return [];
     }
 };

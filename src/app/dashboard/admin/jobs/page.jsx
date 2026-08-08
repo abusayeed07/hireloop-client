@@ -28,12 +28,19 @@ import {
   Loader2,
   AlertCircle,
   RefreshCw,
+  FileCheck,
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import toast from "react-hot-toast";
 import Pagination from "@/components/Pagination";
 import LoadingPage from "@/app/loading";
-import { getAdminJobs, getAdminJobStats, deleteAdminJob } from "@/lib/api/jobs";
+import { 
+    getAdminJobs, 
+    getAdminJobStats, 
+    deleteAdminJob,
+    adminApproveJob,
+    adminRejectJob 
+} from "@/lib/api/jobs";
 
 // ==========================================
 // CATEGORY ICONS & COLORS
@@ -60,6 +67,25 @@ const CATEGORY_COLORS = {
   'Education': 'text-indigo-400',
 };
 
+// ✅ Approval status configs
+const APPROVAL_STATUS = {
+    pending: { 
+        label: 'Pending Approval', 
+        className: 'bg-yellow-500/10 text-yellow-400 border-yellow-500/20',
+        icon: <Clock className="w-3 h-3" />
+    },
+    approved: { 
+        label: 'Approved', 
+        className: 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20',
+        icon: <CheckCircle className="w-3 h-3" />
+    },
+    rejected: { 
+        label: 'Rejected', 
+        className: 'bg-red-500/10 text-red-400 border-red-500/20',
+        icon: <XCircle className="w-3 h-3" />
+    },
+};
+
 export default function JobsPage() {
   const router = useRouter();
 
@@ -68,6 +94,7 @@ export default function JobsPage() {
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
+  const [approvalFilter, setApprovalFilter] = useState("all");
   const [categoryFilter, setCategoryFilter] = useState("all");
   const [currentPage, setCurrentPage] = useState(1);
   const [pageSize, setPageSize] = useState(5);
@@ -78,6 +105,8 @@ export default function JobsPage() {
     totalJobs: 0,
     activeJobs: 0,
     pendingJobs: 0,
+    pendingApproval: 0,
+    rejectedJobs: 0,
     newJobs3Days: 0,
   });
 
@@ -86,6 +115,7 @@ export default function JobsPage() {
   const [selectedJob, setSelectedJob] = useState(null);
   const [actionType, setActionType] = useState(null);
   const [updating, setUpdating] = useState(false);
+  const [rejectReason, setRejectReason] = useState("");
 
   const itemsPerPage = pageSize;
 
@@ -95,7 +125,15 @@ export default function JobsPage() {
   const fetchJobs = useCallback(async () => {
     setLoading(true);
     try {
-      const jobsData = await getAdminJobs();
+      const filters = {};
+      if (approvalFilter !== "all") {
+        filters.adminApproval = approvalFilter;
+      }
+      if (statusFilter !== "all") {
+        filters.status = statusFilter;
+      }
+      
+      const jobsData = await getAdminJobs(filters);
       const statsData = await getAdminJobStats();
 
       // Normalize jobs
@@ -103,6 +141,8 @@ export default function JobsPage() {
         ...job,
         id: job._id || job.id,
         status: (job.status || 'active').toLowerCase(),
+        adminApproval: job.adminApproval || 'pending',
+        adminRejectionReason: job.adminRejectionReason || '',
         jobTitle: job.jobTitle || job.title || 'Untitled Job',
         company: job.companyName || job.company || 'Unknown Company',
         companyLogo: job.companyLogo || job.logo || null,
@@ -121,6 +161,8 @@ export default function JobsPage() {
         totalJobs: statsData.totalJobs || 0,
         activeJobs: statsData.activeJobs || 0,
         pendingJobs: statsData.pendingJobs || 0,
+        pendingApproval: statsData.pendingApproval || 0,
+        rejectedJobs: statsData.rejectedJobs || 0,
         newJobs3Days: statsData.newJobs3Days || 0,
       });
     } catch (error) {
@@ -130,7 +172,7 @@ export default function JobsPage() {
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [statusFilter, approvalFilter]);
 
   useEffect(() => {
     fetchJobs();
@@ -174,53 +216,141 @@ export default function JobsPage() {
 
   useEffect(() => {
     setCurrentPage(1);
-  }, [searchTerm, statusFilter, categoryFilter, pageSize]);
+  }, [searchTerm, statusFilter, approvalFilter, categoryFilter, pageSize]);
 
   // ==========================================
-  // ACTIONS
+  // ✅ FIXED: ACTIONS WITH PREVENTION OF DOUBLE CALLS
   // ==========================================
-  const handleJobAction = (jobId, action) => {
+  
+  // ✅ Handle approve - FIXED: prevents double calls
+  const handleApprove = useCallback(async (jobId) => {
+    if (updating) return; // ✅ Prevent double calls
+    
+    console.log('✅ Approving job:', jobId);
+    setUpdating(true);
+    
+    try {
+      const result = await adminApproveJob(jobId);
+      console.log('📥 Approve result:', result);
+      
+      if (result.success) {
+        toast.success("Job approved and published!");
+        // ✅ Close modal first
+        setShowConfirmModal(false);
+        setSelectedJob(null);
+        // ✅ Then refresh data
+        await fetchJobs();
+      } else {
+        toast.error(result.error || "Failed to approve job");
+      }
+    } catch (error) {
+      console.error("Error approving job:", error);
+      toast.error("Something went wrong");
+    } finally {
+      setUpdating(false);
+    }
+  }, [updating, fetchJobs]);
+
+  // ✅ Handle reject - FIXED: prevents double calls
+  const handleReject = useCallback(async (jobId, reason) => {
+    if (updating) return; // ✅ Prevent double calls
+    
+    if (!reason || reason.trim() === "") {
+      toast.error("Please provide a reason for rejection");
+      return;
+    }
+    
+    console.log('❌ Rejecting job:', jobId, 'Reason:', reason);
+    setUpdating(true);
+    
+    try {
+      const result = await adminRejectJob(jobId, reason);
+      console.log('📥 Reject result:', result);
+      
+      if (result.success) {
+        toast.success("Job rejected");
+        setShowConfirmModal(false);
+        setSelectedJob(null);
+        setRejectReason("");
+        await fetchJobs();
+      } else {
+        toast.error(result.error || "Failed to reject job");
+      }
+    } catch (error) {
+      console.error("Error rejecting job:", error);
+      toast.error("Something went wrong");
+    } finally {
+      setUpdating(false);
+    }
+  }, [updating, fetchJobs]);
+
+  // ✅ Handle delete
+  const handleDelete = useCallback(async (jobId) => {
+    if (updating) return;
+    
+    console.log('🗑️ Deleting job:', jobId);
+    setUpdating(true);
+    
+    try {
+      const result = await deleteAdminJob(jobId);
+      if (result.success) {
+        toast.success("Job deleted successfully");
+        setShowConfirmModal(false);
+        setSelectedJob(null);
+        await fetchJobs();
+      } else {
+        toast.error(result.error || "Failed to delete job");
+      }
+    } catch (error) {
+      console.error("Error deleting job:", error);
+      toast.error("Something went wrong");
+    } finally {
+      setUpdating(false);
+    }
+  }, [updating, fetchJobs]);
+
+  // ✅ Open modal for action - FIXED: prevents double modal
+  const handleJobAction = useCallback((jobId, action) => {
+    // ✅ Prevent opening modal if already open or updating
+    if (showConfirmModal || updating) return;
+    
     const job = jobs.find((j) => j.id === jobId);
     if (!job) {
       toast.error("Job not found");
       return;
     }
+    console.log('📝 Opening modal for action:', action, 'Job:', job.jobTitle);
+    
     setSelectedJob(job);
     setActionType(action);
+    setRejectReason("");
     setShowConfirmModal(true);
-  };
+  }, [jobs, showConfirmModal, updating]);
 
-  const handleConfirmAction = async () => {
-    if (!selectedJob || !actionType) return;
-    const jobId = selectedJob.id;
-    setUpdating(true);
+  // ✅ Confirm action - FIXED: prevents double calls
+  const handleConfirmAction = useCallback(() => {
+    if (!selectedJob || updating) return;
+    
+    console.log('✅ Confirming action:', actionType, 'for job:', selectedJob.jobTitle);
+    
+    if (actionType === 'approve') {
+      handleApprove(selectedJob.id);
+    } else if (actionType === 'reject') {
+      handleReject(selectedJob.id, rejectReason);
+    } else if (actionType === 'delete') {
+      handleDelete(selectedJob.id);
+    }
+  }, [selectedJob, actionType, rejectReason, updating, handleApprove, handleReject, handleDelete]);
 
-    try {
-      let result;
-      if (actionType === 'delete') {
-        result = await deleteAdminJob(jobId);
-      }
-
-      if (result && result.success) {
-        toast.success(result.message || `Job ${actionType.replace('_', ' ')}d successfully`);
-        await fetchJobs();
-      } else {
-        toast.error(result?.error || "Failed to update job");
-      }
-    } catch (error) {
-      console.error("Error updating job:", error);
-      toast.error(error.message || "Failed to update job");
-    } finally {
-      setUpdating(false);
+  // Close modal
+  const closeModal = useCallback(() => {
+    if (!updating) {
       setShowConfirmModal(false);
       setSelectedJob(null);
       setActionType(null);
+      setRejectReason("");
     }
-  };
-
-  const handleCreateJob = () => {
-    router.push('/dashboard/admin/jobs/create');
-  };
+  }, [updating]);
 
   // ==========================================
   // HELPERS
@@ -247,6 +377,10 @@ export default function JobsPage() {
     };
   };
 
+  const getApprovalStatus = (approval) => {
+    return APPROVAL_STATUS[approval] || APPROVAL_STATUS.pending;
+  };
+
   const getCompanyInitials = (name) => {
     if (!name) return "C";
     return name.split(" ").slice(0, 2).map((word) => word.charAt(0).toUpperCase()).join("");
@@ -261,7 +395,6 @@ export default function JobsPage() {
   // ✅ FIXED DROPDOWNS
   // ==========================================
   
-  // 1. Custom Category Dropdown
   const CategoryDropdown = ({ value, onChange }) => {
     const [isOpen, setIsOpen] = useState(false);
     const dropdownRef = useRef(null);
@@ -282,7 +415,6 @@ export default function JobsPage() {
 
     return (
       <div className="relative w-full sm:w-auto" ref={dropdownRef}>
-        {/* TRIGGER BUTTON */}
         <button
           type="button"
           onClick={() => setIsOpen(!isOpen)}
@@ -295,7 +427,6 @@ export default function JobsPage() {
           <ChevronDown className={`w-3.5 h-3.5 text-zinc-400 transition-transform duration-200 ${isOpen ? 'rotate-180' : ''}`} />
         </button>
 
-        {/* DROPDOWN MENU - 100% SOLID BG to fix the transparency bug */}
         <AnimatePresence>
           {isOpen && (
             <motion.div
@@ -362,25 +493,25 @@ export default function JobsPage() {
           <div>
             <h1 className="text-2xl font-bold text-white tracking-tight">Manage Jobs</h1>
             <p className="text-zinc-500 text-sm mt-1">
-              Oversee all active listings and historical job posts across the platform.
+              Oversee all active listings, pending approvals, and historical job posts across the platform.
             </p>
           </div>
           <div className="flex items-center gap-3">
             <motion.button
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
-              onClick={fetchJobs}
+              onClick={() => fetchJobs()}
               className="flex items-center gap-2 px-4 py-2 bg-zinc-800/50 hover:bg-zinc-700/50 text-zinc-300 rounded-lg text-sm transition-all duration-300 border border-white/5 hover:border-white/10"
             >
               <RefreshCw className="w-4 h-4" />
               <span className="hidden sm:inline">Refresh</span>
             </motion.button>
-           
           </div>
         </motion.div>
 
-        {/* Top Stat Cards - Forced into 4 Columns (1 Row) */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4 mb-6">
+        {/* Top Stat Cards */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-5 gap-4 mb-6">
+          {/* ... stats cards (same as before) ... */}
           <div className="bg-[#111214] border border-white/5 rounded-xl p-5">
             <div className="flex items-center justify-between mb-1">
               <h3 className="text-zinc-400 text-xs font-medium">Total Jobs</h3>
@@ -410,11 +541,20 @@ export default function JobsPage() {
 
           <div className="bg-[#111214] border border-white/5 rounded-xl p-5">
             <div className="flex items-center justify-between mb-1">
-              <h3 className="text-zinc-400 text-xs font-medium">Pending Jobs</h3>
+              <h3 className="text-zinc-400 text-xs font-medium">Pending</h3>
               <Clock className="w-3.5 h-3.5 text-yellow-500" />
             </div>
-            <div className="text-2xl font-bold text-yellow-400 mb-0.5">{stats.pendingJobs || 0}</div>
+            <div className="text-2xl font-bold text-yellow-400 mb-0.5">{stats.pendingApproval || 0}</div>
             <div className="text-[10px] text-zinc-500">Awaiting approval</div>
+          </div>
+
+          <div className="bg-[#111214] border border-white/5 rounded-xl p-5">
+            <div className="flex items-center justify-between mb-1">
+              <h3 className="text-zinc-400 text-xs font-medium">Rejected</h3>
+              <XCircle className="w-3.5 h-3.5 text-red-500" />
+            </div>
+            <div className="text-2xl font-bold text-red-400 mb-0.5">{stats.rejectedJobs || 0}</div>
+            <div className="text-[10px] text-zinc-500">Not approved</div>
           </div>
         </div>
 
@@ -438,7 +578,17 @@ export default function JobsPage() {
             </div>
 
             <div className="flex flex-wrap items-center gap-2 lg:gap-3">
-              {/* ✅ UPDATED STATUS DROPDOWN TO MATCH STYLE */}
+              <select
+                value={approvalFilter}
+                onChange={(e) => setApprovalFilter(e.target.value)}
+                className="px-3 py-2 lg:px-3 lg:py-2.5 bg-zinc-800 border border-white/10 rounded-lg lg:rounded-xl text-xs lg:text-sm text-white focus:outline-none focus:border-cyan-500/50 cursor-pointer transition-all duration-300 hover:bg-zinc-700"
+              >
+                <option value="all">All Approval</option>
+                <option value="pending">Pending</option>
+                <option value="approved">Approved</option>
+                <option value="rejected">Rejected</option>
+              </select>
+
               <select
                 value={statusFilter}
                 onChange={(e) => setStatusFilter(e.target.value)}
@@ -489,6 +639,7 @@ export default function JobsPage() {
                   <th className="px-6 py-4 font-medium text-zinc-500">Category</th>
                   <th className="px-6 py-4 font-medium text-zinc-500">Type</th>
                   <th className="px-6 py-4 font-medium text-zinc-500">Date Posted</th>
+                  <th className="px-6 py-4 font-medium text-zinc-500">Approval</th>
                   <th className="px-6 py-4 font-medium text-zinc-500">Status</th>
                   <th className="px-6 py-4 font-medium text-zinc-500 text-right">Actions</th>
                 </tr>
@@ -497,7 +648,7 @@ export default function JobsPage() {
                 <AnimatePresence mode="wait">
                   {currentJobs.length === 0 ? (
                     <tr>
-                      <td colSpan={7} className="px-6 py-12 text-center text-zinc-500">
+                      <td colSpan={8} className="px-6 py-12 text-center text-zinc-500">
                         <div className="flex flex-col items-center gap-2">
                           <Briefcase className="w-10 h-10 opacity-30" />
                           <p>No jobs found matching your filters</p>
@@ -507,6 +658,7 @@ export default function JobsPage() {
                   ) : (
                     currentJobs.map((job) => {
                       const status = getStatusConfig(job.status);
+                      const approval = getApprovalStatus(job.adminApproval);
                       return (
                         <motion.tr
                           key={job.id}
@@ -546,14 +698,52 @@ export default function JobsPage() {
                           <td className="px-6 py-4">{job.category}</td>
                           <td className="px-6 py-4">{job.jobType}</td>
                           <td className="px-6 py-4">{formatDate(job.datePosted)}</td>
+                          
+                          <td className="px-6 py-4">
+                            <span className={`inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[10px] font-medium ${approval.className}`}>
+                              {approval.icon}
+                              {approval.label}
+                            </span>
+                            {job.adminRejectionReason && (
+                              <p className="text-[10px] text-red-400 mt-1 truncate max-w-[120px]">
+                                Reason: {job.adminRejectionReason}
+                              </p>
+                            )}
+                          </td>
+
                           <td className="px-6 py-4">
                             <span className={`inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[10px] font-medium ${status.className}`}>
                               {status.icon}
                               {status.label}
                             </span>
                           </td>
+
                           <td className="px-6 py-4 text-right">
-                            <div className="flex items-center justify-end gap-2">
+                            <div className="flex items-center justify-end gap-2 flex-wrap">
+                              {job.adminApproval === 'pending' && (
+                                <>
+                                  <motion.button
+                                    whileHover={{ scale: 1.05 }}
+                                    whileTap={{ scale: 0.95 }}
+                                    onClick={() => handleJobAction(job.id, 'approve')}
+                                    className="px-2.5 py-1 bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-400 rounded-lg text-xs transition-all border border-emerald-500/20 flex items-center gap-1"
+                                  >
+                                    <CheckCircle className="w-3 h-3" />
+                                    Approve
+                                  </motion.button>
+                                  
+                                  <motion.button
+                                    whileHover={{ scale: 1.05 }}
+                                    whileTap={{ scale: 0.95 }}
+                                    onClick={() => handleJobAction(job.id, 'reject')}
+                                    className="px-2.5 py-1 bg-red-500/10 hover:bg-red-500/20 text-red-400 rounded-lg text-xs transition-all border border-red-500/20 flex items-center gap-1"
+                                  >
+                                    <XCircle className="w-3 h-3" />
+                                    Reject
+                                  </motion.button>
+                                </>
+                              )}
+                              
                               <motion.button 
                                 whileHover={{ scale: 1.1 }} 
                                 whileTap={{ scale: 0.9 }} 
@@ -562,7 +752,6 @@ export default function JobsPage() {
                               >
                                 <Eye className="w-4 h-4" />
                               </motion.button>
-                              
                               
                               <motion.button 
                                 whileHover={{ scale: 1.1 }} 
@@ -583,7 +772,6 @@ export default function JobsPage() {
             </table>
           </div>
 
-          {/* Pagination */}
           <div className="px-6 py-4 border-t border-white/5 flex flex-col sm:flex-row justify-between items-center gap-4">
             <p className="text-xs text-zinc-500">
               Showing <span className="text-zinc-300">{currentJobs.length}</span> of {filteredJobs.length} results
@@ -608,7 +796,7 @@ export default function JobsPage() {
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             className="fixed inset-0 bg-black/80 backdrop-blur-md z-50 flex items-center justify-center p-3 sm:p-4"
-            onClick={() => setShowConfirmModal(false)}
+            onClick={closeModal}
           >
             <motion.div
               initial={{ scale: 0.9, opacity: 0 }}
@@ -617,51 +805,164 @@ export default function JobsPage() {
               className="bg-[#111214] border border-white/5 rounded-xl sm:rounded-2xl p-4 sm:p-6 max-w-md w-full shadow-2xl shadow-cyan-500/5 mx-2"
               onClick={(e) => e.stopPropagation()}
             >
-              <div className="flex items-center gap-3 mb-4">
-                <div className="p-2 rounded-xl bg-red-500/10 text-red-400 border border-red-500/20 shrink-0">
-                  <AlertCircle className="w-5 h-5 sm:w-6 sm:h-6" />
-                </div>
-                <div>
-                  <h3 className="text-base sm:text-lg font-semibold text-white">Confirm Action</h3>
-                  <p className="text-xs sm:text-sm text-zinc-400">
-                    Are you sure you want to permanently delete {selectedJob.jobTitle}? This action cannot be undone.
-                  </p>
-                </div>
-              </div>
+              {actionType === 'reject' ? (
+                // Reject Modal
+                <>
+                  <div className="flex items-center gap-3 mb-4">
+                    <div className="p-2 rounded-xl bg-red-500/10 text-red-400 border border-red-500/20 shrink-0">
+                      <AlertCircle className="w-5 h-5 sm:w-6 sm:h-6" />
+                    </div>
+                    <div>
+                      <h3 className="text-base sm:text-lg font-semibold text-white">Reject Job</h3>
+                      <p className="text-xs sm:text-sm text-zinc-400">
+                        Provide a reason why this job is being rejected.
+                      </p>
+                    </div>
+                  </div>
 
-              <div className="bg-zinc-800/30 rounded-xl p-3 sm:p-4 mb-4 sm:mb-6 border border-white/5">
-                <p className="text-xs sm:text-sm text-zinc-400">Job Details:</p>
-                <p className="text-sm sm:text-base text-white font-medium">{selectedJob.jobTitle}</p>
-                <p className="text-xs sm:text-sm text-zinc-500">{selectedJob.company}</p>
-                <p className="text-[10px] sm:text-xs text-zinc-500 mt-1">Status: {getStatusConfig(selectedJob.status).label}</p>
-              </div>
+                  <div className="bg-zinc-800/30 rounded-xl p-3 sm:p-4 mb-4 border border-white/5">
+                    <p className="text-xs sm:text-sm text-zinc-400">Job Details:</p>
+                    <p className="text-sm sm:text-base text-white font-medium">{selectedJob.jobTitle}</p>
+                    <p className="text-xs sm:text-sm text-zinc-500">{selectedJob.company}</p>
+                  </div>
 
-              <div className="flex flex-col sm:flex-row gap-3">
-                <motion.button
-                  whileHover={{ scale: 1.02 }}
-                  whileTap={{ scale: 0.98 }}
-                  onClick={() => setShowConfirmModal(false)}
-                  className="flex-1 px-4 py-2.5 bg-zinc-800/50 hover:bg-zinc-700/50 text-white rounded-xl text-sm font-medium transition-all duration-300 border border-white/5 order-2 sm:order-1"
-                >
-                  Cancel
-                </motion.button>
-                <motion.button
-                  whileHover={{ scale: 1.02 }}
-                  whileTap={{ scale: 0.98 }}
-                  onClick={handleConfirmAction}
-                  disabled={updating}
-                  className="flex-1 px-4 py-2.5 bg-gradient-to-r from-red-600 to-rose-600 hover:from-red-700 hover:to-rose-700 text-white rounded-xl text-sm font-medium transition-all duration-300 disabled:opacity-50 flex items-center justify-center gap-2 shadow-lg shadow-red-500/20 order-1 sm:order-2"
-                >
-                  {updating ? (
-                    <>
-                      <Loader2 className="w-4 h-4 animate-spin" />
-                      Processing...
-                    </>
-                  ) : (
-                    "Yes, delete"
-                  )}
-                </motion.button>
-              </div>
+                  <div className="mb-4">
+                    <label className="text-xs text-zinc-400 block mb-1.5">Rejection Reason *</label>
+                    <textarea
+                      value={rejectReason}
+                      onChange={(e) => setRejectReason(e.target.value)}
+                      placeholder="Please explain why this job is being rejected..."
+                      className="w-full px-3 py-2 bg-zinc-900/50 border border-zinc-800 rounded-lg text-white text-sm placeholder:text-zinc-500 focus:outline-none focus:border-red-500/50 transition-all resize-none min-h-[80px]"
+                    />
+                  </div>
+
+                  <div className="flex flex-col sm:flex-row gap-3">
+                    <motion.button
+                      whileHover={{ scale: 1.02 }}
+                      whileTap={{ scale: 0.98 }}
+                      onClick={closeModal}
+                      disabled={updating}
+                      className="flex-1 px-4 py-2.5 bg-zinc-800/50 hover:bg-zinc-700/50 text-white rounded-xl text-sm font-medium transition-all duration-300 border border-white/5 order-2 sm:order-1"
+                    >
+                      Cancel
+                    </motion.button>
+                    <motion.button
+                      whileHover={{ scale: 1.02 }}
+                      whileTap={{ scale: 0.98 }}
+                      onClick={handleConfirmAction}
+                      disabled={updating || !rejectReason.trim()}
+                      className="flex-1 px-4 py-2.5 bg-gradient-to-r from-red-600 to-rose-600 hover:from-red-700 hover:to-rose-700 text-white rounded-xl text-sm font-medium transition-all duration-300 disabled:opacity-50 flex items-center justify-center gap-2 shadow-lg shadow-red-500/20 order-1 sm:order-2"
+                    >
+                      {updating ? (
+                        <>
+                          <Loader2 className="w-4 h-4 animate-spin" />
+                          Processing...
+                        </>
+                      ) : (
+                        "Yes, reject"
+                      )}
+                    </motion.button>
+                  </div>
+                </>
+              ) : actionType === 'approve' ? (
+                // Approve Modal
+                <>
+                  <div className="flex items-center gap-3 mb-4">
+                    <div className="p-2 rounded-xl bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 shrink-0">
+                      <CheckCircle className="w-5 h-5 sm:w-6 sm:h-6" />
+                    </div>
+                    <div>
+                      <h3 className="text-base sm:text-lg font-semibold text-white">Approve Job</h3>
+                      <p className="text-xs sm:text-sm text-zinc-400">
+                        This job will be published and visible to all users.
+                      </p>
+                    </div>
+                  </div>
+
+                  <div className="bg-zinc-800/30 rounded-xl p-3 sm:p-4 mb-4 border border-white/5">
+                    <p className="text-xs sm:text-sm text-zinc-400">Job Details:</p>
+                    <p className="text-sm sm:text-base text-white font-medium">{selectedJob.jobTitle}</p>
+                    <p className="text-xs sm:text-sm text-zinc-500">{selectedJob.company}</p>
+                  </div>
+
+                  <div className="flex flex-col sm:flex-row gap-3">
+                    <motion.button
+                      whileHover={{ scale: 1.02 }}
+                      whileTap={{ scale: 0.98 }}
+                      onClick={closeModal}
+                      disabled={updating}
+                      className="flex-1 px-4 py-2.5 bg-zinc-800/50 hover:bg-zinc-700/50 text-white rounded-xl text-sm font-medium transition-all duration-300 border border-white/5 order-2 sm:order-1"
+                    >
+                      Cancel
+                    </motion.button>
+                    <motion.button
+                      whileHover={{ scale: 1.02 }}
+                      whileTap={{ scale: 0.98 }}
+                      onClick={handleConfirmAction}
+                      disabled={updating}
+                      className="flex-1 px-4 py-2.5 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 text-white rounded-xl text-sm font-medium transition-all duration-300 disabled:opacity-50 flex items-center justify-center gap-2 shadow-lg shadow-emerald-500/20 order-1 sm:order-2"
+                    >
+                      {updating ? (
+                        <>
+                          <Loader2 className="w-4 h-4 animate-spin" />
+                          Processing...
+                        </>
+                      ) : (
+                        "Yes, approve"
+                      )}
+                    </motion.button>
+                  </div>
+                </>
+              ) : (
+                // Delete Modal
+                <>
+                  <div className="flex items-center gap-3 mb-4">
+                    <div className="p-2 rounded-xl bg-red-500/10 text-red-400 border border-red-500/20 shrink-0">
+                      <AlertCircle className="w-5 h-5 sm:w-6 sm:h-6" />
+                    </div>
+                    <div>
+                      <h3 className="text-base sm:text-lg font-semibold text-white">Confirm Action</h3>
+                      <p className="text-xs sm:text-sm text-zinc-400">
+                        Are you sure you want to permanently delete this job? This action cannot be undone.
+                      </p>
+                    </div>
+                  </div>
+
+                  <div className="bg-zinc-800/30 rounded-xl p-3 sm:p-4 mb-4 border border-white/5">
+                    <p className="text-xs sm:text-sm text-zinc-400">Job Details:</p>
+                    <p className="text-sm sm:text-base text-white font-medium">{selectedJob.jobTitle}</p>
+                    <p className="text-xs sm:text-sm text-zinc-500">{selectedJob.company}</p>
+                  </div>
+
+                  <div className="flex flex-col sm:flex-row gap-3">
+                    <motion.button
+                      whileHover={{ scale: 1.02 }}
+                      whileTap={{ scale: 0.98 }}
+                      onClick={closeModal}
+                      disabled={updating}
+                      className="flex-1 px-4 py-2.5 bg-zinc-800/50 hover:bg-zinc-700/50 text-white rounded-xl text-sm font-medium transition-all duration-300 border border-white/5 order-2 sm:order-1"
+                    >
+                      Cancel
+                    </motion.button>
+                    <motion.button
+                      whileHover={{ scale: 1.02 }}
+                      whileTap={{ scale: 0.98 }}
+                      onClick={handleConfirmAction}
+                      disabled={updating}
+                      className="flex-1 px-4 py-2.5 bg-gradient-to-r from-red-600 to-rose-600 hover:from-red-700 hover:to-rose-700 text-white rounded-xl text-sm font-medium transition-all duration-300 disabled:opacity-50 flex items-center justify-center gap-2 shadow-lg shadow-red-500/20 order-1 sm:order-2"
+                    >
+                      {updating ? (
+                        <>
+                          <Loader2 className="w-4 h-4 animate-spin" />
+                          Processing...
+                        </>
+                      ) : (
+                        "Yes, delete"
+                      )}
+                    </motion.button>
+                  </div>
+                </>
+              )}
             </motion.div>
           </motion.div>
         )}
