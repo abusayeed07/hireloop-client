@@ -151,34 +151,50 @@ export default function CompaniesPage() {
   const [filteredCompanies, setFilteredCompanies] = useState([]);
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState("");
+  
+  // ✅ 1. Add state for stats
+  const [stats, setStats] = useState({ pending: 0, approved: 0, rejected: 0 });
 
   // Pagination Configuration
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 9;
 
-  // Fetch companies
+  // ✅ 2. Fetch companies AND stats together
   useEffect(() => {
-    const fetchCompanies = async () => {
+    const fetchData = async () => {
       try {
-        const response = await serverFetch('/api/companies');
+        setLoading(true);
         
-        console.log('📊 Raw API response:', response);
+        // Fetch both in parallel for speed
+        const [companiesResponse, statsResponse] = await Promise.all([
+          serverFetch('/api/companies'),
+          serverFetch('/api/companies/stats/public') // Our new endpoint
+        ]);
         
-        // ✅ Handle the response format correctly
+        // Handle companies data
         let companiesData = [];
-        if (response && response.success && response.data) {
-          companiesData = response.data;
-        } else if (Array.isArray(response)) {
-          companiesData = response;
+        if (companiesResponse && companiesResponse.success && companiesResponse.data) {
+          companiesData = companiesResponse.data;
+        } else if (Array.isArray(companiesResponse)) {
+          companiesData = companiesResponse;
         }
         
         console.log(`✅ Found ${companiesData.length} companies`);
-        console.log('📊 Companies:', companiesData.map(c => ({ name: c.name, status: c.status })));
         
         setCompanies(companiesData);
         setFilteredCompanies(companiesData);
+
+        // ✅ 3. Handle real stats
+        if (statsResponse && statsResponse.success) {
+          setStats({
+            pending: statsResponse.data.pending || 0,
+            approved: statsResponse.data.approved || 0,
+            rejected: statsResponse.data.rejected || 0
+          });
+        }
+        
       } catch (error) {
-        console.error("Failed to fetch companies:", error);
+        console.error("Failed to fetch data:", error);
         toast.error("Failed to load companies");
         setCompanies([]);
         setFilteredCompanies([]);
@@ -186,7 +202,7 @@ export default function CompaniesPage() {
         setLoading(false);
       }
     };
-    fetchCompanies();
+    fetchData();
   }, []);
 
   // Filter companies based on search
@@ -298,7 +314,7 @@ export default function CompaniesPage() {
           </motion.div>
         )}
 
-        {/* Results Header */}
+        {/* Results Header - ✅ 4. Use stats state for real numbers */}
         <div className="flex items-center justify-between gap-3 mb-6">
           <p className="text-sm text-zinc-400">
             Showing <span className="text-white font-medium">{filteredCompanies.length > 0 ? Math.min(indexOfFirstItem + 1, filteredCompanies.length) : 0}-{Math.min(indexOfLastItem, filteredCompanies.length)}</span> of <span className="text-white font-medium">{filteredCompanies.length}</span> Companies Found
@@ -307,15 +323,15 @@ export default function CompaniesPage() {
             <div className="flex items-center gap-2 text-xs text-zinc-500">
               <span className="flex items-center gap-1">
                 <span className="w-2 h-2 rounded-full bg-emerald-400"></span>
-                {filteredCompanies.filter(c => c.status?.toLowerCase() === 'approved').length} Approved
+                {stats.approved} Approved
               </span>
               <span className="flex items-center gap-1">
                 <span className="w-2 h-2 rounded-full bg-amber-400"></span>
-                {filteredCompanies.filter(c => c.status?.toLowerCase() === 'pending').length} Pending
+                {stats.pending} Pending
               </span>
               <span className="flex items-center gap-1">
                 <span className="w-2 h-2 rounded-full bg-rose-400"></span>
-                {filteredCompanies.filter(c => c.status?.toLowerCase() === 'rejected').length} Rejected
+                {stats.rejected} Rejected
               </span>
             </div>
           )}

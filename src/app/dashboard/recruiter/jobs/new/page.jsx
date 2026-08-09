@@ -1,4 +1,5 @@
 // src/app/dashboard/recruiter/jobs/new/page.jsx
+
 "use client";
 
 import React, { useState, useEffect } from "react";
@@ -9,7 +10,7 @@ import { getLoggedInRecruiterCompany } from "@/lib/api/companies";
 import { getMyJobs } from "@/lib/api/jobs";
 import { useRouter } from "next/navigation";
 import { motion } from "framer-motion";
-import toast from "react-hot-toast"; // ✅ Import toast
+import toast from "react-hot-toast";
 import Metadata from "@/components/Metadata";
 
 export default function PostJobPage() {
@@ -19,6 +20,7 @@ export default function PostJobPage() {
   const [jobs, setJobs] = useState([]);
   const [loading, setLoading] = useState(true);
   const [isRedirecting, setIsRedirecting] = useState(false);
+  const [companyStatus, setCompanyStatus] = useState(null);
 
   useEffect(() => {
     let isMounted = true;
@@ -44,7 +46,6 @@ export default function PostJobPage() {
         if (!companyData || Object.keys(companyData).length === 0 || !companyData._id) {
           console.log('❌ No company found for this recruiter.');
           
-          // ✅ Show toast message
           toast.error('⚠️ Please create a company profile first before posting jobs!', {
             duration: 5000,
             position: 'top-right',
@@ -53,7 +54,6 @@ export default function PostJobPage() {
           if (isMounted) {
             if (!isRedirecting) {
               setIsRedirecting(true);
-              // ✅ Redirect to company profile page after a short delay
               setTimeout(() => {
                 router.replace('/dashboard/recruiter/company');
               }, 1000);
@@ -62,13 +62,27 @@ export default function PostJobPage() {
           return;
         }
 
-        // ✅ Company exists, fetch jobs
-        const jobsData = await getMyJobs() || [];
-        console.log('🔍 Jobs data received:', jobsData.length, 'jobs');
+        // ✅ Set company status
+        setCompanyStatus(companyData.status || 'approved');
+
+        // ✅ Company exists, fetch jobs (only if approved)
+        if (companyData.status === 'approved') {
+          const jobsData = await getMyJobs() || [];
+          console.log('🔍 Jobs data received:', jobsData.length, 'jobs');
+          if (isMounted) {
+            setJobs(jobsData);
+          }
+        } else {
+          // ✅ If pending or rejected, set jobs to empty
+          setJobs([]);
+        }
         
         if (isMounted) {
-          setCompany(companyData);
-          setJobs(jobsData);
+          // ✅ FIX: Ensure adminRejectionReason is passed to company
+          setCompany({
+            ...companyData,
+            adminRejectionReason: companyData.adminRejectionReason || null
+          });
         }
       } catch (error) {
         console.error("❌ Error fetching data:", error);
@@ -146,14 +160,17 @@ export default function PostJobPage() {
       <Metadata page="recruiter-post-job" />
       <div className="min-h-screen bg-gradient-to-br from-[#0d0d0e] via-[#0f0f11] to-[#0d0d0e] p-8">
         <div className="max-w-5xl mx-auto">
-          <div className="mb-8">
-            <RecruiterJobsTracker 
-              user={session.user} 
-              jobs={jobs} 
-              title="Active Job Postings" 
-              viewPlansLink="/pricing" 
-            />
-          </div>
+          {/* ✅ ONLY show RecruiterJobsTracker if company is approved */}
+          {companyStatus === 'approved' && (
+            <div className="mb-8">
+              <RecruiterJobsTracker 
+                user={session.user} 
+                jobs={jobs} 
+                title="Active Job Postings" 
+                viewPlansLink="/pricing" 
+              />
+            </div>
+          )}
           <PostJobForm user={session.user} company={company} />
         </div>
       </div>

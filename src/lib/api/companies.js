@@ -36,7 +36,7 @@ export const getCompanies = async () => {
     }
 };
 
-// ✅ FIXED: Unwrap the data property
+// ✅ FIXED: Unwrap the data property (PUBLIC ROUTE)
 export const getCompanyById = async (companyId) => {
     try {
         if (!companyId) return null;
@@ -51,6 +51,22 @@ export const getCompanyById = async (companyId) => {
         return response || null;
     } catch (error) {
         console.error(`❌ getCompanyById error for ${companyId}:`, error);
+        return null;
+    }
+};
+
+// ✅ NEW: Get single company for ADMIN dashboard (Uses the new admin route)
+export const getAdminCompanyById = async (companyId) => {
+    try {
+        if (!companyId) return null;
+        const response = await serverFetch(`/api/companies/admin/companies/${companyId}`);
+        
+        if (response && response.success === true && response.data) {
+            return response.data;
+        }
+        return response || null;
+    } catch (error) {
+        console.error(`❌ getAdminCompanyById error for ${companyId}:`, error);
         return null;
     }
 };
@@ -166,13 +182,16 @@ export const getAdminCompanies = async (page = 1, limit = 50, search = '', statu
 };
 
 // ✅ Update company status (Admin only)
-export const updateCompanyStatus = async (companyId, action) => {
+export const updateCompanyStatus = async (companyId, action, reason = null) => {
     try {
         if (!companyId) return { success: false, error: 'Company ID required' };
 
+        const body = { action };
+        if (reason) body.reason = reason;
+
         const result = await serverFetch(`/api/companies/admin/companies/${companyId}`, {
             method: 'PATCH',
-            body: JSON.stringify({ action }),
+            body: JSON.stringify(body),
         });
         return result;
     } catch (error) {

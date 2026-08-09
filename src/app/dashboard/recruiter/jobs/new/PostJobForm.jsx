@@ -23,13 +23,20 @@ import {
   GraduationCap,
   Gift,
   Clock,
+  ArrowRotateLeft,
 } from "@gravity-ui/icons";
 import { useRouter } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
 import toast from "react-hot-toast";
 import { createJob, updateJob } from "@/lib/api/jobs";
+import { Pencil } from "lucide-react";
 
-export default function PostJobForm({ user, company, initialData = null, isEditing = false }) {
+export default function PostJobForm({
+  user,
+  company,
+  initialData = null,
+  isEditing = false,
+}) {
   const router = useRouter();
   const [isRemote, setIsRemote] = useState(initialData?.isRemote || false);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -106,6 +113,18 @@ export default function PostJobForm({ user, company, initialData = null, isEditi
     },
   };
 
+  const pulseVariants = {
+    pulse: {
+      scale: [1, 1.05, 1],
+      opacity: [1, 0.8, 1],
+      transition: {
+        duration: 2,
+        repeat: Infinity,
+        ease: "easeInOut",
+      },
+    },
+  };
+
   // Check if user is logged in
   if (!user) {
     return (
@@ -129,13 +148,15 @@ export default function PostJobForm({ user, company, initialData = null, isEditi
           >
             <span className="text-3xl">👤</span>
           </motion.div>
-          <h3 className="text-xl font-semibold text-white mb-2">Not Logged In</h3>
+          <h3 className="text-xl font-semibold text-white mb-2">
+            Not Logged In
+          </h3>
           <p className="text-zinc-400 text-sm mb-6">
             Please log in to post a job.
           </p>
           <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
             <Button
-              onClick={() => router.push('/signin')}
+              onClick={() => router.push("/signin")}
               className="bg-gradient-to-r from-purple-600 to-purple-700 text-white font-semibold hover:from-purple-700 hover:to-purple-800 rounded-xl px-6 h-11"
             >
               Sign In
@@ -169,13 +190,15 @@ export default function PostJobForm({ user, company, initialData = null, isEditi
           >
             <Briefcase size={32} className="text-red-400" />
           </motion.div>
-          <h3 className="text-xl font-semibold text-white mb-2">Company Not Found</h3>
+          <h3 className="text-xl font-semibold text-white mb-2">
+            Company Not Found
+          </h3>
           <p className="text-zinc-400 text-sm mb-6">
             Please make sure your company profile is set up before posting jobs.
           </p>
           <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
             <Button
-              onClick={() => router.push('/dashboard/recruiter/company')}
+              onClick={() => router.push("/dashboard/recruiter/company")}
               className="bg-gradient-to-r from-purple-600 to-purple-700 text-white font-semibold hover:from-purple-700 hover:to-purple-800 rounded-xl px-6 h-11"
             >
               Set Up Company
@@ -186,7 +209,205 @@ export default function PostJobForm({ user, company, initialData = null, isEditi
     );
   }
 
-  // handle submit 
+  // ✅ Check company status - PENDING (show only pending message, no form)
+  if (company.status === "pending") {
+    return (
+      <motion.div
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        exit={{ opacity: 0 }}
+        className="min-h-screen bg-gradient-to-br from-[#0d0d0e] via-[#0f0f11] to-[#0d0d0e] flex items-center justify-center p-8 relative overflow-hidden"
+      >
+        <motion.div
+          animate={{
+            scale: [1, 1.2, 1],
+            opacity: [0.3, 0.1, 0.3],
+          }}
+          transition={{
+            duration: 8,
+            repeat: Infinity,
+            ease: "easeInOut",
+          }}
+          className="absolute top-[-20%] right-[-10%] w-[500px] h-[500px] bg-yellow-500/5 rounded-full blur-3xl"
+        />
+        <motion.div
+          initial={{ scale: 0.9, opacity: 0 }}
+          animate={{ scale: 1, opacity: 1 }}
+          transition={{ type: "spring", damping: 15 }}
+          className="relative z-10 bg-[#121214]/80 backdrop-blur-sm border border-yellow-500/30 rounded-2xl p-8 text-center max-w-md"
+        >
+          <motion.div
+            animate={{ rotate: 360 }}
+            transition={{ duration: 2, repeat: Infinity, ease: "linear" }}
+            className="w-16 h-16 border-4 border-yellow-500/30 border-t-yellow-500 rounded-full mx-auto mb-4"
+          />
+          <h3 className="text-xl font-semibold text-white mb-2">
+            Company Pending Approval
+          </h3>
+          <p className="text-zinc-400 text-sm mb-4">
+            Your company profile is currently under review by our admin team.
+          </p>
+          <p className="text-zinc-500 text-xs">
+            You will be able to post jobs once your company is approved.
+          </p>
+          <div className="mt-6 p-3 bg-yellow-500/5 border border-yellow-500/10 rounded-xl">
+            <p className="text-xs text-yellow-400 flex items-center justify-center gap-2">
+              <Clock size={14} />
+              <span>Estimated review time: 24-48 hours</span>
+            </p>
+          </div>
+          <motion.div
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
+            className="mt-6"
+          >
+            <Button
+              onClick={() => router.push("/dashboard/recruiter/company")}
+              className="bg-zinc-800 hover:bg-zinc-700 text-white border border-zinc-700 rounded-xl px-6 h-11"
+            >
+              Check Company Status
+            </Button>
+          </motion.div>
+        </motion.div>
+      </motion.div>
+    );
+  }
+
+  // ✅ Check company status - REJECTED (show rejected message with note from admin)
+  if (company.status === "rejected") {
+    return (
+      <motion.div
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        exit={{ opacity: 0 }}
+        className="min-h-screen bg-gradient-to-br from-[#0d0d0e] via-[#0f0f11] to-[#0d0d0e] flex items-center justify-center p-8 relative overflow-hidden"
+      >
+        <motion.div
+          animate={{
+            scale: [1, 1.2, 1],
+            opacity: [0.3, 0.1, 0.3],
+          }}
+          transition={{
+            duration: 8,
+            repeat: Infinity,
+            ease: "easeInOut",
+          }}
+          className="absolute top-[-20%] right-[-10%] w-[500px] h-[500px] bg-red-500/5 rounded-full blur-3xl"
+        />
+        <motion.div
+          animate={{
+            scale: [1, 1.3, 1],
+            opacity: [0.2, 0.05, 0.2],
+          }}
+          transition={{
+            duration: 10,
+            repeat: Infinity,
+            ease: "easeInOut",
+            delay: 1,
+          }}
+          className="absolute bottom-[-20%] left-[-10%] w-[600px] h-[600px] bg-red-600/5 rounded-full blur-3xl"
+        />
+        <motion.div
+          initial={{ scale: 0.9, opacity: 0 }}
+          animate={{ scale: 1, opacity: 1 }}
+          transition={{ type: "spring", damping: 15 }}
+          className="relative z-10 bg-[#121214]/80 backdrop-blur-sm border border-red-500/30 rounded-2xl p-8 text-center max-w-md"
+        >
+          <motion.div
+            variants={pulseVariants}
+            animate="pulse"
+            className="w-16 h-16 bg-red-500/10 rounded-full flex items-center justify-center mx-auto mb-4"
+          >
+            <span className="text-3xl">❌</span>
+          </motion.div>
+          <h3 className="text-xl font-semibold text-white mb-2">
+            Company Rejected
+          </h3>
+          <p className="text-zinc-400 text-sm mb-3">
+            Your company profile has been rejected by the admin.
+          </p>
+
+          {/* ✅ Rejection Reason from Admin - Check multiple possible field names */}
+          {(company.adminRejectionReason ||
+            company.rejectionReason ||
+            company.reviewMessage) && (
+            <motion.div
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.2 }}
+              className="bg-red-500/10 border border-red-500/20 rounded-xl p-4 mb-4 text-left"
+            >
+              <p className="text-xs text-red-400 font-medium mb-1 flex items-center gap-2">
+                <span>📝</span> Admin Note:
+              </p>
+              <p className="text-sm text-zinc-300 leading-relaxed">
+                {company.adminRejectionReason ||
+                  company.rejectionReason ||
+                  company.reviewMessage}
+              </p>
+            </motion.div>
+          )}
+
+          <p className="text-zinc-500 text-xs mb-4">
+            Please update your company information and request a re-review.
+          </p>
+          <div className="flex flex-col sm:flex-row gap-3 justify-center">
+            <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
+              <Button
+                onClick={() => router.push("/dashboard/recruiter/company")}
+                className="bg-zinc-800 hover:bg-zinc-700 text-white border border-zinc-700 rounded-xl px-6 h-11 inline-flex items-center gap-2"
+              >
+                <Pencil size={16} />
+                Update Company
+              </Button>
+            </motion.div>
+            <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
+              <Button
+                onClick={async () => {
+                  try {
+                    const baseUrl =
+                      process.env.NEXT_PUBLIC_BASE_URL ||
+                      "http://localhost:5000";
+                    const response = await fetch(
+                      `${baseUrl}/api/companies/${company._id}/request-re-review`,
+                      {
+                        method: "POST",
+                        headers: { "Content-Type": "application/json" },
+                        credentials: "include",
+                        body: JSON.stringify({
+                          message:
+                            "I have updated the company information. Please review again.",
+                        }),
+                      },
+                    );
+                    const result = await response.json();
+                    if (result.success) {
+                      toast.success(
+                        "Re-review request sent! Admin will review your company.",
+                      );
+                      setTimeout(() => {
+                        router.push("/dashboard/recruiter/company");
+                      }, 1500);
+                    } else {
+                      toast.error(result.error || "Failed to send request");
+                    }
+                  } catch (error) {
+                    console.error("Error requesting re-review:", error);
+                    toast.error("Something went wrong. Please try again.");
+                  }
+                }}
+                className="bg-gradient-to-r from-purple-600 to-purple-700 text-white font-semibold hover:from-purple-700 hover:to-purple-800 rounded-xl px-6 h-11"
+              >
+                <ArrowRotateLeft size={16}/>
+                Request Re-Review
+              </Button>
+            </motion.div>
+          </div>
+        </motion.div>
+      </motion.div>
+    );
+  }
+  // ✅ Company is approved - show the form
   const handleSubmit = async (e) => {
     e.preventDefault();
 
@@ -195,7 +416,7 @@ export default function PostJobForm({ user, company, initialData = null, isEditi
 
     // Manual validation
     const newErrors = {};
-    
+
     if (!data.jobTitle || data.jobTitle.trim() === "") {
       newErrors.jobTitle = "Job title is required";
     } else if (data.jobTitle.length < 3) {
@@ -210,11 +431,9 @@ export default function PostJobForm({ user, company, initialData = null, isEditi
       newErrors.jobType = "Job type is required";
     }
 
-    // ✅ BULLETPROOF SALARY VALIDATION WITH CORRECT UX
     const rawMin = data.minSalary;
     const rawMax = data.maxSalary;
 
-    // 1. Check if they are empty strings
     if (!rawMin || rawMin.trim() === "") {
       newErrors.minSalary = "Minimum salary is required";
     }
@@ -222,15 +441,13 @@ export default function PostJobForm({ user, company, initialData = null, isEditi
       newErrors.maxSalary = "Maximum salary is required";
     }
 
-    // 2. Convert to numbers for comparison
     const minSal = parseInt(rawMin);
     const maxSal = parseInt(rawMax);
 
-    // 3. Only compare if both are valid numbers
     if (!isNaN(minSal) && !isNaN(maxSal)) {
       if (minSal > maxSal) {
-        // 🟢 BETTER UX: Highlight the Max Salary field because the user is trying to set it lower than Min
-        newErrors.maxSalary = "Maximum salary must be greater than minimum salary";
+        newErrors.maxSalary =
+          "Maximum salary must be greater than minimum salary";
       }
     }
 
@@ -252,13 +469,15 @@ export default function PostJobForm({ user, company, initialData = null, isEditi
     if (!data.responsibilities || data.responsibilities.trim() === "") {
       newErrors.responsibilities = "Key responsibilities are required";
     } else if (data.responsibilities.length < 20) {
-      newErrors.responsibilities = "Please provide at least 20 characters of responsibilities";
+      newErrors.responsibilities =
+        "Please provide at least 20 characters of responsibilities";
     }
 
     if (!data.requirements || data.requirements.trim() === "") {
       newErrors.requirements = "Requirements and qualifications are required";
     } else if (data.requirements.length < 20) {
-      newErrors.requirements = "Please provide at least 20 characters of requirements";
+      newErrors.requirements =
+        "Please provide at least 20 characters of requirements";
     }
 
     if (Object.keys(newErrors).length > 0) {
@@ -286,7 +505,7 @@ export default function PostJobForm({ user, company, initialData = null, isEditi
           max: parseInt(data.maxSalary),
           currency: data.currency || "USD",
         },
-        skills: data.skills ? data.skills.split(",").map(s => s.trim()) : [],
+        skills: data.skills ? data.skills.split(",").map((s) => s.trim()) : [],
       };
 
       let result;
@@ -298,16 +517,23 @@ export default function PostJobForm({ user, company, initialData = null, isEditi
       }
 
       if (result && result.success) {
-        toast.success(isEditing ? "Job updated successfully!" : "Job posted successfully!");
+        toast.success(
+          isEditing ? "Job updated successfully!" : "Job posted successfully!",
+        );
         e.target.reset();
         setIsRemote(false);
         setTimeout(() => {
           router.push("/dashboard/recruiter/jobs");
         }, 500);
       } else if (result && result.error) {
-        toast.error(result.error || `Failed to ${isEditing ? 'update' : 'post'} job. Please try again.`);
+        toast.error(
+          result.error ||
+            `Failed to ${isEditing ? "update" : "post"} job. Please try again.`,
+        );
       } else {
-        toast.error(`Failed to ${isEditing ? 'update' : 'post'} job. Please try again.`);
+        toast.error(
+          `Failed to ${isEditing ? "update" : "post"} job. Please try again.`,
+        );
       }
     } catch (error) {
       console.error("Error posting job:", error);
@@ -355,13 +581,12 @@ export default function PostJobForm({ user, company, initialData = null, isEditi
                     transition={{ delay: 0.3 }}
                     className="text-zinc-400 text-sm mt-2"
                   >
-                    {isEditing 
+                    {isEditing
                       ? "Update the details below to refresh your open position."
-                      : "Fill out the details below to publish your open position and attract top talent."
-                    }
+                      : "Fill out the details below to publish your open position and attract top talent."}
                   </motion.p>
                 </div>
-                
+
                 {/* "Posting as" - Display Logged-in User */}
                 <motion.div
                   initial={{ opacity: 0, scale: 0.9 }}
@@ -382,7 +607,7 @@ export default function PostJobForm({ user, company, initialData = null, isEditi
                       {user.name || user.email}
                     </span>
                   </div>
-                  
+
                   {/* Company Badge (below user) */}
                   <div className="flex items-center gap-2 bg-zinc-900/50 border border-zinc-800/50 rounded-lg px-3 py-1">
                     <Briefcase size={12} className="text-zinc-500" />
@@ -394,7 +619,7 @@ export default function PostJobForm({ user, company, initialData = null, isEditi
                 </motion.div>
               </div>
 
-              {/* Status panel */}
+              {/* ✅ Status panel - Shows actual company status (only for approved) */}
               <motion.div
                 initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
@@ -421,7 +646,9 @@ export default function PostJobForm({ user, company, initialData = null, isEditi
                     className="w-1.5 h-1.5 bg-blue-500 rounded-full"
                   />
                   <span className="text-xs text-zinc-400">
-                    {isEditing ? "Changes will be published immediately" : "Job will be published immediately"}
+                    {isEditing
+                      ? "Changes will be published immediately"
+                      : "Job will be published immediately"}
                   </span>
                 </motion.div>
                 {/* User info badge */}
@@ -438,7 +665,7 @@ export default function PostJobForm({ user, company, initialData = null, isEditi
               </motion.div>
             </motion.div>
 
-            {/* Form */}
+            {/* Form - Only shown when company is approved */}
             <Form onSubmit={handleSubmit} className="space-y-10">
               {/* SECTION 1: Job Information */}
               <motion.div variants={itemVariants}>
@@ -461,13 +688,18 @@ export default function PostJobForm({ user, company, initialData = null, isEditi
                         isInvalid={!!errors.jobTitle}
                         errorMessage={errors.jobTitle}
                         className="flex flex-col gap-1.5 w-full"
-                        onFocus={() => setFocusedField('jobTitle')}
+                        onFocus={() => setFocusedField("jobTitle")}
                         onBlur={() => setFocusedField(null)}
-                        defaultValue={initialData?.jobTitle || ""} 
+                        defaultValue={initialData?.jobTitle || ""}
                       >
-                        <Label className="text-zinc-300 font-medium text-sm flex items-center gap-2" htmlFor="jobTitle">
+                        <Label
+                          className="text-zinc-300 font-medium text-sm flex items-center gap-2"
+                          htmlFor="jobTitle"
+                        >
                           <motion.span
-                            animate={{ rotate: focusedField === 'jobTitle' ? 360 : 0 }}
+                            animate={{
+                              rotate: focusedField === "jobTitle" ? 360 : 0,
+                            }}
                             transition={{ duration: 0.5 }}
                           >
                             <Briefcase size={14} className="text-purple-400" />
@@ -503,7 +735,10 @@ export default function PostJobForm({ user, company, initialData = null, isEditi
                       transition={{ type: "spring", damping: 15 }}
                       className="flex flex-col gap-1.5 w-full"
                     >
-                      <Label className="text-zinc-300 font-medium text-sm flex items-center gap-2" htmlFor="jobCategory">
+                      <Label
+                        className="text-zinc-300 font-medium text-sm flex items-center gap-2"
+                        htmlFor="jobCategory"
+                      >
                         <ListCheck size={14} className="text-purple-400" />
                         Job Category
                       </Label>
@@ -515,13 +750,19 @@ export default function PostJobForm({ user, company, initialData = null, isEditi
                         errorMessage={errors.jobCategory}
                         aria-label="Job Category"
                         placeholder="Select a category"
-                        defaultSelectedKeys={initialData?.jobCategory ? [initialData.jobCategory] : []} 
+                        defaultSelectedKeys={
+                          initialData?.jobCategory
+                            ? [initialData.jobCategory]
+                            : []
+                        }
                       >
-                        <Select.Trigger className={`w-full flex items-center justify-between bg-[#1c1c1e] border rounded-lg h-12 px-3 text-white transition-all duration-200 text-sm outline-none ${
-                          errors.jobCategory
-                            ? "border-red-500 focus:border-red-500"
-                            : "border-zinc-800 hover:bg-[#242426] focus:border-zinc-600"
-                        }`}>
+                        <Select.Trigger
+                          className={`w-full flex items-center justify-between bg-[#1c1c1e] border rounded-lg h-12 px-3 text-white transition-all duration-200 text-sm outline-none ${
+                            errors.jobCategory
+                              ? "border-red-500 focus:border-red-500"
+                              : "border-zinc-800 hover:bg-[#242426] focus:border-zinc-600"
+                          }`}
+                        >
                           <Select.Value placeholder="Select a category" />
                           <Select.Indicator />
                         </Select.Trigger>
@@ -632,7 +873,10 @@ export default function PostJobForm({ user, company, initialData = null, isEditi
                       transition={{ type: "spring", damping: 15 }}
                       className="flex flex-col gap-1.5 w-full"
                     >
-                      <Label className="text-zinc-300 font-medium text-sm flex items-center gap-2" htmlFor="jobType">
+                      <Label
+                        className="text-zinc-300 font-medium text-sm flex items-center gap-2"
+                        htmlFor="jobType"
+                      >
                         <Clock size={14} className="text-purple-400" />
                         Job Type
                       </Label>
@@ -644,13 +888,17 @@ export default function PostJobForm({ user, company, initialData = null, isEditi
                         errorMessage={errors.jobType}
                         aria-label="Job Type"
                         placeholder="Select job type"
-                        defaultSelectedKeys={initialData?.jobType ? [initialData.jobType] : []} 
+                        defaultSelectedKeys={
+                          initialData?.jobType ? [initialData.jobType] : []
+                        }
                       >
-                        <Select.Trigger className={`w-full flex items-center justify-between bg-[#1c1c1e] border rounded-lg h-12 px-3 text-white transition-all duration-200 text-sm outline-none ${
-                          errors.jobType
-                            ? "border-red-500 focus:border-red-500"
-                            : "border-zinc-800 hover:bg-[#242426] focus:border-zinc-600"
-                        }`}>
+                        <Select.Trigger
+                          className={`w-full flex items-center justify-between bg-[#1c1c1e] border rounded-lg h-12 px-3 text-white transition-all duration-200 text-sm outline-none ${
+                            errors.jobType
+                              ? "border-red-500 focus:border-red-500"
+                              : "border-zinc-800 hover:bg-[#242426] focus:border-zinc-600"
+                          }`}
+                        >
                           <Select.Value placeholder="Select job type" />
                           <Select.Indicator />
                         </Select.Trigger>
@@ -731,7 +979,7 @@ export default function PostJobForm({ user, company, initialData = null, isEditi
                             isInvalid={!!errors.minSalary}
                             errorMessage={errors.minSalary}
                             className="w-full"
-                            defaultValue={initialData?.salary?.min || ""} 
+                            defaultValue={initialData?.salary?.min || ""}
                           >
                             <div className="relative">
                               <span className="absolute left-3 top-1/2 -translate-y-1/2 text-zinc-500 z-10 pointer-events-none">
@@ -771,7 +1019,7 @@ export default function PostJobForm({ user, company, initialData = null, isEditi
                             isInvalid={!!errors.maxSalary}
                             errorMessage={errors.maxSalary}
                             className="w-full"
-                            defaultValue={initialData?.salary?.max || ""} 
+                            defaultValue={initialData?.salary?.max || ""}
                           >
                             <div className="relative">
                               <span className="absolute left-3 top-1/2 -translate-y-1/2 text-zinc-500 z-10 pointer-events-none">
@@ -809,7 +1057,9 @@ export default function PostJobForm({ user, company, initialData = null, isEditi
                             id="currency"
                             name="currency"
                             aria-label="Currency"
-                            defaultSelectedKeys={[initialData?.salary?.currency || "USD"]} 
+                            defaultSelectedKeys={[
+                              initialData?.salary?.currency || "USD",
+                            ]}
                           >
                             <Select.Trigger className="w-full flex items-center justify-between bg-[#1c1c1e] border border-zinc-800 hover:bg-[#242426] h-12 rounded-lg px-3 text-white transition-all duration-200 text-sm outline-none data-[focused=true]:border-zinc-600">
                               <Select.Value />
@@ -865,7 +1115,10 @@ export default function PostJobForm({ user, company, initialData = null, isEditi
                       className="space-y-1.5"
                     >
                       <div className="flex items-center justify-between mb-1.5">
-                        <Label className="text-zinc-300 font-medium text-sm flex items-center gap-2" htmlFor="location">
+                        <Label
+                          className="text-zinc-300 font-medium text-sm flex items-center gap-2"
+                          htmlFor="location"
+                        >
                           <MapPin size={14} className="text-purple-400" />
                           Location
                         </Label>
@@ -906,7 +1159,7 @@ export default function PostJobForm({ user, company, initialData = null, isEditi
                           }
                           disabled={isRemote}
                           aria-label="Location"
-                          defaultValue={initialData?.location || ""} 
+                          defaultValue={initialData?.location || ""}
                           className={`w-full text-white bg-[#1c1c1e] border rounded-lg h-12 pl-10 pr-3 text-sm placeholder:text-zinc-600 outline-none transition-all duration-200 ${
                             !isRemote && errors.location
                               ? "border-red-500 focus:border-red-500"
@@ -951,9 +1204,18 @@ export default function PostJobForm({ user, company, initialData = null, isEditi
                         isInvalid={!!errors.deadline}
                         errorMessage={errors.deadline}
                         className="flex flex-col gap-1.5 w-full"
-                        defaultValue={initialData?.deadline ? new Date(initialData.deadline).toISOString().split('T')[0] : ""} 
+                        defaultValue={
+                          initialData?.deadline
+                            ? new Date(initialData.deadline)
+                                .toISOString()
+                                .split("T")[0]
+                            : ""
+                        }
                       >
-                        <Label className="text-zinc-300 font-medium text-sm flex items-center gap-2" htmlFor="deadline">
+                        <Label
+                          className="text-zinc-300 font-medium text-sm flex items-center gap-2"
+                          htmlFor="deadline"
+                        >
                           <Calendar size={14} className="text-purple-400" />
                           Application Deadline
                         </Label>
@@ -1004,9 +1266,12 @@ export default function PostJobForm({ user, company, initialData = null, isEditi
                       isInvalid={!!errors.responsibilities}
                       errorMessage={errors.responsibilities}
                       className="flex flex-col gap-1.5 w-full"
-                      defaultValue={initialData?.responsibilities || ""} 
+                      defaultValue={initialData?.responsibilities || ""}
                     >
-                      <Label className="text-zinc-300 font-medium text-sm flex items-center gap-2" htmlFor="responsibilities">
+                      <Label
+                        className="text-zinc-300 font-medium text-sm flex items-center gap-2"
+                        htmlFor="responsibilities"
+                      >
                         <ListCheck size={14} className="text-purple-400" />
                         Key Responsibilities
                       </Label>
@@ -1047,9 +1312,12 @@ export default function PostJobForm({ user, company, initialData = null, isEditi
                       isInvalid={!!errors.requirements}
                       errorMessage={errors.requirements}
                       className="flex flex-col gap-1.5 w-full"
-                      defaultValue={initialData?.requirements || ""} 
+                      defaultValue={initialData?.requirements || ""}
                     >
-                      <Label className="text-zinc-300 font-medium text-sm flex items-center gap-2" htmlFor="requirements">
+                      <Label
+                        className="text-zinc-300 font-medium text-sm flex items-center gap-2"
+                        htmlFor="requirements"
+                      >
                         <GraduationCap size={14} className="text-purple-400" />
                         Requirements & Qualifications
                       </Label>
@@ -1087,12 +1355,17 @@ export default function PostJobForm({ user, company, initialData = null, isEditi
                       id="benefits"
                       name="benefits"
                       className="flex flex-col gap-1.5 w-full"
-                      defaultValue={initialData?.benefits || ""} 
+                      defaultValue={initialData?.benefits || ""}
                     >
-                      <Label className="text-zinc-300 font-medium text-sm flex items-center gap-2" htmlFor="benefits">
+                      <Label
+                        className="text-zinc-300 font-medium text-sm flex items-center gap-2"
+                        htmlFor="benefits"
+                      >
                         <Gift size={14} className="text-purple-400" />
                         Benefits & Perks{" "}
-                        <span className="text-zinc-500 text-xs">(Optional)</span>
+                        <span className="text-zinc-500 text-xs">
+                          (Optional)
+                        </span>
                       </Label>
                       <TextArea
                         placeholder="• Competitive salary and equity package • Health, dental, and vision insurance • Remote work stipend • Professional development budget • Flexible working hours"
@@ -1117,15 +1390,22 @@ export default function PostJobForm({ user, company, initialData = null, isEditi
                       transition={{ type: "spring", damping: 15 }}
                       className="flex flex-col gap-1.5"
                     >
-                      <Label className="text-zinc-400 text-xs" htmlFor="experienceLevel">
+                      <Label
+                        className="text-zinc-400 text-xs"
+                        htmlFor="experienceLevel"
+                      >
                         Experience Level
                       </Label>
-                      <Select 
+                      <Select
                         id="experienceLevel"
-                        name="experienceLevel" 
+                        name="experienceLevel"
                         aria-label="Experience Level"
                         placeholder="Select level"
-                        defaultSelectedKeys={initialData?.experienceLevel ? [initialData.experienceLevel] : []} 
+                        defaultSelectedKeys={
+                          initialData?.experienceLevel
+                            ? [initialData.experienceLevel]
+                            : []
+                        }
                       >
                         <Select.Trigger className="w-full flex items-center justify-between bg-[#1c1c1e] border border-zinc-800 hover:bg-[#242426] h-12 rounded-lg px-3 text-white transition-all duration-200 text-sm outline-none data-[focused=true]:border-zinc-600">
                           <Select.Value placeholder="Select level" />
@@ -1180,9 +1460,12 @@ export default function PostJobForm({ user, company, initialData = null, isEditi
                         name="vacancies"
                         type="number"
                         className="flex flex-col gap-1.5"
-                        defaultValue={initialData?.vacancies || ""} 
+                        defaultValue={initialData?.vacancies || ""}
                       >
-                        <Label className="text-zinc-400 text-xs" htmlFor="vacancies">
+                        <Label
+                          className="text-zinc-400 text-xs"
+                          htmlFor="vacancies"
+                        >
                           Number of Vacancies
                         </Label>
                         <Input
@@ -1201,7 +1484,12 @@ export default function PostJobForm({ user, company, initialData = null, isEditi
                     transition={{ type: "spring", damping: 15 }}
                     className="grid grid-cols-1 gap-4"
                   >
-                    <TextField id="skills" name="skills" className="flex flex-col gap-1.5" defaultValue={initialData?.skills || ""}> 
+                    <TextField
+                      id="skills"
+                      name="skills"
+                      className="flex flex-col gap-1.5"
+                      defaultValue={initialData?.skills || ""}
+                    >
                       <Label className="text-zinc-400 text-xs" htmlFor="skills">
                         Required Skills (Optional)
                       </Label>
@@ -1219,7 +1507,10 @@ export default function PostJobForm({ user, company, initialData = null, isEditi
                 variants={itemVariants}
                 className="flex justify-end gap-3 pt-6 border-t border-zinc-800 w-full"
               >
-                <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
+                <motion.div
+                  whileHover={{ scale: 1.02 }}
+                  whileTap={{ scale: 0.98 }}
+                >
                   <Button
                     type="button"
                     variant="bordered"
@@ -1250,13 +1541,19 @@ export default function PostJobForm({ user, company, initialData = null, isEditi
                       >
                         <motion.div
                           animate={{ rotate: 360 }}
-                          transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
+                          transition={{
+                            duration: 1,
+                            repeat: Infinity,
+                            ease: "linear",
+                          }}
                           className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full"
                         />
                         {isEditing ? "Updating..." : "Posting..."}
                       </motion.span>
+                    ) : isEditing ? (
+                      "Update Job"
                     ) : (
-                      isEditing ? "Update Job" : "Post Job"
+                      "Post Job"
                     )}
                   </Button>
                 </motion.div>

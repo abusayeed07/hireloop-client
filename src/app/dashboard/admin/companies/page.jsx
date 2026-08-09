@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect, useCallback, useMemo, useRef } from "react";
 import Link from "next/link"; 
-import { useRouter } from "next/navigation"; // ✅ Added for navigation
+import { useRouter } from "next/navigation";
 import {
   Search,
   Filter,
@@ -83,7 +83,7 @@ const backgroundOrbVariants = {
   },
 };
 
-// ✅ Industry mapping - convert codes to full names
+// ✅ Industry mapping
 const industryMap = {
   'Technology': 'Technology',
   'Design': 'Design', 
@@ -106,7 +106,6 @@ const industryMap = {
   'man': 'Manufacturing',
 };
 
-// ✅ Get full industry name from code
 const getFullIndustry = (industry) => {
   if (!industry) return 'Other';
   const trimmed = industry.trim();
@@ -114,10 +113,9 @@ const getFullIndustry = (industry) => {
 };
 
 const CompaniesPage = () => {
-  const router = useRouter(); // ✅ Initialize router
+  const router = useRouter();
 
-  // ✅ Remove `debouncedSearchTerm` and `setIsSearching` entirely to match Users page
-  const [allCompanies, setAllCompanies] = useState([]); // ✅ Stores ALL fetched companies
+  const [allCompanies, setAllCompanies] = useState([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
@@ -134,16 +132,19 @@ const CompaniesPage = () => {
     rejected: 0,
     total: 0,
   });
+  
+  // ✅ Reject modal state
+  const [showRejectModal, setShowRejectModal] = useState(false);
+  const [rejectCompany, setRejectCompany] = useState(null);
+  const [rejectReason, setRejectReason] = useState("");
 
   const itemsPerPage = pageSize;
 
-  // ✅ Get companies from API - Fetch ALL for instant client side filtering
+  // ✅ Get companies from API
   const getCompanies = useCallback(async () => {
     try {
       const params = new URLSearchParams();
-      params.append('limit', '1000'); // Fetch large batch
-
-      console.log(`📡 Fetching: ${API_BASE_URL}/api/companies/admin/companies?${params}`);
+      params.append('limit', '1000');
 
       const response = await fetch(`${API_BASE_URL}/api/companies/admin/companies?${params}`, {
         method: 'GET',
@@ -153,16 +154,12 @@ const CompaniesPage = () => {
         },
       });
 
-      console.log(`📡 Response status: ${response.status}`);
-
       if (!response.ok) {
         const error = await response.json().catch(() => ({ error: 'Unknown error' }));
-        console.error('❌ API Error:', error);
         throw new Error(error.error || `HTTP error! status: ${response.status}`);
       }
 
       const data = await response.json();
-      console.log('📡 Data received:', data);
       return data;
     } catch (error) {
       console.error('❌ Error fetching companies:', error);
@@ -170,11 +167,15 @@ const CompaniesPage = () => {
     }
   }, []);
 
-  // ✅ Update company status
-  const updateCompanyStatus = useCallback(async (companyId, action) => {
+  // ✅ Update company status - FIXED to include reason
+  const updateCompanyStatus = useCallback(async (companyId, action, reason = null) => {
     try {
-      console.log(`📡 Updating company ${companyId} with action: ${action}`);
-      console.log(`📡 URL: ${API_BASE_URL}/api/companies/admin/companies/${companyId}`);
+      const body = { action };
+      if (reason) {
+        body.reason = reason;
+      }
+
+      console.log('📡 Sending request:', { companyId, action, reason });
 
       const response = await fetch(`${API_BASE_URL}/api/companies/admin/companies/${companyId}`, {
         method: 'PATCH',
@@ -182,14 +183,11 @@ const CompaniesPage = () => {
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ action }),
+        body: JSON.stringify(body),
       });
-
-      console.log(`📡 Response status: ${response.status}`);
 
       if (!response.ok) {
         const errorData = await response.json().catch(() => ({}));
-        console.error('❌ Error response:', errorData);
         throw new Error(errorData.message || errorData.error || `HTTP error! status: ${response.status}`);
       }
 
@@ -205,9 +203,6 @@ const CompaniesPage = () => {
   // ✅ Delete company
   const deleteCompany = useCallback(async (companyId) => {
     try {
-      console.log(`📡 Deleting company ${companyId}`);
-      console.log(`📡 URL: ${API_BASE_URL}/api/companies/admin/companies/${companyId}`);
-
       const response = await fetch(`${API_BASE_URL}/api/companies/admin/companies/${companyId}`, {
         method: 'DELETE',
         credentials: 'include',
@@ -216,16 +211,12 @@ const CompaniesPage = () => {
         },
       });
 
-      console.log(`📡 Response status: ${response.status}`);
-
       if (!response.ok) {
         const errorData = await response.json().catch(() => ({}));
-        console.error('❌ Error response:', errorData);
         throw new Error(errorData.message || errorData.error || `HTTP error! status: ${response.status}`);
       }
 
       const data = await response.json();
-      console.log('📡 Delete response:', data);
       return data;
     } catch (error) {
       console.error("❌ Error deleting company:", error);
@@ -233,7 +224,7 @@ const CompaniesPage = () => {
     }
   }, []);
 
-  // ✅ Fetch companies from API - Only on Mount & Refresh
+  // ✅ Fetch companies from API
   const fetchCompanies = async () => {
     setLoading(true);
     try {
@@ -273,6 +264,7 @@ const CompaniesPage = () => {
           dateSubmitted: company.dateSubmitted || company.createdAt || company.created_at || new Date().toISOString(),
           logo: company.logo || null,
           description: company.description || '',
+          adminRejectionReason: company.adminRejectionReason || null,
         };
       });
       
@@ -299,12 +291,11 @@ const CompaniesPage = () => {
     }
   };
 
-  // ✅ Only fetch companies on mount
   useEffect(() => {
     fetchCompanies();
   }, []);
 
-  // ✅ CLIENT-SIDE FILTERING (Instant no-reload)
+  // ✅ CLIENT-SIDE FILTERING
   const filteredCompanies = useMemo(() => {
     let result = [...allCompanies];
 
@@ -329,30 +320,24 @@ const CompaniesPage = () => {
     return result;
   }, [allCompanies, searchTerm, statusFilter, industryFilter]);
 
-  // ✅ Calculate total pages based on filtered companies
   const totalPages = Math.max(1, Math.ceil(filteredCompanies.length / itemsPerPage));
 
-  // ✅ Reset page to 1 on filter change
   useEffect(() => {
     setCurrentPage(1);
   }, [searchTerm, statusFilter, industryFilter]);
 
-  // ✅ Handle page change
   const handlePageChange = (page) => {
     if (page !== currentPage && page >= 1 && page <= totalPages) {
-      console.log(`🔄 Changing to page ${page}`);
       setCurrentPage(page);
     }
   };
 
-  // Handle page size change
   const handlePageSizeChange = (e) => {
     const newSize = Number(e.target.value);
     setPageSize(newSize);
     setCurrentPage(1);
   };
 
-  // ✅ Calculate display range for "Showing X to Y of Z"
   const getDisplayRange = () => {
     if (filteredCompanies.length === 0) {
       return { start: 0, end: 0 };
@@ -364,7 +349,6 @@ const CompaniesPage = () => {
 
   const { start, end } = getDisplayRange();
 
-  // ✅ CURRENT PAGE SLICE (THE FIX!)
   const currentCompanies = useMemo(() => {
     const indexOfLastItem = currentPage * itemsPerPage;
     const indexOfFirstItem = indexOfLastItem - itemsPerPage;
@@ -379,9 +363,47 @@ const CompaniesPage = () => {
       return;
     }
 
+    // ✅ If reject, open reject modal
+    if (action === 'reject') {
+      setRejectCompany(company);
+      setRejectReason("");
+      setShowRejectModal(true);
+      return;
+    }
+
     setSelectedCompany(company);
     setActionType(action);
     setShowConfirmModal(true);
+  };
+
+  // ✅ Handle reject confirm with reason - FIXED to properly send reason
+  const handleRejectConfirm = async () => {
+    if (!rejectCompany || !rejectReason.trim()) {
+      toast.error("Please provide a rejection reason");
+      return;
+    }
+
+    setUpdating(true);
+    try {
+      console.log('📡 Rejecting company with reason:', rejectReason);
+      const result = await updateCompanyStatus(rejectCompany.id, 'reject', rejectReason);
+      console.log('📡 Reject result:', result);
+      
+      if (result && result.success) {
+        toast.success(result.message || "Company rejected successfully");
+        setShowRejectModal(false);
+        setRejectCompany(null);
+        setRejectReason("");
+        await fetchCompanies();
+      } else {
+        toast.error(result?.error || "Failed to reject company");
+      }
+    } catch (error) {
+      console.error("Error rejecting company:", error);
+      toast.error(error.message || "Failed to reject company");
+    } finally {
+      setUpdating(false);
+    }
   };
 
   const handleConfirmAction = async () => {
@@ -400,13 +422,8 @@ const CompaniesPage = () => {
       }
 
       if (result && result.success) {
-        if (actionType === 'delete') {
-          toast.success(result.message || "Company deleted successfully");
-        } else {
-          toast.success(result.message || `Company ${actionType.replace('_', ' ')}d successfully`);
-        }
-
-        await fetchCompanies(); // Re-fetch list to sync changes
+        toast.success(result.message || `Company ${actionType.replace('_', ' ')}d successfully`);
+        await fetchCompanies();
       } else {
         toast.error(result?.error || "Failed to update company");
       }
@@ -446,7 +463,6 @@ const CompaniesPage = () => {
     };
   };
 
-  // Format date
   const formatDate = (dateString) => {
     if (!dateString) return "N/A";
     try {
@@ -460,7 +476,6 @@ const CompaniesPage = () => {
     }
   };
 
-  // Get company initials
   const getCompanyInitials = (name) => {
     if (!name) return "C";
     return name
@@ -470,7 +485,6 @@ const CompaniesPage = () => {
       .join("");
   };
 
-  // ✅ Get unique industries from all companies
   const getUniqueIndustries = useMemo(() => {
     const industries = new Set();
     allCompanies.forEach(company => {
@@ -481,7 +495,6 @@ const CompaniesPage = () => {
     return Array.from(industries).sort();
   }, [allCompanies]);
 
-  // ✅ Use LoadingPage component
   if (loading) {
     return (
       <LoadingPage 
@@ -497,7 +510,6 @@ const CompaniesPage = () => {
     );
   }
 
-  // ✅ CHANGE IN RETURN: Map over currentCompanies instead of companies
   return (
     <div className="relative min-h-screen bg-[#090a0f] overflow-hidden">
       {/* Animated Background */}
@@ -529,28 +541,6 @@ const CompaniesPage = () => {
             backgroundSize: '50px 50px',
           }}
         />
-        {[...Array(15)].map((_, i) => (
-          <motion.div
-            key={i}
-            className="absolute w-1 h-1 bg-blue-400/20 rounded-full"
-            initial={{
-              x: Math.random() * (typeof window !== 'undefined' ? window.innerWidth : 1000),
-              y: Math.random() * (typeof window !== 'undefined' ? window.innerHeight : 800),
-              opacity: 0,
-            }}
-            animate={{
-              y: [null, -100, 100, -50, 50],
-              x: [null, 50, -50, 30, -30],
-              opacity: [0, 0.5, 0.3, 0.6, 0],
-            }}
-            transition={{
-              duration: Math.random() * 10 + 10,
-              repeat: Infinity,
-              ease: "linear",
-              delay: Math.random() * 5,
-            }}
-          />
-        ))}
       </div>
 
       {/* Main Content */}
@@ -562,7 +552,7 @@ const CompaniesPage = () => {
           className="min-h-screen text-white p-3 sm:p-4 md:p-6"
         >
           <div className="max-w-7xl mx-auto">
-            {/* Header */}
+            {/* Header with Refresh Button */}
             <motion.div
               initial={{ opacity: 0, y: -20 }}
               animate={{ opacity: 1, y: 0 }}
@@ -604,20 +594,19 @@ const CompaniesPage = () => {
                     Review and manage corporate entity access requests for the HireLoop ecosystem.
                   </motion.p>
                 </div>
-                <div className="flex items-center gap-2 w-full sm:w-auto">
-                  <motion.button
-                    initial={{ opacity: 0, scale: 0.9 }}
-                    animate={{ opacity: 1, scale: 1 }}
-                    transition={{ delay: 0.3 }}
-                    whileHover={{ scale: 1.05 }}
-                    whileTap={{ scale: 0.95 }}
-                    onClick={() => { fetchCompanies(); }}
-                    className="flex-1 sm:flex-none px-4 py-2 bg-zinc-800/50 hover:bg-zinc-700/50 text-zinc-300 rounded-xl text-sm transition-all duration-300 flex items-center justify-center gap-2 border border-white/5 hover:border-white/10 hover:shadow-lg hover:shadow-cyan-500/10"
-                  >
-                    <RefreshCw className="w-4 h-4" />
-                    <span className="hidden sm:inline">Refresh</span>
-                  </motion.button>
-                </div>
+                
+                {/* ✅ Refresh Button */}
+                <motion.button
+                  initial={{ opacity: 0, scale: 0.8 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                  onClick={() => fetchCompanies()}
+                  className="flex items-center gap-2 px-4 py-2 bg-zinc-800/50 hover:bg-zinc-700/50 rounded-xl border border-white/5 hover:border-white/10 transition-all duration-300"
+                >
+                  <RefreshCw className="w-4 h-4 text-zinc-400" />
+                  <span className="text-sm font-medium text-zinc-300">Refresh</span>
+                </motion.button>
               </div>
             </motion.div>
 
@@ -769,7 +758,7 @@ const CompaniesPage = () => {
               </div>
             </motion.div>
 
-            {/* Companies Table - Mobile Responsive */}
+            {/* Companies Table */}
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
@@ -791,7 +780,7 @@ const CompaniesPage = () => {
                   </thead>
                   <tbody>
                     <AnimatePresence mode="wait">
-                      {currentCompanies.length === 0 ? ( // ✅ Changed to currentCompanies
+                      {currentCompanies.length === 0 ? (
                         <motion.tr
                           initial={{ opacity: 0 }}
                           animate={{ opacity: 1 }}
@@ -813,7 +802,7 @@ const CompaniesPage = () => {
                           </td>
                         </motion.tr>
                       ) : (
-                        currentCompanies.map((company, idx) => { // ✅ Changed to currentCompanies
+                        currentCompanies.map((company, idx) => {
                           const companyId = company._id || company.id;
                           const statusBadge = getStatusBadge(company.status);
                           return (
@@ -882,6 +871,7 @@ const CompaniesPage = () => {
                               </td>
                               <td className="px-4 sm:px-6 py-3 sm:py-4">
                                 <div className="flex items-center justify-end gap-1 sm:gap-2 flex-wrap">
+                                  {/* Approve button */}
                                   {company.status !== 'approved' && (
                                     <motion.button
                                       whileHover={{ scale: 1.05 }}
@@ -893,7 +883,9 @@ const CompaniesPage = () => {
                                       Approve
                                     </motion.button>
                                   )}
-                                  {company.status !== 'rejected' && (
+                                  
+                                  {/* Reject button - opens reject modal */}
+                                  {company.status !== 'rejected' && company.status !== 'approved' && (
                                     <motion.button
                                       whileHover={{ scale: 1.05 }}
                                       whileTap={{ scale: 0.95 }}
@@ -904,8 +896,8 @@ const CompaniesPage = () => {
                                       Reject
                                     </motion.button>
                                   )}
-                                  
-                                  {/* ✅ FIX: Make Eye button navigate to Company Details */}
+
+                                  {/* View Details button */}
                                   <motion.button
                                     whileHover={{ scale: 1.1 }}
                                     whileTap={{ scale: 0.9 }}
@@ -916,17 +908,16 @@ const CompaniesPage = () => {
                                     <Eye className="w-3 h-3 sm:w-4 sm:h-4" />
                                   </motion.button>
 
-                                  {company.status === 'rejected' && (
-                                    <motion.button
-                                      whileHover={{ scale: 1.1 }}
-                                      whileTap={{ scale: 0.9 }}
-                                      onClick={() => handleCompanyAction(companyId, "delete")}
-                                      className="p-1 sm:p-1.5 rounded-lg hover:bg-red-500/10 transition-all duration-300 text-red-400 hover:text-red-300"
-                                      title="Delete Company"
-                                    >
-                                      <Trash2 className="w-3 h-3 sm:w-4 sm:h-4" />
-                                    </motion.button>
-                                  )}
+                                  {/* Delete button */}
+                                  <motion.button
+                                    whileHover={{ scale: 1.1 }}
+                                    whileTap={{ scale: 0.9 }}
+                                    onClick={() => handleCompanyAction(companyId, "delete")}
+                                    className="p-1 sm:p-1.5 rounded-lg hover:bg-red-500/10 transition-all duration-300 text-red-400 hover:text-red-300"
+                                    title="Remove Company"
+                                  >
+                                    <Trash2 className="w-3 h-3 sm:w-4 sm:h-4" />
+                                  </motion.button>
                                 </div>
                               </td>
                             </motion.tr>
@@ -940,14 +931,14 @@ const CompaniesPage = () => {
 
               {/* Mobile Card View */}
               <div className="md:hidden divide-y divide-white/5">
-                {currentCompanies.length === 0 ? ( // ✅ Changed to currentCompanies
+                {currentCompanies.length === 0 ? (
                   <div className="py-12 text-center">
                     <Building2 className="w-12 h-12 text-zinc-600 mx-auto mb-3" />
                     <p className="text-zinc-400">No companies found</p>
                     <p className="text-xs text-zinc-500 mt-1">Try adjusting your filters</p>
                   </div>
                 ) : (
-                  currentCompanies.map((company, idx) => { // ✅ Changed to currentCompanies
+                  currentCompanies.map((company, idx) => {
                     const companyId = company._id || company.id;
                     const statusBadge = getStatusBadge(company.status);
                     return (
@@ -1012,7 +1003,8 @@ const CompaniesPage = () => {
                               Approve
                             </button>
                           )}
-                          {company.status !== 'rejected' && (
+                          
+                          {company.status !== 'rejected' && company.status !== 'approved' && (
                             <button
                               onClick={() => handleCompanyAction(companyId, "reject")}
                               className="flex-1 px-3 py-1.5 text-xs bg-red-500/10 text-red-400 hover:bg-red-500/20 rounded-lg transition-all duration-300 border border-red-500/20 hover:border-red-500/40 flex items-center justify-center gap-1"
@@ -1021,23 +1013,22 @@ const CompaniesPage = () => {
                               Reject
                             </button>
                           )}
-                          {/* ✅ FIX: Make Eye button navigate to Company Details on Mobile */}
+
                           <button
-                            onClick={() => router.push(`/companies/${companyId}`)}
+                            onClick={() => router.push(`/dashboard/admin/companies/${companyId}`)}
                             className="p-1.5 rounded-lg hover:bg-white/5 transition-all duration-300 text-zinc-500 hover:text-white"
                             title="View Details"
                           >
                             <Eye className="w-4 h-4" />
                           </button>
-                          {company.status === 'rejected' && (
-                            <button
-                              onClick={() => handleCompanyAction(companyId, "delete")}
-                              className="p-1.5 rounded-lg hover:bg-red-500/10 transition-all duration-300 text-red-400 hover:text-red-300"
-                              title="Delete Company"
-                            >
-                              <Trash2 className="w-4 h-4" />
-                            </button>
-                          )}
+
+                          <button
+                            onClick={() => handleCompanyAction(companyId, "delete")}
+                            className="p-1.5 rounded-lg hover:bg-red-500/10 transition-all duration-300 text-red-400 hover:text-red-300"
+                            title="Remove Company"
+                          >
+                            <Trash2 className="w-4 h-4" />
+                          </button>
                         </div>
                       </motion.div>
                     );
@@ -1045,7 +1036,7 @@ const CompaniesPage = () => {
                 )}
               </div>
 
-              {/* ✅ Pagination - Mobile Responsive */}
+              {/* Pagination */}
               <motion.div 
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
@@ -1069,7 +1060,7 @@ const CompaniesPage = () => {
         </motion.div>
       </div>
 
-      {/* Confirmation Modal - Mobile Responsive */}
+      {/* Confirmation Modal */}
       <AnimatePresence>
         {showConfirmModal && selectedCompany && (
           <motion.div
@@ -1094,7 +1085,7 @@ const CompaniesPage = () => {
                   <h3 className="text-base sm:text-lg font-semibold text-white">Confirm Action</h3>
                   <p className="text-xs sm:text-sm text-zinc-400">
                     {actionType === 'delete' 
-                      ? `Are you sure you want to permanently delete ${selectedCompany.name}? This action cannot be undone.`
+                      ? `Are you sure you want to permanently remove ${selectedCompany.name}? This action cannot be undone.`
                       : `Are you sure you want to ${actionType} ${selectedCompany.name}?`
                     }
                   </p>
@@ -1139,6 +1130,91 @@ const CompaniesPage = () => {
                     </>
                   ) : (
                     `Yes, ${actionType}`
+                  )}
+                </motion.button>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* ✅ Reject Modal with Reason */}
+      <AnimatePresence>
+        {showRejectModal && rejectCompany && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 bg-black/80 backdrop-blur-md z-50 flex items-center justify-center p-3 sm:p-4"
+            onClick={() => {
+              setShowRejectModal(false);
+              setRejectCompany(null);
+              setRejectReason("");
+            }}
+          >
+            <motion.div
+              initial={{ scale: 0.9, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.9, opacity: 0 }}
+              className="bg-[#111214] border border-red-500/20 rounded-xl sm:rounded-2xl p-4 sm:p-6 max-w-md w-full shadow-2xl shadow-red-500/5 mx-2"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <div className="flex items-center gap-3 mb-4">
+                <div className="p-2 rounded-xl bg-red-500/10 text-red-400 border border-red-500/20 shrink-0">
+                  <XCircle className="w-5 h-5 sm:w-6 sm:h-6" />
+                </div>
+                <div>
+                  <h3 className="text-base sm:text-lg font-semibold text-white">Reject Company</h3>
+                  <p className="text-xs sm:text-sm text-zinc-400">
+                    Provide a reason for rejecting <span className="text-white font-medium">{rejectCompany.name}</span>
+                  </p>
+                </div>
+              </div>
+
+              <div className="bg-zinc-800/30 rounded-xl p-3 sm:p-4 mb-4 border border-red-500/10">
+                <p className="text-xs sm:text-sm text-zinc-400 mb-2">Rejection Reason:</p>
+                <textarea
+                  value={rejectReason}
+                  onChange={(e) => setRejectReason(e.target.value)}
+                  placeholder="Enter the reason for rejection..."
+                  rows={4}
+                  className="w-full bg-zinc-900/50 border border-white/5 rounded-lg p-3 text-sm text-white placeholder-zinc-500 focus:outline-none focus:border-red-500/30 focus:ring-1 focus:ring-red-500/20 transition-all duration-300 resize-none"
+                />
+                <p className="text-[10px] text-zinc-500 mt-1">
+                  This reason will be sent to the recruiter for review.
+                </p>
+              </div>
+
+              <div className="flex flex-col sm:flex-row gap-3">
+                <motion.button
+                  whileHover={{ scale: 1.02 }}
+                  whileTap={{ scale: 0.98 }}
+                  onClick={() => {
+                    setShowRejectModal(false);
+                    setRejectCompany(null);
+                    setRejectReason("");
+                  }}
+                  className="flex-1 px-4 py-2.5 bg-zinc-800/50 hover:bg-zinc-700/50 text-white rounded-xl text-sm font-medium transition-all duration-300 border border-white/5"
+                >
+                  Cancel
+                </motion.button>
+                <motion.button
+                  whileHover={{ scale: 1.02 }}
+                  whileTap={{ scale: 0.98 }}
+                  onClick={handleRejectConfirm}
+                  disabled={updating || !rejectReason.trim()}
+                  className="flex-1 px-4 py-2.5 bg-gradient-to-r from-red-600 to-orange-600 hover:from-red-700 hover:to-orange-700 text-white font-medium rounded-xl text-sm transition-all duration-300 shadow-lg shadow-red-500/20 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                >
+                  {updating ? (
+                    <>
+                      <Loader2 className="w-4 h-4 animate-spin" />
+                      Processing...
+                    </>
+                  ) : (
+                    <>
+                      <X className="w-4 h-4" />
+                      Confirm Rejection
+                    </>
                   )}
                 </motion.button>
               </div>

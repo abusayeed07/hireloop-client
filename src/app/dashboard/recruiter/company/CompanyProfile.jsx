@@ -45,7 +45,7 @@ import {
   FaInstagram,
   FaYoutube,
 } from "react-icons/fa";
-import { createCompany, updateCompany } from "@/lib/api/companies"; // ✅ Import updateCompany
+import { createCompany, updateCompany } from "@/lib/api/companies";
 import toast from "react-hot-toast";
 import Image from "next/image";
 import { motion, AnimatePresence } from "framer-motion";
@@ -215,7 +215,19 @@ export default function CompanyProfile({ recruiter, recruiterCompany }) {
     setFormValues((prev) => ({ ...prev, [field]: value }));
   };
 
-  // Submit handler
+  // ✅ Get status message
+  const getStatusMessage = (status) => {
+    switch (status?.toLowerCase()) {
+      case "approved":
+        return "Your company is approved and visible to job seekers.";
+      case "rejected":
+        return "Your company was rejected. Please update the information and resubmit.";
+      default:
+        return "Your company is pending review by the admin team.";
+    }
+  };
+
+  // Submit handler - ✅ FIXED: Sets status to 'pending' when editing a rejected company
   const handleSubmit = async (e) => {
     e.preventDefault();
 
@@ -259,6 +271,12 @@ export default function CompanyProfile({ recruiter, recruiterCompany }) {
       return;
     }
 
+    // ✅ FIX: If company was rejected and is being edited, set status to 'pending' for re-review
+    let newStatus = company?.status || "pending";
+    if (company?.status === 'rejected') {
+      newStatus = 'pending';
+    }
+
     const newCompanyData = {
       name: companyName,
       websiteUrl,
@@ -267,7 +285,7 @@ export default function CompanyProfile({ recruiter, recruiterCompany }) {
       employeeCount: employeeCount || "1-10 employees",
       description,
       logo: logoUrl || (company ? company.logo : ""),
-      status: company?.status || "Pending",
+      status: newStatus,
       recruiterId: recruiter.id,
       foundedYear,
       companySize,
@@ -288,7 +306,6 @@ export default function CompanyProfile({ recruiter, recruiterCompany }) {
     try {
       let result;
 
-      // ✅ CRITICAL FIX: Differentiate between Create and Update
       if (company && company._id) {
         // 🟢 UPDATE EXISTING COMPANY
         result = await updateCompany(company._id, newCompanyData);
@@ -307,11 +324,15 @@ export default function CompanyProfile({ recruiter, recruiterCompany }) {
         setErrors({});
         setIsEditing(false);
 
-        toast.success(company && company._id ? "Company updated successfully!" : "Company profile saved successfully!");
+        // ✅ Show appropriate success message
+        if (company?.status === 'rejected') {
+          toast.success("Company profile updated! Your changes have been sent for re-review.");
+        } else {
+          toast.success(company && company._id ? "Company updated successfully!" : "Company profile saved successfully!");
+        }
 
         router.refresh();
 
-        // Only redirect to jobs if this was a new company creation
         if (!company || !company._id) {
           setTimeout(() => {
             router.push("/dashboard/recruiter/jobs/new");
@@ -606,6 +627,13 @@ export default function CompanyProfile({ recruiter, recruiterCompany }) {
                     {getStatusIcon(company.status)}
                     {company.status || "Pending"}
                   </span>
+                </div>
+                {/* ✅ Status Message */}
+                <div className="mt-2">
+                  <p className={`text-xs ${getStatusStyles(company.status)} px-3 py-1 rounded-lg inline-flex items-center gap-2`}>
+                    {getStatusIcon(company.status)}
+                    <span>{getStatusMessage(company.status)}</span>
+                  </p>
                 </div>
                 <a
                   href={company.websiteUrl}

@@ -198,6 +198,7 @@ export default function JobsPage() {
       );
     }
 
+    // We handle status filter safely
     if (statusFilter !== "all") {
       result = result.filter((job) => job.status === statusFilter);
     }
@@ -219,26 +220,18 @@ export default function JobsPage() {
   }, [searchTerm, statusFilter, approvalFilter, categoryFilter, pageSize]);
 
   // ==========================================
-  // ✅ FIXED: ACTIONS WITH PREVENTION OF DOUBLE CALLS
+  // ACTIONS
   // ==========================================
   
-  // ✅ Handle approve - FIXED: prevents double calls
   const handleApprove = useCallback(async (jobId) => {
-    if (updating) return; // ✅ Prevent double calls
-    
-    console.log('✅ Approving job:', jobId);
+    if (updating) return; 
     setUpdating(true);
-    
     try {
       const result = await adminApproveJob(jobId);
-      console.log('📥 Approve result:', result);
-      
       if (result.success) {
-        toast.success("Job approved and published!");
-        // ✅ Close modal first
+        toast.success("Job approved and published to Browse Jobs!");
         setShowConfirmModal(false);
         setSelectedJob(null);
-        // ✅ Then refresh data
         await fetchJobs();
       } else {
         toast.error(result.error || "Failed to approve job");
@@ -251,24 +244,17 @@ export default function JobsPage() {
     }
   }, [updating, fetchJobs]);
 
-  // ✅ Handle reject - FIXED: prevents double calls
   const handleReject = useCallback(async (jobId, reason) => {
-    if (updating) return; // ✅ Prevent double calls
-    
+    if (updating) return;
     if (!reason || reason.trim() === "") {
       toast.error("Please provide a reason for rejection");
       return;
     }
-    
-    console.log('❌ Rejecting job:', jobId, 'Reason:', reason);
     setUpdating(true);
-    
     try {
       const result = await adminRejectJob(jobId, reason);
-      console.log('📥 Reject result:', result);
-      
       if (result.success) {
-        toast.success("Job rejected");
+        toast.success("Job rejected. Reason sent to recruiter.");
         setShowConfirmModal(false);
         setSelectedJob(null);
         setRejectReason("");
@@ -284,13 +270,9 @@ export default function JobsPage() {
     }
   }, [updating, fetchJobs]);
 
-  // ✅ Handle delete
   const handleDelete = useCallback(async (jobId) => {
     if (updating) return;
-    
-    console.log('🗑️ Deleting job:', jobId);
     setUpdating(true);
-    
     try {
       const result = await deleteAdminJob(jobId);
       if (result.success) {
@@ -309,30 +291,21 @@ export default function JobsPage() {
     }
   }, [updating, fetchJobs]);
 
-  // ✅ Open modal for action - FIXED: prevents double modal
   const handleJobAction = useCallback((jobId, action) => {
-    // ✅ Prevent opening modal if already open or updating
     if (showConfirmModal || updating) return;
-    
     const job = jobs.find((j) => j.id === jobId);
     if (!job) {
       toast.error("Job not found");
       return;
     }
-    console.log('📝 Opening modal for action:', action, 'Job:', job.jobTitle);
-    
     setSelectedJob(job);
     setActionType(action);
-    setRejectReason("");
+    setRejectReason(""); // Reset reason when opening modal
     setShowConfirmModal(true);
   }, [jobs, showConfirmModal, updating]);
 
-  // ✅ Confirm action - FIXED: prevents double calls
   const handleConfirmAction = useCallback(() => {
     if (!selectedJob || updating) return;
-    
-    console.log('✅ Confirming action:', actionType, 'for job:', selectedJob.jobTitle);
-    
     if (actionType === 'approve') {
       handleApprove(selectedJob.id);
     } else if (actionType === 'reject') {
@@ -342,7 +315,6 @@ export default function JobsPage() {
     }
   }, [selectedJob, actionType, rejectReason, updating, handleApprove, handleReject, handleDelete]);
 
-  // Close modal
   const closeModal = useCallback(() => {
     if (!updating) {
       setShowConfirmModal(false);
@@ -355,24 +327,41 @@ export default function JobsPage() {
   // ==========================================
   // HELPERS
   // ==========================================
-  const getStatusConfig = (status) => {
-    if (status === "active") {
+  const getStatusConfig = (job) => {
+    // ✅ OVERRIDE: If Admin Approval is rejected, we MUST show Rejected, regardless of what "status" says
+    if (job.adminApproval === 'rejected') {
+      return { 
+        label: "Rejected", 
+        className: "bg-red-500/10 text-red-400 border border-red-500/20",
+        icon: <XCircle className="w-3 h-3" />
+      };
+    }
+
+    // Otherwise, check the regular status
+    if (job.status === "active") {
       return { 
         label: "Active", 
         className: "bg-emerald-500/10 text-emerald-400 border border-emerald-500/20",
         icon: <CheckCircle className="w-3 h-3" />
       };
     }
-    if (status === "pending") {
+    if (job.status === "pending") {
       return { 
         label: "Pending", 
         className: "bg-yellow-500/10 text-yellow-400 border border-yellow-500/20",
         icon: <Clock className="w-3 h-3" />
       };
     }
+    if (job.status === "rejected") {
+      return { 
+        label: "Rejected", 
+        className: "bg-red-500/10 text-red-400 border border-red-500/20",
+        icon: <XCircle className="w-3 h-3" />
+      };
+    }
     return { 
-      label: "Closed", 
-      className: "bg-zinc-800/50 text-zinc-400 border border-zinc-700/60",
+      label: "Pending", 
+      className: "bg-zinc-800/50 text-yellow-400 border border-zinc-700/60",
       icon: <XCircle className="w-3 h-3" />
     };
   };
@@ -392,9 +381,8 @@ export default function JobsPage() {
   };
 
   // ==========================================
-  // ✅ FIXED DROPDOWNS
+  // CATEGORY DROPDOWN
   // ==========================================
-  
   const CategoryDropdown = ({ value, onChange }) => {
     const [isOpen, setIsOpen] = useState(false);
     const dropdownRef = useRef(null);
@@ -511,7 +499,6 @@ export default function JobsPage() {
 
         {/* Top Stat Cards */}
         <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-5 gap-4 mb-6">
-          {/* ... stats cards (same as before) ... */}
           <div className="bg-[#111214] border border-white/5 rounded-xl p-5">
             <div className="flex items-center justify-between mb-1">
               <h3 className="text-zinc-400 text-xs font-medium">Total Jobs</h3>
@@ -583,8 +570,8 @@ export default function JobsPage() {
                 onChange={(e) => setApprovalFilter(e.target.value)}
                 className="px-3 py-2 lg:px-3 lg:py-2.5 bg-zinc-800 border border-white/10 rounded-lg lg:rounded-xl text-xs lg:text-sm text-white focus:outline-none focus:border-cyan-500/50 cursor-pointer transition-all duration-300 hover:bg-zinc-700"
               >
-                <option value="all">All Approval</option>
-                <option value="pending">Pending</option>
+                <option value="all">All Jobs</option>
+                <option value="pending">Pending Approval</option>
                 <option value="approved">Approved</option>
                 <option value="rejected">Rejected</option>
               </select>
@@ -597,6 +584,7 @@ export default function JobsPage() {
                 <option value="all">All Status</option>
                 <option value="active">Active</option>
                 <option value="pending">Pending</option>
+                <option value="rejected">Rejected</option>
                 <option value="closed">Closed</option>
               </select>
 
@@ -657,7 +645,8 @@ export default function JobsPage() {
                     </tr>
                   ) : (
                     currentJobs.map((job) => {
-                      const status = getStatusConfig(job.status);
+                      // ✅ Pass the entire job object to getStatusConfig
+                      const status = getStatusConfig(job);
                       const approval = getApprovalStatus(job.adminApproval);
                       return (
                         <motion.tr
@@ -705,8 +694,9 @@ export default function JobsPage() {
                               {approval.label}
                             </span>
                             {job.adminRejectionReason && (
-                              <p className="text-[10px] text-red-400 mt-1 truncate max-w-[120px]">
-                                Reason: {job.adminRejectionReason}
+                              <p className="text-[10px] text-red-400 mt-1 truncate max-w-[120px] flex items-center gap-1">
+                                <AlertCircle className="w-3 h-3 shrink-0" />
+                                {job.adminRejectionReason}
                               </p>
                             )}
                           </td>
@@ -720,7 +710,10 @@ export default function JobsPage() {
 
                           <td className="px-6 py-4 text-right">
                             <div className="flex items-center justify-end gap-2 flex-wrap">
+                              
+                              {/* ✅ RULES FOR ACTION BUTTONS */}
                               {job.adminApproval === 'pending' && (
+                                // 1. If PENDING: Show both Approve and Reject
                                 <>
                                   <motion.button
                                     whileHover={{ scale: 1.05 }}
@@ -742,6 +735,27 @@ export default function JobsPage() {
                                     Reject
                                   </motion.button>
                                 </>
+                              )}
+
+                              {job.adminApproval === 'rejected' && (
+                                // 2. If REJECTED: Show ONLY Approve (for re-review)
+                                <motion.button
+                                  whileHover={{ scale: 1.05 }}
+                                  whileTap={{ scale: 0.95 }}
+                                  onClick={() => handleJobAction(job.id, 'approve')}
+                                  className="px-2.5 py-1 bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-400 rounded-lg text-xs transition-all border border-emerald-500/20 flex items-center gap-1"
+                                >
+                                  <CheckCircle className="w-3 h-3" />
+                                  Approve
+                                </motion.button>
+                              )}
+
+                              {/* 3. If APPROVED: Show only Published badge */}
+                              {job.adminApproval === 'approved' && (
+                                <span className="px-2.5 py-1 bg-zinc-800/40 text-zinc-500 rounded-lg text-xs border border-white/5 flex items-center gap-1">
+                                  <CheckCircle className="w-3 h-3" />
+                                  Published
+                                </span>
                               )}
                               
                               <motion.button 
@@ -788,7 +802,7 @@ export default function JobsPage() {
         </motion.div>
       </div>
 
-      {/* Confirmation Modal */}
+      {/* ✅ Confirmation Modal - Adapted for Approve/Reject with Reason */}
       <AnimatePresence>
         {showConfirmModal && selectedJob && (
           <motion.div
@@ -806,16 +820,16 @@ export default function JobsPage() {
               onClick={(e) => e.stopPropagation()}
             >
               {actionType === 'reject' ? (
-                // Reject Modal
+                // ✅ REJECT MODAL WITH REASON INPUT
                 <>
                   <div className="flex items-center gap-3 mb-4">
                     <div className="p-2 rounded-xl bg-red-500/10 text-red-400 border border-red-500/20 shrink-0">
                       <AlertCircle className="w-5 h-5 sm:w-6 sm:h-6" />
                     </div>
                     <div>
-                      <h3 className="text-base sm:text-lg font-semibold text-white">Reject Job</h3>
+                      <h3 className="text-base sm:text-lg font-semibold text-white">Reject Job Post</h3>
                       <p className="text-xs sm:text-sm text-zinc-400">
-                        Provide a reason why this job is being rejected.
+                        Provide a reason why this job is being rejected. This will be sent to the recruiter.
                       </p>
                     </div>
                   </div>
@@ -831,9 +845,12 @@ export default function JobsPage() {
                     <textarea
                       value={rejectReason}
                       onChange={(e) => setRejectReason(e.target.value)}
-                      placeholder="Please explain why this job is being rejected..."
+                      placeholder="Example: Missing specific job requirements, incomplete company details..."
                       className="w-full px-3 py-2 bg-zinc-900/50 border border-zinc-800 rounded-lg text-white text-sm placeholder:text-zinc-500 focus:outline-none focus:border-red-500/50 transition-all resize-none min-h-[80px]"
                     />
+                    <p className="text-[10px] text-zinc-500 mt-1.5">
+                      The recruiter will see this message on their dashboard.
+                    </p>
                   </div>
 
                   <div className="flex flex-col sm:flex-row gap-3">
@@ -859,22 +876,22 @@ export default function JobsPage() {
                           Processing...
                         </>
                       ) : (
-                        "Yes, reject"
+                        "Confirm Rejection"
                       )}
                     </motion.button>
                   </div>
                 </>
               ) : actionType === 'approve' ? (
-                // Approve Modal
+                // ✅ APPROVE MODAL
                 <>
                   <div className="flex items-center gap-3 mb-4">
                     <div className="p-2 rounded-xl bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 shrink-0">
                       <CheckCircle className="w-5 h-5 sm:w-6 sm:h-6" />
                     </div>
                     <div>
-                      <h3 className="text-base sm:text-lg font-semibold text-white">Approve Job</h3>
+                      <h3 className="text-base sm:text-lg font-semibold text-white">Approve & Publish</h3>
                       <p className="text-xs sm:text-sm text-zinc-400">
-                        This job will be published and visible to all users.
+                        This job will be published immediately and visible to all job seekers on the Browse Jobs page.
                       </p>
                     </div>
                   </div>
@@ -908,20 +925,20 @@ export default function JobsPage() {
                           Processing...
                         </>
                       ) : (
-                        "Yes, approve"
+                        "Yes, Approve"
                       )}
                     </motion.button>
                   </div>
                 </>
               ) : (
-                // Delete Modal
+                // ✅ DELETE MODAL
                 <>
                   <div className="flex items-center gap-3 mb-4">
                     <div className="p-2 rounded-xl bg-red-500/10 text-red-400 border border-red-500/20 shrink-0">
                       <AlertCircle className="w-5 h-5 sm:w-6 sm:h-6" />
                     </div>
                     <div>
-                      <h3 className="text-base sm:text-lg font-semibold text-white">Confirm Action</h3>
+                      <h3 className="text-base sm:text-lg font-semibold text-white">Delete Job</h3>
                       <p className="text-xs sm:text-sm text-zinc-400">
                         Are you sure you want to permanently delete this job? This action cannot be undone.
                       </p>
@@ -957,7 +974,7 @@ export default function JobsPage() {
                           Processing...
                         </>
                       ) : (
-                        "Yes, delete"
+                        "Yes, Delete"
                       )}
                     </motion.button>
                   </div>
