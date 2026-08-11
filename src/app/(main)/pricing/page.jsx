@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
 import { useSession } from "@/lib/auth-client";
 import { Button, Modal } from "@heroui/react";
@@ -22,6 +22,7 @@ import {
   CreditCard,
   DollarSign,
   Shield,
+  ArrowRight,
 } from "lucide-react";
 import { toast } from "react-hot-toast";
 import LoadingPage from "@/app/loading";
@@ -39,6 +40,7 @@ const PricingPage = () => {
   const [selectedPlan, setSelectedPlan] = useState(null);
   const [isAdminModalOpen, setIsAdminModalOpen] = useState(false);
   const router = useRouter();
+  const searchParams = useSearchParams();
   
   const { data: session, status, update } = useSession();
 
@@ -48,6 +50,21 @@ const PricingPage = () => {
       update();
     }
   }, [status, update]);
+
+  // ✅ Read the `tab` query param and switch tabs on load
+  useEffect(() => {
+    const tab = searchParams.get('tab');
+    if (tab === 'recruiter') {
+      setActiveTab('recruiter');
+      
+      setTimeout(() => {
+        const toggleSection = document.getElementById('pricing-toggle');
+        if (toggleSection) {
+          toggleSection.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+      }, 300);
+    }
+  }, [searchParams]);
 
   // Get plan tier order for comparison
   const getPlanTierOrder = (tier) => {
@@ -435,6 +452,7 @@ const PricingPage = () => {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.4, delay: 0.1 }}
             className="flex justify-center mb-8 sm:mb-12 px-2"
+            id="pricing-toggle"
           >
             <div className="relative bg-zinc-900/50 border border-zinc-800 rounded-xl sm:rounded-2xl p-1 flex gap-0.5 sm:gap-1 w-full max-w-md">
               <button
@@ -845,9 +863,9 @@ const PricingPage = () => {
         )}
       </AnimatePresence>
 
-      {/* Downgrade Warning Modal - Mobile Optimized */}
+      {/* ✅ FULLY FIXED: Downgrade Warning Modal */}
       <AnimatePresence mode="wait">
-        {isDowngradeModalOpen && (
+        {isDowngradeModalOpen && selectedPlan && (
           <Modal isOpen={isDowngradeModalOpen} onOpenChange={setIsDowngradeModalOpen}>
             <Modal.Backdrop className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4">
               <motion.div
@@ -869,7 +887,114 @@ const PricingPage = () => {
                 <div className="absolute inset-0 bg-gradient-to-br from-yellow-600/10 via-transparent to-amber-900/20 blur-3xl pointer-events-none" />
 
                 <Modal.Dialog className="relative z-10 bg-transparent">
-                  {/* ... (same downgrade modal content) ... */}
+                  <motion.button
+                    whileHover={{ rotate: 90, scale: 1.1 }}
+                    whileTap={{ scale: 0.9 }}
+                    className="hover:bg-yellow-950/30 text-zinc-500 hover:text-yellow-500 transition-colors rounded-lg top-2 sm:top-3 md:top-4 right-2 sm:right-3 md:right-4 absolute p-1.5 z-20"
+                    onClick={closeModal}
+                  >
+                    <X className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
+                  </motion.button>
+
+                  <div className="pt-6 sm:pt-8 px-4 sm:px-6 flex justify-center">
+                    <motion.div
+                      className="mx-auto flex h-16 w-16 sm:h-20 sm:w-20 md:h-24 md:w-24 items-center justify-center rounded-full bg-yellow-500/10 border border-yellow-500/30 shadow-[0_0_30px_rgba(234,179,8,0.15)]"
+                      initial={{ scale: 0, rotate: -180 }}
+                      animate={{ scale: 1, rotate: 0 }}
+                      transition={{
+                        duration: 0.5,
+                        type: "spring",
+                        bounce: 0.4,
+                      }}
+                    >
+                      <AlertTriangle className="h-8 w-8 sm:h-10 sm:w-10 md:h-12 md:w-12 text-yellow-500" />
+                    </motion.div>
+                  </div>
+
+                  <Modal.Header className="pt-3 sm:pt-4 px-4 sm:px-6 pb-1 sm:pb-2 text-center">
+                    <Modal.Heading className="text-base sm:text-lg font-bold text-zinc-200 tracking-tight">
+                      Downgrade Warning
+                    </Modal.Heading>
+                  </Modal.Header>
+
+                  <Modal.Body className="py-3 sm:py-4 px-4 sm:px-6 text-zinc-400">
+                    <motion.div
+                      className="space-y-3 sm:space-y-4"
+                      initial={{ opacity: 0 }}
+                      animate={{ opacity: 1 }}
+                      transition={{ delay: 0.15 }}
+                    >
+                      <div className="text-zinc-300 text-xs sm:text-sm leading-relaxed text-center">
+                        You are about to downgrade to the <strong className="text-yellow-400">{selectedPlan.name}</strong> plan.
+                      </div>
+
+                      <motion.div
+                        className="bg-yellow-950/20 border border-yellow-500/30 rounded-lg sm:rounded-xl p-4"
+                        initial={{ x: -10, opacity: 0 }}
+                        animate={{ x: 0, opacity: 1 }}
+                        transition={{ delay: 0.2 }}
+                      >
+                        <div className="flex items-start gap-3">
+                          <AlertCircle className="w-5 h-5 text-yellow-400 mt-0.5 shrink-0" />
+                          <div className="text-yellow-300 text-[10px] sm:text-xs leading-relaxed">
+                            <p className="font-semibold text-yellow-400 mb-1">
+                              ⚠️ You will lose access to the following features:
+                            </p>
+                            <ul className="space-y-1">
+                              {getLostFeatures().map((feature, idx) => (
+                                <li key={idx} className="flex items-center gap-2">
+                                  <X className="w-3 h-3 text-red-400" />
+                                  <span>{feature.text}</span>
+                                </li>
+                              ))}
+                              {getLostFeatures().length === 0 && (
+                                <li className="text-zinc-500 text-xs">No features will be lost.</li>
+                              )}
+                            </ul>
+                          </div>
+                        </div>
+                      </motion.div>
+
+                      <motion.div
+                        className="bg-blue-950/20 border border-blue-900/30 rounded-lg sm:rounded-xl p-3"
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        transition={{ delay: 0.3 }}
+                      >
+                        <p className="text-blue-400/80 text-[9px] sm:text-xs flex items-center gap-2">
+                          <ShieldCheck className="w-3 h-3 sm:w-4 sm:h-4 shrink-0" />
+                          You will still keep access to all your current data and settings.
+                        </p>
+                      </motion.div>
+                    </motion.div>
+                  </Modal.Body>
+
+                  <Modal.Footer className="border-t border-yellow-500/30 py-3 sm:py-4 px-4 sm:px-6 flex justify-center gap-3 bg-zinc-950/30">
+                    <motion.div
+                      className="w-full sm:w-auto"
+                      whileHover={{ scale: 1.02 }}
+                      whileTap={{ scale: 0.98 }}
+                    >
+                      <Button
+                        className="w-full sm:w-auto px-6 py-2.5 bg-zinc-800 hover:bg-zinc-700 text-white font-medium text-xs rounded-lg sm:rounded-xl transition-all duration-300 border border-zinc-700"
+                        onClick={closeModal}
+                      >
+                        Cancel
+                      </Button>
+                    </motion.div>
+                    <motion.div
+                      className="w-full sm:w-auto"
+                      whileHover={{ scale: 1.02 }}
+                      whileTap={{ scale: 0.98 }}
+                    >
+                      <Button
+                        className="w-full sm:w-auto px-6 py-2.5 bg-gradient-to-r from-yellow-600 to-amber-600 hover:from-yellow-700 hover:to-amber-700 text-white font-medium text-xs rounded-lg sm:rounded-xl transition-all duration-300 shadow-lg shadow-yellow-500/20"
+                        onClick={() => handlePurchase(selectedPlan)}
+                      >
+                        Confirm Downgrade
+                      </Button>
+                    </motion.div>
+                  </Modal.Footer>
                 </Modal.Dialog>
               </motion.div>
             </Modal.Backdrop>

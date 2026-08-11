@@ -1,4 +1,3 @@
-// frontend/src/middleware.js
 import { NextResponse } from 'next/server';
 import { authClient } from '@/lib/auth-client';
 
@@ -15,6 +14,7 @@ const ROUTES = {
     '/blog',
     '/privacy',
     '/terms',
+    '/unauthorized', // ✅ Allow direct access to the unauthorized page just in case
   ],
   
   // Protected routes - require authentication
@@ -105,20 +105,26 @@ export async function middleware(request) {
     const isAdminRoute = matchesRoute(path, ROUTES.adminOnly);
     const isSeekerRoute = matchesRoute(path, ROUTES.seekerOnly);
 
-    // Handle role-based access
+    // ✅ Handle role-based access by redirecting to UNAUTHORIZED page with custom message
     if (isRecruiterRoute && userRole !== 'recruiter') {
-      const redirectPath = userRole === 'admin' ? '/dashboard/admin' : '/dashboard/seeker';
-      return NextResponse.redirect(new URL(redirectPath, request.url));
+      const url = new URL('/unauthorized', request.url);
+      url.searchParams.set('message', 'This page is exclusively for Recruiters.');
+      url.searchParams.set('redirect', '/dashboard');
+      return NextResponse.redirect(url);
     }
 
     if (isAdminRoute && userRole !== 'admin') {
-      const redirectPath = userRole === 'recruiter' ? '/dashboard/recruiter' : '/dashboard/seeker';
-      return NextResponse.redirect(new URL(redirectPath, request.url));
+      const url = new URL('/unauthorized', request.url);
+      url.searchParams.set('message', 'You must be an Admin to access this page.');
+      url.searchParams.set('redirect', '/dashboard');
+      return NextResponse.redirect(url);
     }
 
     if (isSeekerRoute && userRole !== 'seeker') {
-      const redirectPath = userRole === 'admin' ? '/dashboard/admin' : '/dashboard/recruiter';
-      return NextResponse.redirect(new URL(redirectPath, request.url));
+      const url = new URL('/unauthorized', request.url);
+      url.searchParams.set('message', 'This page is exclusively for Job Seekers.');
+      url.searchParams.set('redirect', '/dashboard');
+      return NextResponse.redirect(url);
     }
 
     // Redirect /dashboard to role-specific dashboard
@@ -131,9 +137,12 @@ export async function middleware(request) {
       return NextResponse.redirect(new URL(dashboardPath, request.url));
     }
 
-    // If authenticated user tries to access signin/signup, redirect to dashboard
+    // ✅ If authenticated user tries to access signin/signup, send to Unauthorized page
     if (path === '/signin' || path === '/signup') {
-      return NextResponse.redirect(new URL('/dashboard', request.url));
+      const url = new URL('/unauthorized', request.url);
+      url.searchParams.set('message', 'You are already logged in. Please log out first.');
+      url.searchParams.set('redirect', '/dashboard');
+      return NextResponse.redirect(url);
     }
 
     // Allow all other requests

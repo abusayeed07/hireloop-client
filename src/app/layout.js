@@ -1,4 +1,3 @@
-// src/app/layout.jsx
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { Toaster } from "react-hot-toast";
@@ -13,6 +12,15 @@ const geistMono = Geist_Mono({
   variable: "--font-geist-mono",
   subsets: ["latin"],
 });
+
+// ✅ ADDED THIS METADATA BLOCK
+export const metadata = {
+  title: "HireLoop",
+  description: "Find your dream job or top talent.",
+  icons: {
+    icon: "/icon.svg", // Tells Next.js to use the icon.svg file you create in src/app
+  },
+};
 
 export default function RootLayout({
   children,

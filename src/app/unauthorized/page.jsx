@@ -2,7 +2,7 @@
 
 import React, { useEffect, useState } from "react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { motion } from "framer-motion";
 import {
   Shield,
@@ -15,6 +15,18 @@ import {
 
 const UnauthorizedPage = () => {
   const router = useRouter();
+  const searchParams = useSearchParams();
+
+  // Read dynamic params from URL
+  const customMessage = searchParams.get('message');
+  const redirectUrl = searchParams.get('redirect');
+  
+  // Dynamic UI States
+  const title = customMessage ? "Access Restricted" : "Access Denied";
+  const subtitle = customMessage ? "Unauthorized" : "Unauthorized";
+  const description = customMessage || 
+    "You don't have permission to access this page. Please contact your administrator if you believe this is a mistake.";
+
   const [countdown, setCountdown] = useState(5);
 
   useEffect(() => {
@@ -30,6 +42,17 @@ const UnauthorizedPage = () => {
 
     return () => clearInterval(timer);
   }, []);
+
+  // Handle automatic redirect after countdown hits 0
+  useEffect(() => {
+    if (countdown === 0) {
+      if (redirectUrl) {
+        router.push(redirectUrl);
+      } else {
+        router.push('/');
+      }
+    }
+  }, [countdown, redirectUrl, router]);
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-zinc-950 via-zinc-900 to-zinc-950 flex items-center justify-center px-4 relative overflow-hidden">
@@ -94,7 +117,7 @@ const UnauthorizedPage = () => {
               transition={{ delay: 0.3 }}
               className="text-3xl md:text-4xl font-bold text-white text-center mb-2"
             >
-              Access Denied
+              {title}
             </motion.h1>
 
             {/* Subtitle */}
@@ -106,21 +129,19 @@ const UnauthorizedPage = () => {
             >
               <div className="h-px w-12 bg-gradient-to-r from-transparent to-red-500" />
               <span className="text-sm text-red-400 font-medium uppercase tracking-wider">
-                Unauthorized
+                {subtitle}
               </span>
               <div className="h-px w-12 bg-gradient-to-l from-transparent to-red-500" />
             </motion.div>
 
-            {/* Message */}
+            {/* Dynamic Message */}
             <motion.p
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ delay: 0.5 }}
               className="text-zinc-400 text-center leading-relaxed mb-8"
             >
-              You don't have permission to access this page.
-              <br />
-              Please contact your administrator if you believe this is a mistake.
+              {description}
             </motion.p>
 
             {/* Auto Redirect Info */}
@@ -145,7 +166,13 @@ const UnauthorizedPage = () => {
               className="flex flex-col sm:flex-row gap-3"
             >
               <button
-                onClick={() => router.back()}
+                onClick={() => {
+                  if (redirectUrl) {
+                    router.push(redirectUrl);
+                  } else {
+                    router.back();
+                  }
+                }}
                 className="cursor-pointer flex-1 flex items-center justify-center gap-2 px-4 py-3 bg-zinc-800 hover:bg-zinc-700 text-white rounded-xl transition-all duration-200 hover:scale-105 text-sm font-medium"
               >
                 <ArrowLeft className="w-4 h-4" />
@@ -169,7 +196,7 @@ const UnauthorizedPage = () => {
               className="mt-6 text-center"
             >
               <Link
-                href="mailto:support@hireloop.com"
+                href={`mailto:${process.env.NEXT_PUBLIC_SUPPORT_EMAIL || 'support@hireloop.com'}`}
                 className="inline-flex items-center gap-2 text-xs text-zinc-500 hover:text-zinc-300 transition-colors"
               >
                 <Mail className="w-3.5 h-3.5" />

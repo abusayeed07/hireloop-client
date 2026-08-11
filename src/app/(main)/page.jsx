@@ -6,6 +6,7 @@ import { useRouter } from "next/navigation";
 import { authClient } from "@/lib/auth-client";
 import { getJobs } from "@/lib/api/jobs";
 import Marquee from "react-fast-marquee";
+import SplitText from "@/components/ui/SplitText";
 
 import {
   Magnifier,
@@ -350,9 +351,18 @@ export default function HomePage() {
           </motion.div>
 
           <div className="mt-3 md:mt-6 lg:mt-8 px-1 sm:px-2">
-            <h1 className="text-2xl sm:text-4xl md:text-6xl lg:text-7xl xl:text-8xl font-bold leading-tight tracking-tight">
-              Find Your Dream{" "}
-              <span className="relative inline-block min-w-[140px] sm:min-w-[180px] md:min-w-[250px] lg:min-w-[280px]">
+            {/* ✅ Replaced static H1 with SplitText */}
+            <SplitText
+              text="Find Your Dream Job Today"
+              className="text-2xl sm:text-4xl md:text-6xl lg:text-7xl xl:text-8xl font-bold leading-tight tracking-tight"
+              delay={50}
+              animationFrom={{ opacity: 0, transform: 'translate3d(0,50px,0)' }}
+              animationTo={{ opacity: 1, transform: 'translate3d(0,0,0)' }}
+            />
+
+            {/* Animated Rotating Job Title */}
+            <div className="mt-4 md:mt-6 lg:mt-8">
+              <h2 className="relative inline-block min-w-[140px] sm:min-w-[180px] md:min-w-[250px] lg:min-w-[280px]">
                 <AnimatePresence mode="wait">
                   <motion.span
                     key={currentTextIndex}
@@ -368,12 +378,8 @@ export default function HomePage() {
                 <span className="opacity-0 text-2xl sm:text-4xl md:text-6xl lg:text-7xl xl:text-8xl">
                   {rotatingTexts[0]}
                 </span>
-              </span>
-              <br />
-              <span className="text-white/80 text-2xl sm:text-4xl md:text-6xl lg:text-7xl xl:text-8xl">
-                Job Today
-              </span>
-            </h1>
+              </h2>
+            </div>
           </div>
 
           <motion.p

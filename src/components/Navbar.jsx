@@ -1,4 +1,3 @@
-// components/Navbar.jsx
 "use client";
 
 import React, { useState, useEffect } from "react";
@@ -11,6 +10,66 @@ import logoImg from "../../public/logo.png";
 import toast from "react-hot-toast";
 import { authClient } from "@/lib/auth-client";
 import { useSessionWithSuspension } from "@/hooks/useSessionWithSuspension";
+
+// 1️⃣ ADDED CSS BUBBLE ANIMATION
+const bubbleStyles = `
+  @keyframes floatBubbleNav {
+    0% { transform: translate(0, 0) scale(1) rotate(0deg); }
+    25% { transform: translate(15px, -20px) scale(1.05) rotate(2deg); }
+    50% { transform: translate(-10px, 15px) scale(0.95) rotate(-2deg); }
+    75% { transform: translate(20px, 10px) scale(1.02) rotate(1deg); }
+    100% { transform: translate(-15px, -10px) scale(0.98) rotate(-1deg); }
+  }
+
+  .nav-bubble {
+    position: absolute;
+    border-radius: 50%;
+    filter: blur(30px);
+    opacity: 0.15;
+    animation: floatBubbleNav 20s infinite ease-in-out alternate;
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  .nav-bubble-1 {
+    width: 200px;
+    height: 200px;
+    background: #8b5cf6;
+    top: -20%;
+    left: -5%;
+    animation-duration: 22s;
+  }
+
+  .nav-bubble-2 {
+    width: 250px;
+    height: 250px;
+    background: #06b6d4;
+    bottom: -30%;
+    right: -5%;
+    animation-duration: 18s;
+    animation-delay: 2s;
+  }
+
+  .nav-bubble-3 {
+    width: 150px;
+    height: 150px;
+    background: #ec4899;
+    top: 10%;
+    right: 15%;
+    animation-duration: 25s;
+    animation-delay: 4s;
+  }
+
+  .nav-bubble-4 {
+    width: 180px;
+    height: 180px;
+    background: #f59e0b;
+    bottom: 10%;
+    left: 20%;
+    animation-duration: 20s;
+    animation-delay: 1s;
+  }
+`;
 
 const Navbar = () => {
   const router = useRouter();
@@ -298,13 +357,25 @@ const Navbar = () => {
 
   return (
     <>
+      {/* 2️⃣ INJECT CSS BUBBLE STYLES */}
+      <style>{bubbleStyles}</style>
+
       <motion.nav
         initial={{ y: -100 }}
         animate={{ y: isVisible ? 0 : -100 }}
         transition={{ duration: 0.3, ease: "easeInOut" }}
         className="fixed top-0 left-0 w-full z-50 bg-black/60 backdrop-blur-xl border-b border-white/5 shadow-lg"
       >
-        <div className="container mx-auto px-4 lg:px-8">
+        {/* 3️⃣ ADD BUBBLE LAYER INSIDE NAVBAR */}
+        <div className="relative w-full h-full overflow-hidden">
+          <div className="nav-bubble nav-bubble-1"></div>
+          <div className="nav-bubble nav-bubble-2"></div>
+          <div className="nav-bubble nav-bubble-3"></div>
+          <div className="nav-bubble nav-bubble-4"></div>
+        </div>
+
+        {/* NAVBAR CONTENT (Sits directly above the bubbles with z-index) */}
+        <div className="relative z-10 container mx-auto px-4 lg:px-8">
           <div className="flex justify-between items-center h-16 lg:h-20">
             {/* Logo */}
             <div className="flex-shrink-0">

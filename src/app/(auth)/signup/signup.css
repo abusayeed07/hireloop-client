@@ -173,7 +173,7 @@
   color: #06b6d4;
 }
 
-/* Custom Input Styling */
+/* Custom Input Styling - FIXED PLACEHOLDER & FONT */
 .custom-input {
   width: 100% !important;
   height: 48px !important;
@@ -184,7 +184,15 @@
   border-radius: 12px !important;
   color: #f1f5f9 !important;
   font-size: 0.875rem !important;
+  font-family: var(--font-geist-sans), ui-sans-serif, system-ui, sans-serif !important; /* ✅ Ensures crisp font */
   transition: all 0.2s ease !important;
+}
+
+/* ✅ FIX: Faded placeholder color */
+.custom-input::placeholder {
+  color: #71717a !important;  /* Faded Zinc-500 grey */
+  opacity: 0.7 !important;    /* Slight fade effect */
+  font-weight: 400 !important;
 }
 
 .custom-input:hover {
@@ -424,4 +432,3 @@
 ::-webkit-scrollbar-thumb:hover {
   background: linear-gradient(135deg, #22d3ee, #a78bfa);
 }
-

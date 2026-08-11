@@ -1,4 +1,3 @@
-// frontend/src/app/(auth)/signin/page.jsx
 "use client";
 
 import { useState, useEffect } from "react";
@@ -24,6 +23,7 @@ import {
 import { authClient } from "@/lib/auth-client";
 import toast from "react-hot-toast";
 import LoadingPage from "@/app/loading";
+import DotGrid from "@/components/ui/DotGrid";
 
 export default function SigninPage() {
   const router = useRouter();
@@ -152,6 +152,22 @@ export default function SigninPage() {
 
   return (
     <div className="signup-container">
+      
+      {/* 🚀 React Bits Dense Grid (Sits perfectly behind your CSS) */}
+      <div className="absolute inset-0 w-full h-full z-0 overflow-hidden pointer-events-none">
+        <DotGrid
+          dotSize={5}
+          gap={15}
+          baseColor="#2F293A"   // Dark grey dots
+          activeColor="#5227FF" // Bright purple on hover
+          proximity={120}
+          shockRadius={250}
+          shockStrength={5}
+          resistance={750}
+          returnDuration={1.5}
+        />
+      </div>
+
       <div className="animated-background">
         <div className="gradient-orb gradient-orb-1"></div>
         <div className="gradient-orb gradient-orb-2"></div>

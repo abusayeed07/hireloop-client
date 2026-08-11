@@ -34,6 +34,9 @@ import {
 } from "@gravity-ui/icons";
 import { Phone } from "lucide-react";
 
+// ✅ ADDED: Import DotGrid
+import DotGrid from "@/components/ui/DotGrid";
+
 const API_BASE_URL = process.env.NEXT_PUBLIC_BASE_URL || "http://localhost:5000";
 
 export default function SignUpFormPage() {
@@ -242,8 +245,30 @@ export default function SignUpFormPage() {
 
   return (
     <div className="signup-container min-h-screen w-full bg-[#09090b] flex items-center justify-center p-4 relative overflow-hidden">
-      {/* 🔮 Animated Background */}
-      <div className="animated-background absolute inset-0 pointer-events-none z-0">
+      
+      {/* ✅ ADDED: React Bits DotGrid Layer (Perfectly placed behind everything else) */}
+      <div className="absolute inset-0 w-full h-full z-[0] overflow-hidden pointer-events-none">
+        <DotGrid
+          dotSize={5}
+          gap={15}
+          baseColor="#2F293A"
+          activeColor="#5227FF"
+          proximity={120}
+          shockRadius={250}
+          shockStrength={5}
+          resistance={750}
+          returnDuration={1.5}
+        />
+      </div>
+
+      {/* ✅ ADDED: Subtle React Bits Glow Orbs behind the grid */}
+      <div className="absolute inset-0 z-[-1] pointer-events-none">
+        <div className="absolute -top-40 -left-40 w-96 h-96 bg-purple-600/20 rounded-full blur-[120px]" />
+        <div className="absolute -bottom-40 -right-40 w-96 h-96 bg-purple-600/20 rounded-full blur-[120px]" />
+      </div>
+
+      {/* 🔮 Your Original Animated Background (Still preserved) */}
+      <div className="animated-background absolute inset-0 pointer-events-none z-[-1]">
         <div className="gradient-orb gradient-orb-1"></div>
         <div className="gradient-orb gradient-orb-2"></div>
         <div className="gradient-orb gradient-orb-3"></div>

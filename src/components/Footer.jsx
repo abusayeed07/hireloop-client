@@ -142,16 +142,25 @@ export default function Footer() {
               Sitemap
             </h3>
             <ul className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-1 gap-3 text-sm">
-              {["Home", "Web Design Portfolio", "SEO Strategy", "All Services", "Digital Marketing Blog", "About Us", "Contact Us"].map((item) => (
-                <li key={item}>
+              {/* ✅ Mapped specific paths to each item */}
+              {[
+                { name: "Home", path: "/" },
+                { name: "Web Design Portfolio", path: "#" },
+                { name: "SEO Strategy", path: "#" },
+                { name: "All Services", path: "#" },
+                { name: "Digital Marketing Blog", path: "#" },
+                { name: "About Us", path: "#" },
+                { name: "Contact Us", path: "/contact" },
+              ].map((item) => (
+                <li key={item.name}>
                   <motion.div
                     initial="rest"
                     whileHover="hover"
                     variants={linkHover}
                     className="inline-block cursor-pointer transition-all duration-200"
                   >
-                    <Link href="#" className="hover:underline underline-offset-4 decoration-indigo-500/40">
-                      {item}
+                    <Link href={item.path} className="hover:underline underline-offset-4 decoration-indigo-500/40">
+                      {item.name}
                     </Link>
                   </motion.div>
                 </li>

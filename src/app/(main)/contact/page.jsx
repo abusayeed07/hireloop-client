@@ -295,7 +295,8 @@ export default function ContactPage() {
                             onBlur={() => setFocusedField(null)}
                             onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                             placeholder="John Doe"
-                            className={`bg-[#1c1c1e] border transition-all duration-200 text-white rounded-xl focus:ring-1 ${
+                            // ✅ ADDED: placeholder:text-zinc-500 for faded grey text
+                            className={`bg-[#1c1c1e] border transition-all duration-200 text-white rounded-xl focus:ring-1 placeholder:text-zinc-500 placeholder:font-normal ${
                               focusedField === 'name'
                                 ? "border-blue-500/50 ring-blue-500/20"
                                 : "border-white/10 hover:border-white/20"
@@ -313,7 +314,8 @@ export default function ContactPage() {
                             onBlur={() => setFocusedField(null)}
                             onChange={(e) => setFormData({ ...formData, email: e.target.value })}
                             placeholder="john@example.com"
-                            className={`bg-[#1c1c1e] border transition-all duration-200 text-white rounded-xl focus:ring-1 ${
+                            // ✅ ADDED: placeholder:text-zinc-500 for faded grey text
+                            className={`bg-[#1c1c1e] border transition-all duration-200 text-white rounded-xl focus:ring-1 placeholder:text-zinc-500 placeholder:font-normal ${
                               focusedField === 'email'
                                 ? "border-blue-500/50 ring-blue-500/20"
                                 : "border-white/10 hover:border-white/20"
@@ -332,7 +334,8 @@ export default function ContactPage() {
                           onBlur={() => setFocusedField(null)}
                           onChange={(e) => setFormData({ ...formData, subject: e.target.value })}
                           placeholder="What is this regarding?"
-                          className={`bg-[#1c1c1e] border transition-all duration-200 text-white rounded-xl focus:ring-1 ${
+                          // ✅ ADDED: placeholder:text-zinc-500 for faded grey text
+                          className={`bg-[#1c1c1e] border transition-all duration-200 text-white rounded-xl focus:ring-1 placeholder:text-zinc-500 placeholder:font-normal ${
                             focusedField === 'subject'
                               ? "border-blue-500/50 ring-blue-500/20"
                               : "border-white/10 hover:border-white/20"
@@ -351,7 +354,8 @@ export default function ContactPage() {
                           onChange={(e) => setFormData({ ...formData, message: e.target.value })}
                           placeholder="Describe your issue or question in detail..."
                           rows={5}
-                          className={`bg-[#1c1c1e] border transition-all duration-200 text-white rounded-xl focus:ring-1 min-h-[150px] resize-none ${
+                          // ✅ ADDED: placeholder:text-zinc-500 for faded grey text
+                          className={`bg-[#1c1c1e] border transition-all duration-200 text-white rounded-xl focus:ring-1 min-h-[150px] resize-none placeholder:text-zinc-500 placeholder:font-normal ${
                             focusedField === 'message'
                               ? "border-blue-500/50 ring-blue-500/20"
                               : "border-white/10 hover:border-white/20"

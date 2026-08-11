@@ -385,7 +385,7 @@ export default function CompanyProfile({ recruiter, recruiterCompany }) {
   // ========================================================
   if (!company?._id && !isEditing) {
     return (
-      <div className="min-h-[85vh] flex items-center justify-center px-6 relative overflow-hidden">
+      <div className="min-h-screen bg-[#090a0f] flex items-center justify-center px-4 sm:px-6 py-12 relative overflow-hidden">
         
         {/* 🎨 Animated Gradient Background Orbs */}
         <motion.div
@@ -585,218 +585,220 @@ export default function CompanyProfile({ recruiter, recruiterCompany }) {
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.6, ease: "easeOut" }}
-        className="max-w-5xl mx-auto my-8 space-y-6"
+        className="min-h-screen bg-[#090a0f] py-8 px-4 sm:px-6"
       >
-        {/* Header Card */}
-        <motion.div
-          whileHover={{ borderColor: "rgba(255,255,255,0.1)" }}
-          className="bg-zinc-950 border border-zinc-900 rounded-xl p-8 transition-all"
-        >
-          <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 border-b border-zinc-900 pb-6">
-            <div className="flex items-center gap-5">
-              <div className="w-20 h-20 rounded-xl bg-zinc-900 border border-zinc-800 flex items-center justify-center overflow-hidden">
-                {company.logo ? (
-                  <Image
-                    src={company.logo}
-                    alt={company.name}
-                    height={80}
-                    width={80}
-                    className="w-full h-full object-contain p-2"
-                  />
-                ) : (
-                  <Building2 size={40} className="text-zinc-600" />
+        <div className="max-w-5xl mx-auto space-y-6">
+          {/* Header Card */}
+          <motion.div
+            whileHover={{ borderColor: "rgba(255,255,255,0.1)" }}
+            className="bg-zinc-950 border border-zinc-900 rounded-xl p-8 transition-all"
+          >
+            <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 border-b border-zinc-900 pb-6">
+              <div className="flex items-center gap-5">
+                <div className="w-20 h-20 rounded-xl bg-zinc-900 border border-zinc-800 flex items-center justify-center overflow-hidden">
+                  {company.logo ? (
+                    <Image
+                      src={company.logo}
+                      alt={company.name}
+                      height={80}
+                      width={80}
+                      className="w-full h-full object-contain p-2"
+                    />
+                  ) : (
+                    <Building2 size={40} className="text-zinc-600" />
+                  )}
+                </div>
+                <div>
+                  <h1 className="text-2xl font-bold text-white">
+                    {company.name}
+                  </h1>
+                  <div className="flex flex-wrap items-center gap-2 mt-1">
+                    <span className="text-sm text-zinc-400">
+                      {company.industry || "General"}
+                    </span>
+                    <span className="text-zinc-600">•</span>
+                    <span className="text-sm text-zinc-400 flex items-center gap-1">
+                      <MapPin className="w-3 h-3" />
+                      {company.location || "Location not specified"}
+                    </span>
+                    <span className="text-zinc-600">•</span>
+                    <span
+                      className={`text-xs px-2.5 py-0.5 rounded-full font-medium border flex items-center gap-1 ${getStatusStyles(company.status)}`}
+                    >
+                      {getStatusIcon(company.status)}
+                      {company.status || "Pending"}
+                    </span>
+                  </div>
+                  {/* ✅ Status Message */}
+                  <div className="mt-2">
+                    <p className={`text-xs ${getStatusStyles(company.status)} px-3 py-1 rounded-lg inline-flex items-center gap-2`}>
+                      {getStatusIcon(company.status)}
+                      <span>{getStatusMessage(company.status)}</span>
+                    </p>
+                  </div>
+                  <a
+                    href={company.websiteUrl}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="text-sm text-blue-400 hover:underline flex items-center gap-1 mt-2"
+                  >
+                    <Link2 size={14} />
+                    {company.websiteUrl}
+                  </a>
+                </div>
+              </div>
+              <Button
+                onPress={startEditing}
+                variant="bordered"
+                className="border-zinc-800 text-zinc-300 hover:bg-zinc-900 rounded-lg px-4 font-medium h-10 flex items-center gap-2 transition-all hover:border-zinc-600"
+              >
+                <Pencil size={14} /> Edit Profile
+              </Button>
+            </div>
+          </motion.div>
+
+          {/* Stats Row */}
+          <motion.div
+            variants={{
+              hidden: { opacity: 0 },
+              visible: { opacity: 1, transition: { staggerChildren: 0.1 } },
+            }}
+            initial="hidden"
+            animate="visible"
+            className="grid grid-cols-2 md:grid-cols-4 gap-4"
+          >
+            <StatCard icon={Users} label="Employees" value={company.employeeCount || "N/A"} />
+            <StatCard icon={Briefcase} label="Open Jobs" value={company.jobs?.length || 0} />
+            <StatCard icon={Calendar} label="Founded" value={company.foundedYear || "N/A"} color="text-purple-400" />
+            <StatCard icon={Building2} label="Company Type" value={company.companyType || "N/A"} color="text-emerald-400" />
+          </motion.div>
+
+          {/* About Section */}
+          {company.description && (
+            <motion.div
+              whileHover={{ borderColor: "rgba(255,255,255,0.1)" }}
+              className="bg-zinc-950 border border-zinc-900 rounded-xl p-6 transition-all"
+            >
+              <h3 className="text-sm font-semibold text-zinc-400 uppercase tracking-wider flex items-center gap-2 mb-3">
+                <FileText size={14} />
+                About the Company
+              </h3>
+              <p className="text-zinc-300 text-sm leading-relaxed whitespace-pre-wrap">
+                {company.description}
+              </p>
+            </motion.div>
+          )}
+
+          {/* Mission & Vision */}
+          {(company.mission || company.vision || company.values) && (
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              {company.mission && (
+                <motion.div
+                  whileHover={{ borderColor: "rgba(255,255,255,0.1)" }}
+                  className="bg-zinc-950 border border-zinc-900 rounded-xl p-5 transition-all"
+                >
+                  <div className="flex items-center gap-2 mb-2">
+                    <Target className="w-4 h-4 text-blue-400" />
+                    <h4 className="text-xs font-semibold text-zinc-400 uppercase tracking-wider">
+                      Mission
+                    </h4>
+                  </div>
+                  <p className="text-zinc-300 text-sm">{company.mission}</p>
+                </motion.div>
+              )}
+              {company.vision && (
+                <motion.div
+                  whileHover={{ borderColor: "rgba(255,255,255,0.1)" }}
+                  className="bg-zinc-950 border border-zinc-900 rounded-xl p-5 transition-all"
+                >
+                  <div className="flex items-center gap-2 mb-2">
+                    <Eye className="w-4 h-4 text-purple-400" />
+                    <h4 className="text-xs font-semibold text-zinc-400 uppercase tracking-wider">
+                      Vision
+                    </h4>
+                  </div>
+                  <p className="text-zinc-300 text-sm">{company.vision}</p>
+                </motion.div>
+              )}
+              {company.values && (
+                <motion.div
+                  whileHover={{ borderColor: "rgba(255,255,255,0.1)" }}
+                  className="bg-zinc-950 border border-zinc-900 rounded-xl p-5 transition-all"
+                >
+                  <div className="flex items-center gap-2 mb-2">
+                    <Heart className="w-4 h-4 text-red-400" />
+                    <h4 className="text-xs font-semibold text-zinc-400 uppercase tracking-wider">
+                      Values
+                    </h4>
+                  </div>
+                  <p className="text-zinc-300 text-sm">{company.values}</p>
+                </motion.div>
+              )}
+            </div>
+          )}
+
+          {/* Contact & Social */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <motion.div
+              whileHover={{ borderColor: "rgba(255,255,255,0.1)" }}
+              className="bg-zinc-950 border border-zinc-900 rounded-xl p-6 transition-all"
+            >
+              <h4 className="text-xs font-semibold text-zinc-400 uppercase tracking-wider mb-4">
+                Contact Information
+              </h4>
+              <div className="space-y-2">
+                {company.phone && (
+                  <ContactInfo icon={Phone} label="Phone" value={company.phone} />
+                )}
+                {company.email && (
+                  <ContactInfo icon={Mail} label="Email" value={company.email} />
+                )}
+                {company.location && (
+                  <ContactInfo icon={MapPin} label="Location" value={company.location} />
                 )}
               </div>
-              <div>
-                <h1 className="text-2xl font-bold text-white">
-                  {company.name}
-                </h1>
-                <div className="flex flex-wrap items-center gap-2 mt-1">
-                  <span className="text-sm text-zinc-400">
-                    {company.industry || "General"}
-                  </span>
-                  <span className="text-zinc-600">•</span>
-                  <span className="text-sm text-zinc-400 flex items-center gap-1">
-                    <MapPin className="w-3 h-3" />
-                    {company.location || "Location not specified"}
-                  </span>
-                  <span className="text-zinc-600">•</span>
-                  <span
-                    className={`text-xs px-2.5 py-0.5 rounded-full font-medium border flex items-center gap-1 ${getStatusStyles(company.status)}`}
-                  >
-                    {getStatusIcon(company.status)}
-                    {company.status || "Pending"}
-                  </span>
-                </div>
-                {/* ✅ Status Message */}
-                <div className="mt-2">
-                  <p className={`text-xs ${getStatusStyles(company.status)} px-3 py-1 rounded-lg inline-flex items-center gap-2`}>
-                    {getStatusIcon(company.status)}
-                    <span>{getStatusMessage(company.status)}</span>
-                  </p>
-                </div>
-                <a
-                  href={company.websiteUrl}
-                  target="_blank"
-                  rel="noreferrer"
-                  className="text-sm text-blue-400 hover:underline flex items-center gap-1 mt-2"
-                >
-                  <Link2 size={14} />
-                  {company.websiteUrl}
-                </a>
-              </div>
-            </div>
-            <Button
-              onPress={startEditing}
-              variant="bordered"
-              className="border-zinc-800 text-zinc-300 hover:bg-zinc-900 rounded-lg px-4 font-medium h-10 flex items-center gap-2 transition-all hover:border-zinc-600"
+            </motion.div>
+            <motion.div
+              whileHover={{ borderColor: "rgba(255,255,255,0.1)" }}
+              className="bg-zinc-950 border border-zinc-900 rounded-xl p-6 transition-all"
             >
-              <Pencil size={14} /> Edit Profile
-            </Button>
+              <h4 className="text-xs font-semibold text-zinc-400 uppercase tracking-wider mb-4">
+                Social Links
+              </h4>
+              <div className="flex flex-wrap gap-2">
+                {company.twitter && (
+                  <SocialLink icon={FaTwitter} href={company.twitter} label="Twitter" color="text-blue-400" />
+                )}
+                {company.linkedin && (
+                  <SocialLink icon={FaLinkedin} href={company.linkedin} label="LinkedIn" color="text-blue-600" />
+                )}
+                {company.instagram && (
+                  <SocialLink icon={FaInstagram} href={company.instagram} label="Instagram" color="text-pink-500" />
+                )}
+                {company.youtube && (
+                  <SocialLink icon={FaYoutube} href={company.youtube} label="YouTube" color="text-red-600" />
+                )}
+                <a
+                  href="#"
+                  className="w-9 h-9 rounded-full bg-zinc-900/50 border border-zinc-800 hover:border-blue-500/50 flex items-center justify-center transition-all hover:bg-zinc-800 group"
+                >
+                  <span className="text-xs text-zinc-500 group-hover:text-blue-400 transition-colors font-semibold">FB</span>
+                  <span className="sr-only">Facebook</span>
+                </a>
+                {!company.twitter && !company.linkedin && !company.instagram && !company.youtube && (
+                  <p className="text-sm text-zinc-500">No social links added yet</p>
+                )}
+              </div>
+            </motion.div>
           </div>
-        </motion.div>
 
-        {/* Stats Row */}
-        <motion.div
-          variants={{
-            hidden: { opacity: 0 },
-            visible: { opacity: 1, transition: { staggerChildren: 0.1 } },
-          }}
-          initial="hidden"
-          animate="visible"
-          className="grid grid-cols-2 md:grid-cols-4 gap-4"
-        >
-          <StatCard icon={Users} label="Employees" value={company.employeeCount || "N/A"} />
-          <StatCard icon={Briefcase} label="Open Jobs" value={company.jobs?.length || 0} />
-          <StatCard icon={Calendar} label="Founded" value={company.foundedYear || "N/A"} color="text-purple-400" />
-          <StatCard icon={Building2} label="Company Type" value={company.companyType || "N/A"} color="text-emerald-400" />
-        </motion.div>
-
-        {/* About Section */}
-        {company.description && (
-          <motion.div
-            whileHover={{ borderColor: "rgba(255,255,255,0.1)" }}
-            className="bg-zinc-950 border border-zinc-900 rounded-xl p-6 transition-all"
-          >
-            <h3 className="text-sm font-semibold text-zinc-400 uppercase tracking-wider flex items-center gap-2 mb-3">
-              <FileText size={14} />
-              About the Company
-            </h3>
-            <p className="text-zinc-300 text-sm leading-relaxed whitespace-pre-wrap">
-              {company.description}
-            </p>
-          </motion.div>
-        )}
-
-        {/* Mission & Vision */}
-        {(company.mission || company.vision || company.values) && (
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            {company.mission && (
-              <motion.div
-                whileHover={{ borderColor: "rgba(255,255,255,0.1)" }}
-                className="bg-zinc-950 border border-zinc-900 rounded-xl p-5 transition-all"
-              >
-                <div className="flex items-center gap-2 mb-2">
-                  <Target className="w-4 h-4 text-blue-400" />
-                  <h4 className="text-xs font-semibold text-zinc-400 uppercase tracking-wider">
-                    Mission
-                  </h4>
-                </div>
-                <p className="text-zinc-300 text-sm">{company.mission}</p>
-              </motion.div>
-            )}
-            {company.vision && (
-              <motion.div
-                whileHover={{ borderColor: "rgba(255,255,255,0.1)" }}
-                className="bg-zinc-950 border border-zinc-900 rounded-xl p-5 transition-all"
-              >
-                <div className="flex items-center gap-2 mb-2">
-                  <Eye className="w-4 h-4 text-purple-400" />
-                  <h4 className="text-xs font-semibold text-zinc-400 uppercase tracking-wider">
-                    Vision
-                  </h4>
-                </div>
-                <p className="text-zinc-300 text-sm">{company.vision}</p>
-              </motion.div>
-            )}
-            {company.values && (
-              <motion.div
-                whileHover={{ borderColor: "rgba(255,255,255,0.1)" }}
-                className="bg-zinc-950 border border-zinc-900 rounded-xl p-5 transition-all"
-              >
-                <div className="flex items-center gap-2 mb-2">
-                  <Heart className="w-4 h-4 text-red-400" />
-                  <h4 className="text-xs font-semibold text-zinc-400 uppercase tracking-wider">
-                    Values
-                  </h4>
-                </div>
-                <p className="text-zinc-300 text-sm">{company.values}</p>
-              </motion.div>
-            )}
+          {/* Company Details Grid */}
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+            <InfoBox icon={Building2} label="Industry" value={company.industry} />
+            <InfoBox icon={Users} label="Company Size" value={company.employeeCount} />
+            <InfoBox icon={Briefcase} label="Company Type" value={company.companyType || "N/A"} />
+            <InfoBox icon={Calendar} label="Founded" value={company.foundedYear || "N/A"} />
           </div>
-        )}
-
-        {/* Contact & Social */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <motion.div
-            whileHover={{ borderColor: "rgba(255,255,255,0.1)" }}
-            className="bg-zinc-950 border border-zinc-900 rounded-xl p-6 transition-all"
-          >
-            <h4 className="text-xs font-semibold text-zinc-400 uppercase tracking-wider mb-4">
-              Contact Information
-            </h4>
-            <div className="space-y-2">
-              {company.phone && (
-                <ContactInfo icon={Phone} label="Phone" value={company.phone} />
-              )}
-              {company.email && (
-                <ContactInfo icon={Mail} label="Email" value={company.email} />
-              )}
-              {company.location && (
-                <ContactInfo icon={MapPin} label="Location" value={company.location} />
-              )}
-            </div>
-          </motion.div>
-          <motion.div
-            whileHover={{ borderColor: "rgba(255,255,255,0.1)" }}
-            className="bg-zinc-950 border border-zinc-900 rounded-xl p-6 transition-all"
-          >
-            <h4 className="text-xs font-semibold text-zinc-400 uppercase tracking-wider mb-4">
-              Social Links
-            </h4>
-            <div className="flex flex-wrap gap-2">
-              {company.twitter && (
-                <SocialLink icon={FaTwitter} href={company.twitter} label="Twitter" color="text-blue-400" />
-              )}
-              {company.linkedin && (
-                <SocialLink icon={FaLinkedin} href={company.linkedin} label="LinkedIn" color="text-blue-600" />
-              )}
-              {company.instagram && (
-                <SocialLink icon={FaInstagram} href={company.instagram} label="Instagram" color="text-pink-500" />
-              )}
-              {company.youtube && (
-                <SocialLink icon={FaYoutube} href={company.youtube} label="YouTube" color="text-red-600" />
-              )}
-              <a
-                href="#"
-                className="w-9 h-9 rounded-full bg-zinc-900/50 border border-zinc-800 hover:border-blue-500/50 flex items-center justify-center transition-all hover:bg-zinc-800 group"
-              >
-                <span className="text-xs text-zinc-500 group-hover:text-blue-400 transition-colors font-semibold">FB</span>
-                <span className="sr-only">Facebook</span>
-              </a>
-              {!company.twitter && !company.linkedin && !company.instagram && !company.youtube && (
-                <p className="text-sm text-zinc-500">No social links added yet</p>
-              )}
-            </div>
-          </motion.div>
-        </div>
-
-        {/* Company Details Grid */}
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-          <InfoBox icon={Building2} label="Industry" value={company.industry} />
-          <InfoBox icon={Users} label="Company Size" value={company.employeeCount} />
-          <InfoBox icon={Briefcase} label="Company Type" value={company.companyType || "N/A"} />
-          <InfoBox icon={Calendar} label="Founded" value={company.foundedYear || "N/A"} />
         </div>
       </motion.div>
     );
@@ -810,470 +812,472 @@ export default function CompanyProfile({ recruiter, recruiterCompany }) {
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.6, ease: "easeOut" }}
-      className="max-w-4xl mx-auto my-8 bg-zinc-950 p-8 border border-zinc-900 rounded-xl shadow-2xl shadow-black/50"
+      className="min-h-screen bg-[#090a0f] py-8 px-4 sm:px-6 md:pt-15"
     >
-      <Form onSubmit={handleSubmit} className="space-y-8">
-        <motion.div
-          initial={{ opacity: 0, y: -10 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="space-y-6"
-        >
-          <h2 className="text-xl font-semibold text-zinc-200 border-b border-zinc-900 pb-3 flex items-center gap-2">
-            <Sparkles className="w-5 h-5 text-zinc-400" />
-            {company && company._id
-              ? "Update Company Profile"
-              : "Configure Workspace Platform"}
-          </h2>
-
-          {/* Row 1: Company Name + Industry */}
+      <div className="max-w-4xl mx-auto bg-zinc-950 p-8 border border-zinc-900 rounded-xl shadow-2xl shadow-black/50">
+        <Form onSubmit={handleSubmit} className="space-y-8">
           <motion.div
-            initial={{ opacity: 0, y: 10 }}
+            initial={{ opacity: 0, y: -10 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.1 }}
-            className="grid grid-cols-1 md:grid-cols-2 gap-6"
+            className="space-y-6"
           >
-            <TextField name="companyName" isRequired className="w-full">
-              <Label className="text-zinc-400 font-medium text-sm">
-                Company Name
-              </Label>
-              <Input
-                placeholder="e.g. Acme Corp"
-                className={textInputClass}
-                value={formValues.companyName}
-                onChange={(e) =>
-                  handleInputChange("companyName", e.target.value)
-                }
-              />
-              {errors.companyName && (
-                <span className="text-xs text-red-500 mt-1">
-                  {errors.companyName}
-                </span>
-              )}
-            </TextField>
+            <h2 className="text-xl font-semibold text-zinc-200 border-b border-zinc-900 pb-3 flex items-center gap-2">
+              <Sparkles className="w-5 h-5 text-zinc-400" />
+              {company && company._id
+                ? "Update Company Profile"
+                : "Configure Workspace Platform"}
+            </h2>
 
-            <div className="flex flex-col gap-1">
-              <Label className="text-zinc-400 font-medium text-sm">
-                Industry / Category
-              </Label>
-              <Select
-                name="industry"
-                selectedKeys={[formValues.industry]}
-                onSelectionChange={(keys) => {
-                  const selected = Array.from(keys)[0];
-                  if (selected)
-                    handleInputChange("industry", selected.toString());
-                }}
-                className="w-full"
-                isRequired
-              >
-                <Select.Trigger className={selectTriggerClass}>
-                  <Select.Value placeholder="Select industry" />
-                  <Select.Indicator>
-                    <ChevronDown size={16} className="text-zinc-500" />
-                  </Select.Indicator>
-                </Select.Trigger>
-                <Select.Popover className={selectPopoverClass}>
-                  <ListBox>
-                    {["Technology", "Design", "Marketing", "Finance", "Healthcare", "Education", "Manufacturing"].map(
-                      (item) => (
+            {/* Row 1: Company Name + Industry */}
+            <motion.div
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.1 }}
+              className="grid grid-cols-1 md:grid-cols-2 gap-6"
+            >
+              <TextField name="companyName" isRequired className="w-full">
+                <Label className="text-zinc-400 font-medium text-sm">
+                  Company Name
+                </Label>
+                <Input
+                  placeholder="e.g. Acme Corp"
+                  className={textInputClass}
+                  value={formValues.companyName}
+                  onChange={(e) =>
+                    handleInputChange("companyName", e.target.value)
+                  }
+                />
+                {errors.companyName && (
+                  <span className="text-xs text-red-500 mt-1">
+                    {errors.companyName}
+                  </span>
+                )}
+              </TextField>
+
+              <div className="flex flex-col gap-1">
+                <Label className="text-zinc-400 font-medium text-sm">
+                  Industry / Category
+                </Label>
+                <Select
+                  name="industry"
+                  selectedKeys={[formValues.industry]}
+                  onSelectionChange={(keys) => {
+                    const selected = Array.from(keys)[0];
+                    if (selected)
+                      handleInputChange("industry", selected.toString());
+                  }}
+                  className="w-full"
+                  isRequired
+                >
+                  <Select.Trigger className={selectTriggerClass}>
+                    <Select.Value placeholder="Select industry" />
+                    <Select.Indicator>
+                      <ChevronDown size={16} className="text-zinc-500" />
+                    </Select.Indicator>
+                  </Select.Trigger>
+                  <Select.Popover className={selectPopoverClass}>
+                    <ListBox>
+                      {["Technology", "Design", "Marketing", "Finance", "Healthcare", "Education", "Manufacturing"].map(
+                        (item) => (
+                          <ListBox.Item
+                            key={item.toLowerCase()}
+                            id={item.toLowerCase()}
+                            className={selectItemClass}
+                            textValue={item}
+                          >
+                            {item}
+                          </ListBox.Item>
+                        ),
+                      )}
+                    </ListBox>
+                  </Select.Popover>
+                </Select>
+              </div>
+            </motion.div>
+
+            {/* Row 2: Website URL + Location */}
+            <motion.div
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.15 }}
+              className="grid grid-cols-1 md:grid-cols-2 gap-6"
+            >
+              <TextField name="websiteUrl" isRequired className="w-full">
+                <Label className="text-zinc-400 font-medium text-sm">
+                  Website URL
+                </Label>
+                <div className="relative">
+                  <span className="absolute left-3 top-1/2 -translate-y-1/2 text-zinc-600 text-sm border-r border-zinc-800 pr-2 z-10">
+                    https://
+                  </span>
+                  <Input
+                    placeholder="www.company.com"
+                    className={`${textInputClass} pl-20`}
+                    value={formValues.websiteUrl}
+                    onChange={(e) =>
+                      handleInputChange("websiteUrl", e.target.value)
+                    }
+                  />
+                </div>
+                {errors.websiteUrl && (
+                  <span className="text-xs text-red-500 mt-1">
+                    {errors.websiteUrl}
+                  </span>
+                )}
+              </TextField>
+
+              <TextField name="location" isRequired className="w-full">
+                <Label className="text-zinc-400 font-medium text-sm">
+                  Location
+                </Label>
+                <div className="relative">
+                  <Globe
+                    size={16}
+                    className="absolute left-3 top-1/2 -translate-y-1/2 text-zinc-600 z-10"
+                  />
+                  <Input
+                    placeholder="e.g. San Francisco, CA"
+                    className={`${textInputClass} pl-10`}
+                    value={formValues.location}
+                    onChange={(e) =>
+                      handleInputChange("location", e.target.value)
+                    }
+                  />
+                </div>
+                {errors.location && (
+                  <span className="text-xs text-red-500 mt-1">
+                    {errors.location}
+                  </span>
+                )}
+              </TextField>
+            </motion.div>
+
+            {/* Row 3: Employee Count + Logo */}
+            <motion.div
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.2 }}
+              className="grid grid-cols-1 md:grid-cols-2 gap-6"
+            >
+              <div className="flex flex-col gap-1">
+                <Label className="text-zinc-400 font-medium text-sm mb-2">
+                  Employee Count Range
+                </Label>
+                <Select
+                  name="employeeCount"
+                  selectedKeys={[formValues.employeeCount]}
+                  onSelectionChange={(keys) => {
+                    const selected = Array.from(keys)[0];
+                    if (selected)
+                      handleInputChange("employeeCount", selected.toString());
+                  }}
+                  className="w-full"
+                >
+                  <Select.Trigger className={selectTriggerClass}>
+                    <Select.Value placeholder="Select employee count" />
+                    <Select.Indicator>
+                      <ChevronDown size={16} className="text-zinc-500" />
+                    </Select.Indicator>
+                  </Select.Trigger>
+                  <Select.Popover className={selectPopoverClass}>
+                    <ListBox>
+                      {[
+                        "1-10 employees",
+                        "11-50 employees",
+                        "51-200 employees",
+                        "201+ employees",
+                      ].map((item) => (
                         <ListBox.Item
-                          key={item.toLowerCase()}
-                          id={item.toLowerCase()}
+                          key={item}
+                          id={item}
                           className={selectItemClass}
                           textValue={item}
                         >
                           {item}
                         </ListBox.Item>
-                      ),
+                      ))}
+                    </ListBox>
+                  </Select.Popover>
+                </Select>
+              </div>
+
+              <div className="flex flex-col gap-1">
+                <Label className="text-zinc-400 font-medium text-sm">
+                  Company Logo
+                </Label>
+                <div className="flex items-center gap-4 mt-1">
+                  <label className="w-14 h-14 border-2 border-dashed border-zinc-700 hover:border-zinc-500 bg-zinc-900/40 rounded-xl flex items-center justify-center cursor-pointer transition-colors overflow-hidden group">
+                    <input
+                      type="file"
+                      accept="image/png, image/jpeg"
+                      onChange={handleLogoUpload}
+                      className="hidden"
+                    />
+                    {logoUrl ? (
+                      <Image
+                        src={logoUrl}
+                        alt="Logo Preview"
+                        height={64}
+                        width={64}
+                        className="w-full h-full object-cover"
+                      />
+                    ) : (
+                      <ArrowUpToLine
+                        size={18}
+                        className="text-zinc-400 group-hover:text-zinc-300 transition-colors"
+                      />
                     )}
-                  </ListBox>
-                </Select.Popover>
-              </Select>
-            </div>
-          </motion.div>
-
-          {/* Row 2: Website URL + Location */}
-          <motion.div
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.15 }}
-            className="grid grid-cols-1 md:grid-cols-2 gap-6"
-          >
-            <TextField name="websiteUrl" isRequired className="w-full">
-              <Label className="text-zinc-400 font-medium text-sm">
-                Website URL
-              </Label>
-              <div className="relative">
-                <span className="absolute left-3 top-1/2 -translate-y-1/2 text-zinc-600 text-sm border-r border-zinc-800 pr-2 z-10">
-                  https://
-                </span>
-                <Input
-                  placeholder="www.company.com"
-                  className={`${textInputClass} pl-20`}
-                  value={formValues.websiteUrl}
-                  onChange={(e) =>
-                    handleInputChange("websiteUrl", e.target.value)
-                  }
-                />
-              </div>
-              {errors.websiteUrl && (
-                <span className="text-xs text-red-500 mt-1">
-                  {errors.websiteUrl}
-                </span>
-              )}
-            </TextField>
-
-            <TextField name="location" isRequired className="w-full">
-              <Label className="text-zinc-400 font-medium text-sm">
-                Location
-              </Label>
-              <div className="relative">
-                <Globe
-                  size={16}
-                  className="absolute left-3 top-1/2 -translate-y-1/2 text-zinc-600 z-10"
-                />
-                <Input
-                  placeholder="e.g. San Francisco, CA"
-                  className={`${textInputClass} pl-10`}
-                  value={formValues.location}
-                  onChange={(e) =>
-                    handleInputChange("location", e.target.value)
-                  }
-                />
-              </div>
-              {errors.location && (
-                <span className="text-xs text-red-500 mt-1">
-                  {errors.location}
-                </span>
-              )}
-            </TextField>
-          </motion.div>
-
-          {/* Row 3: Employee Count + Logo */}
-          <motion.div
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.2 }}
-            className="grid grid-cols-1 md:grid-cols-2 gap-6"
-          >
-            <div className="flex flex-col gap-1">
-              <Label className="text-zinc-400 font-medium text-sm mb-2">
-                Employee Count Range
-              </Label>
-              <Select
-                name="employeeCount"
-                selectedKeys={[formValues.employeeCount]}
-                onSelectionChange={(keys) => {
-                  const selected = Array.from(keys)[0];
-                  if (selected)
-                    handleInputChange("employeeCount", selected.toString());
-                }}
-                className="w-full"
-              >
-                <Select.Trigger className={selectTriggerClass}>
-                  <Select.Value placeholder="Select employee count" />
-                  <Select.Indicator>
-                    <ChevronDown size={16} className="text-zinc-500" />
-                  </Select.Indicator>
-                </Select.Trigger>
-                <Select.Popover className={selectPopoverClass}>
-                  <ListBox>
-                    {[
-                      "1-10 employees",
-                      "11-50 employees",
-                      "51-200 employees",
-                      "201+ employees",
-                    ].map((item) => (
-                      <ListBox.Item
-                        key={item}
-                        id={item}
-                        className={selectItemClass}
-                        textValue={item}
-                      >
-                        {item}
-                      </ListBox.Item>
-                    ))}
-                  </ListBox>
-                </Select.Popover>
-              </Select>
-            </div>
-
-            <div className="flex flex-col gap-1">
-              <Label className="text-zinc-400 font-medium text-sm">
-                Company Logo
-              </Label>
-              <div className="flex items-center gap-4 mt-1">
-                <label className="w-14 h-14 border-2 border-dashed border-zinc-700 hover:border-zinc-500 bg-zinc-900/40 rounded-xl flex items-center justify-center cursor-pointer transition-colors overflow-hidden group">
-                  <input
-                    type="file"
-                    accept="image/png, image/jpeg"
-                    onChange={handleLogoUpload}
-                    className="hidden"
-                  />
-                  {logoUrl ? (
-                    <Image
-                      src={logoUrl}
-                      alt="Logo Preview"
-                      height={64}
-                      width={64}
-                      className="w-full h-full object-cover"
-                    />
-                  ) : (
-                    <ArrowUpToLine
-                      size={18}
-                      className="text-zinc-400 group-hover:text-zinc-300 transition-colors"
-                    />
-                  )}
-                </label>
-                <div className="flex flex-col">
-                  <span className="text-sm text-zinc-300">
-                    {isUploading ? "Uploading..." : "Upload image"}
-                  </span>
-                  <span className="text-xs text-zinc-500">
-                    PNG, JPG up to 5MB
-                  </span>
-                  {errors.logo && (
-                    <span className="text-xs text-red-500 mt-1">
-                      {errors.logo}
+                  </label>
+                  <div className="flex flex-col">
+                    <span className="text-sm text-zinc-300">
+                      {isUploading ? "Uploading..." : "Upload image"}
                     </span>
-                  )}
+                    <span className="text-xs text-zinc-500">
+                      PNG, JPG up to 5MB
+                    </span>
+                    {errors.logo && (
+                      <span className="text-xs text-red-500 mt-1">
+                        {errors.logo}
+                      </span>
+                    )}
+                  </div>
                 </div>
               </div>
-            </div>
-          </motion.div>
+            </motion.div>
 
-          {/* Row 4: Description */}
-          <motion.div
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.25 }}
-          >
-            <TextField name="description" className="w-full">
-              <Label className="text-zinc-400 font-medium text-sm">
-                Brief Description
-              </Label>
-              <TextArea
-                placeholder="Tell us about your company's mission and culture..."
-                rows={4}
-                className={textAreaClass}
-                value={formValues.description}
-                onChange={(e) => handleInputChange("description", e.target.value)}
-              />
-              <Description className="text-xs text-zinc-500 mt-1">
-                Optional: Tell candidates about your company culture and values
-              </Description>
-            </TextField>
-          </motion.div>
-
-          {/* Additional Information Section */}
-          <motion.div
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.3 }}
-            className="border-t border-zinc-900 pt-6 mt-4"
-          >
-            <h3 className="text-md font-semibold text-zinc-200 mb-4">
-              Additional Information
-            </h3>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <TextField name="foundedYear" className="w-full">
-                <Label className="text-zinc-400 font-medium text-sm">
-                  Founded Year
-                </Label>
-                <Input
-                  placeholder="e.g. 2020"
-                  className={textInputClass}
-                  value={formValues.foundedYear}
-                  onChange={(e) =>
-                    handleInputChange("foundedYear", e.target.value)
-                  }
-                />
-              </TextField>
-
-              <TextField name="companyType" className="w-full">
-                <Label className="text-zinc-400 font-medium text-sm">
-                  Company Type
-                </Label>
-                <Input
-                  placeholder="e.g. Private, Public, Non-profit"
-                  className={textInputClass}
-                  value={formValues.companyType}
-                  onChange={(e) =>
-                    handleInputChange("companyType", e.target.value)
-                  }
-                />
-              </TextField>
-
-              <TextField name="mission" className="w-full">
-                <Label className="text-zinc-400 font-medium text-sm">
-                  Mission Statement
-                </Label>
-                <Input
-                  placeholder="Our mission is to..."
-                  className={textInputClass}
-                  value={formValues.mission}
-                  onChange={(e) =>
-                    handleInputChange("mission", e.target.value)
-                  }
-                />
-              </TextField>
-
-              <TextField name="vision" className="w-full">
-                <Label className="text-zinc-400 font-medium text-sm">
-                  Vision Statement
-                </Label>
-                <Input
-                  placeholder="Our vision is to..."
-                  className={textInputClass}
-                  value={formValues.vision}
-                  onChange={(e) =>
-                    handleInputChange("vision", e.target.value)
-                  }
-                />
-              </TextField>
-
-              <TextField name="values" className="w-full md:col-span-2">
-                <Label className="text-zinc-400 font-medium text-sm">
-                  Core Values
-                </Label>
-                <Input
-                  placeholder="Innovation, Integrity, Teamwork..."
-                  className={textInputClass}
-                  value={formValues.values}
-                  onChange={(e) =>
-                    handleInputChange("values", e.target.value)
-                  }
-                />
-              </TextField>
-
-              <TextField name="phone" className="w-full">
-                <Label className="text-zinc-400 font-medium text-sm">
-                  Phone Number
-                </Label>
-                <Input
-                  placeholder="+1 (555) 123-4567"
-                  className={textInputClass}
-                  value={formValues.phone}
-                  onChange={(e) =>
-                    handleInputChange("phone", e.target.value)
-                  }
-                />
-              </TextField>
-
-              <TextField name="email" className="w-full">
-                <Label className="text-zinc-400 font-medium text-sm">
-                  Contact Email
-                </Label>
-                <Input
-                  placeholder="contact@company.com"
-                  className={textInputClass}
-                  value={formValues.email}
-                  onChange={(e) =>
-                    handleInputChange("email", e.target.value)
-                  }
-                />
-              </TextField>
-            </div>
-
-            {/* Social Links */}
+            {/* Row 4: Description */}
             <motion.div
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.35 }}
-              className="mt-4"
+              transition={{ delay: 0.25 }}
             >
-              <h4 className="text-sm font-semibold text-zinc-400 mb-3">
-                Social Links
-              </h4>
+              <TextField name="description" className="w-full">
+                <Label className="text-zinc-400 font-medium text-sm">
+                  Brief Description
+                </Label>
+                <TextArea
+                  placeholder="Tell us about your company's mission and culture..."
+                  rows={4}
+                  className={textAreaClass}
+                  value={formValues.description}
+                  onChange={(e) => handleInputChange("description", e.target.value)}
+                />
+                <Description className="text-xs text-zinc-500 mt-1">
+                  Optional: Tell candidates about your company culture and values
+                </Description>
+              </TextField>
+            </motion.div>
+
+            {/* Additional Information Section */}
+            <motion.div
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.3 }}
+              className="border-t border-zinc-900 pt-6 mt-4"
+            >
+              <h3 className="text-md font-semibold text-zinc-200 mb-4">
+                Additional Information
+              </h3>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <TextField name="twitter" className="w-full">
+                <TextField name="foundedYear" className="w-full">
                   <Label className="text-zinc-400 font-medium text-sm">
-                    Twitter URL
+                    Founded Year
                   </Label>
                   <Input
-                    placeholder="https://twitter.com/company"
+                    placeholder="e.g. 2020"
                     className={textInputClass}
-                    value={formValues.twitter}
+                    value={formValues.foundedYear}
                     onChange={(e) =>
-                      handleInputChange("twitter", e.target.value)
+                      handleInputChange("foundedYear", e.target.value)
                     }
                   />
                 </TextField>
 
-                <TextField name="linkedin" className="w-full">
+                <TextField name="companyType" className="w-full">
                   <Label className="text-zinc-400 font-medium text-sm">
-                    LinkedIn URL
+                    Company Type
                   </Label>
                   <Input
-                    placeholder="https://linkedin.com/company/company"
+                    placeholder="e.g. Private, Public, Non-profit"
                     className={textInputClass}
-                    value={formValues.linkedin}
+                    value={formValues.companyType}
                     onChange={(e) =>
-                      handleInputChange("linkedin", e.target.value)
+                      handleInputChange("companyType", e.target.value)
                     }
                   />
                 </TextField>
 
-                <TextField name="instagram" className="w-full">
+                <TextField name="mission" className="w-full">
                   <Label className="text-zinc-400 font-medium text-sm">
-                    Instagram URL
+                    Mission Statement
                   </Label>
                   <Input
-                    placeholder="https://instagram.com/company"
+                    placeholder="Our mission is to..."
                     className={textInputClass}
-                    value={formValues.instagram}
+                    value={formValues.mission}
                     onChange={(e) =>
-                      handleInputChange("instagram", e.target.value)
+                      handleInputChange("mission", e.target.value)
                     }
                   />
                 </TextField>
 
-                <TextField name="youtube" className="w-full">
+                <TextField name="vision" className="w-full">
                   <Label className="text-zinc-400 font-medium text-sm">
-                    YouTube URL
+                    Vision Statement
                   </Label>
                   <Input
-                    placeholder="https://youtube.com/@company"
+                    placeholder="Our vision is to..."
                     className={textInputClass}
-                    value={formValues.youtube}
+                    value={formValues.vision}
                     onChange={(e) =>
-                      handleInputChange("youtube", e.target.value)
+                      handleInputChange("vision", e.target.value)
+                    }
+                  />
+                </TextField>
+
+                <TextField name="values" className="w-full md:col-span-2">
+                  <Label className="text-zinc-400 font-medium text-sm">
+                    Core Values
+                  </Label>
+                  <Input
+                    placeholder="Innovation, Integrity, Teamwork..."
+                    className={textInputClass}
+                    value={formValues.values}
+                    onChange={(e) =>
+                      handleInputChange("values", e.target.value)
+                    }
+                  />
+                </TextField>
+
+                <TextField name="phone" className="w-full">
+                  <Label className="text-zinc-400 font-medium text-sm">
+                    Phone Number
+                  </Label>
+                  <Input
+                    placeholder="+1 (555) 123-4567"
+                    className={textInputClass}
+                    value={formValues.phone}
+                    onChange={(e) =>
+                      handleInputChange("phone", e.target.value)
+                    }
+                  />
+                </TextField>
+
+                <TextField name="email" className="w-full">
+                  <Label className="text-zinc-400 font-medium text-sm">
+                    Contact Email
+                  </Label>
+                  <Input
+                    placeholder="contact@company.com"
+                    className={textInputClass}
+                    value={formValues.email}
+                    onChange={(e) =>
+                      handleInputChange("email", e.target.value)
                     }
                   />
                 </TextField>
               </div>
+
+              {/* Social Links */}
+              <motion.div
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.35 }}
+                className="mt-4"
+              >
+                <h4 className="text-sm font-semibold text-zinc-400 mb-3">
+                  Social Links
+                </h4>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <TextField name="twitter" className="w-full">
+                    <Label className="text-zinc-400 font-medium text-sm">
+                      Twitter URL
+                    </Label>
+                    <Input
+                      placeholder="https://twitter.com/company"
+                      className={textInputClass}
+                      value={formValues.twitter}
+                      onChange={(e) =>
+                        handleInputChange("twitter", e.target.value)
+                      }
+                    />
+                  </TextField>
+
+                  <TextField name="linkedin" className="w-full">
+                    <Label className="text-zinc-400 font-medium text-sm">
+                      LinkedIn URL
+                    </Label>
+                    <Input
+                      placeholder="https://linkedin.com/company/company"
+                      className={textInputClass}
+                      value={formValues.linkedin}
+                      onChange={(e) =>
+                        handleInputChange("linkedin", e.target.value)
+                      }
+                    />
+                  </TextField>
+
+                  <TextField name="instagram" className="w-full">
+                    <Label className="text-zinc-400 font-medium text-sm">
+                      Instagram URL
+                    </Label>
+                    <Input
+                      placeholder="https://instagram.com/company"
+                      className={textInputClass}
+                      value={formValues.instagram}
+                      onChange={(e) =>
+                        handleInputChange("instagram", e.target.value)
+                      }
+                    />
+                  </TextField>
+
+                  <TextField name="youtube" className="w-full">
+                    <Label className="text-zinc-400 font-medium text-sm">
+                      YouTube URL
+                    </Label>
+                    <Input
+                      placeholder="https://youtube.com/@company"
+                      className={textInputClass}
+                      value={formValues.youtube}
+                      onChange={(e) =>
+                        handleInputChange("youtube", e.target.value)
+                      }
+                    />
+                  </TextField>
+                </div>
+              </motion.div>
             </motion.div>
           </motion.div>
-        </motion.div>
 
-        {/* Form Actions */}
-        <motion.div
-          initial={{ opacity: 0, y: 10 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.4 }}
-          className="flex justify-end gap-3 pt-5 border-t border-zinc-900"
-        >
-          {company && company._id && (
-            <Button
-              type="button"
-              variant="bordered"
-              onPress={() => setIsEditing(false)}
-              className="border-zinc-800 text-zinc-400 hover:bg-zinc-900 rounded-lg px-5 h-11 transition-all"
-            >
-              Cancel
-            </Button>
-          )}
-          <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
-            <Button
-              type="submit"
-              isLoading={isSubmitting}
-              className="bg-white text-black font-semibold hover:bg-zinc-200 rounded-lg px-6 h-11 shadow-lg shadow-white/10 transition-all"
-            >
-              {company && company._id ? "Save Updates" : "Complete Setup"}
-            </Button>
+          {/* Form Actions */}
+          <motion.div
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.4 }}
+            className="flex justify-end gap-3 pt-5 border-t border-zinc-900"
+          >
+            {company && company._id && (
+              <Button
+                type="button"
+                variant="bordered"
+                onPress={() => setIsEditing(false)}
+                className="border-zinc-800 text-zinc-400 hover:bg-zinc-900 rounded-lg px-5 h-11 transition-all"
+              >
+                Cancel
+              </Button>
+            )}
+            <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
+              <Button
+                type="submit"
+                isLoading={isSubmitting}
+                className="bg-white text-black font-semibold hover:bg-zinc-200 rounded-lg px-6 h-11 shadow-lg shadow-white/10 transition-all"
+              >
+                {company && company._id ? "Save Updates" : "Complete Setup"}
+              </Button>
+            </motion.div>
           </motion.div>
-        </motion.div>
-      </Form>
+        </Form>
+      </div>
     </motion.div>
   );
 }

@@ -387,7 +387,7 @@ export function DashboardSidebar() {
         initial={{ opacity: 0, x: -20 }}
         animate={{ opacity: 1, x: 0 }}
         transition={{ duration: 0.5, ease: "easeOut" }}
-        className="hidden lg:flex flex-col w-64 h-screen sticky top-0 bg-zinc-950/60 backdrop-blur-xl border-r border-white/5 p-4 shadow-2xl shadow-black/50"
+        className="hidden lg:flex flex-col w-64 h-screen sticky top-0 bg-[#090a0f] border-r border-white/5 p-4 shadow-2xl shadow-black/50"
       >
         <div className="flex items-center gap-2 px-3 py-4 mb-2 border-b border-white/5">
           <div className="relative w-[150px] h-[40px]">

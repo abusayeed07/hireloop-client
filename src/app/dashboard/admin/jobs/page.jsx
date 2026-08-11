@@ -120,63 +120,60 @@ export default function JobsPage() {
   const itemsPerPage = pageSize;
 
   // ==========================================
-  // FETCH DATA
+  // FETCH DATA - Only fetch on mount, NOT on filter changes
   // ==========================================
-  const fetchJobs = useCallback(async () => {
-    setLoading(true);
-    try {
-      const filters = {};
-      if (approvalFilter !== "all") {
-        filters.adminApproval = approvalFilter;
-      }
-      if (statusFilter !== "all") {
-        filters.status = statusFilter;
-      }
-      
-      const jobsData = await getAdminJobs(filters);
-      const statsData = await getAdminJobStats();
-
-      // Normalize jobs
-      const normalizedJobs = jobsData.map(job => ({
-        ...job,
-        id: job._id || job.id,
-        status: (job.status || 'active').toLowerCase(),
-        adminApproval: job.adminApproval || 'pending',
-        adminRejectionReason: job.adminRejectionReason || '',
-        jobTitle: job.jobTitle || job.title || 'Untitled Job',
-        company: job.companyName || job.company || 'Unknown Company',
-        companyLogo: job.companyLogo || job.logo || null,
-        category: job.jobCategory || job.category || 'Other',
-        jobType: job.jobType || 'Full-time',
-        datePosted: job.createdAt || job.datePosted || new Date().toISOString(),
-      }));
-
-      setJobs(normalizedJobs);
-
-      // Set stats
-      setStats({
-        engagementRate: statsData.engagementRate || 0,
-        avgTimeToFill: statsData.avgTimeToFill || 0,
-        totalApplications: statsData.totalApplications || 0,
-        totalJobs: statsData.totalJobs || 0,
-        activeJobs: statsData.activeJobs || 0,
-        pendingJobs: statsData.pendingJobs || 0,
-        pendingApproval: statsData.pendingApproval || 0,
-        rejectedJobs: statsData.rejectedJobs || 0,
-        newJobs3Days: statsData.newJobs3Days || 0,
-      });
-    } catch (error) {
-      console.error("❌ Error fetching data:", error);
-      toast.error(error.message || "Failed to load jobs");
-      setJobs([]);
-    } finally {
-      setLoading(false);
-    }
-  }, [statusFilter, approvalFilter]);
-
   useEffect(() => {
+    const fetchJobs = async () => {
+      setLoading(true);
+      try {
+        const jobsData = await getAdminJobs({});
+        const statsData = await getAdminJobStats();
+
+        // Normalize jobs and SORT BY DATE (newest first)
+        const normalizedJobs = jobsData.map(job => ({
+          ...job,
+          id: job._id || job.id,
+          status: (job.status || 'active').toLowerCase(),
+          adminApproval: job.adminApproval || 'pending',
+          adminRejectionReason: job.adminRejectionReason || '',
+          jobTitle: job.jobTitle || job.title || 'Untitled Job',
+          company: job.companyName || job.company || 'Unknown Company',
+          companyLogo: job.companyLogo || job.logo || null,
+          category: job.jobCategory || job.category || 'Other',
+          jobType: job.jobType || 'Full-time',
+          datePosted: job.createdAt || job.datePosted || new Date().toISOString(),
+        })).sort((a, b) => {
+          // ✅ Sort by datePosted - newest first
+          const dateA = new Date(a.datePosted);
+          const dateB = new Date(b.datePosted);
+          return dateB - dateA;
+        });
+
+        setJobs(normalizedJobs);
+
+        // Set stats
+        setStats({
+          engagementRate: statsData.engagementRate || 0,
+          avgTimeToFill: statsData.avgTimeToFill || 0,
+          totalApplications: statsData.totalApplications || 0,
+          totalJobs: statsData.totalJobs || 0,
+          activeJobs: statsData.activeJobs || 0,
+          pendingJobs: statsData.pendingJobs || 0,
+          pendingApproval: statsData.pendingApproval || 0,
+          rejectedJobs: statsData.rejectedJobs || 0,
+          newJobs3Days: statsData.newJobs3Days || 0,
+        });
+      } catch (error) {
+        console.error("❌ Error fetching data:", error);
+        toast.error(error.message || "Failed to load jobs");
+        setJobs([]);
+      } finally {
+        setLoading(false);
+      }
+    };
+
     fetchJobs();
-  }, [fetchJobs]);
+  }, []); // ✅ Empty dependency array - only fetch on mount
 
   // ==========================================
   // LOGIC
@@ -198,7 +195,12 @@ export default function JobsPage() {
       );
     }
 
-    // We handle status filter safely
+    // Apply approval filter
+    if (approvalFilter !== "all") {
+      result = result.filter((job) => job.adminApproval === approvalFilter);
+    }
+
+    // Apply status filter
     if (statusFilter !== "all") {
       result = result.filter((job) => job.status === statusFilter);
     }
@@ -208,13 +210,14 @@ export default function JobsPage() {
     }
 
     return result;
-  }, [jobs, searchTerm, statusFilter, categoryFilter]);
+  }, [jobs, searchTerm, statusFilter, approvalFilter, categoryFilter]);
 
   const totalPages = Math.ceil(filteredJobs.length / itemsPerPage);
   const indexOfLastItem = currentPage * itemsPerPage;
   const indexOfFirstItem = indexOfLastItem - itemsPerPage;
   const currentJobs = filteredJobs.slice(indexOfFirstItem, indexOfLastItem);
 
+  // ✅ Reset to page 1 only when filters change, don't reload page
   useEffect(() => {
     setCurrentPage(1);
   }, [searchTerm, statusFilter, approvalFilter, categoryFilter, pageSize]);
@@ -232,7 +235,10 @@ export default function JobsPage() {
         toast.success("Job approved and published to Browse Jobs!");
         setShowConfirmModal(false);
         setSelectedJob(null);
-        await fetchJobs();
+        // Update the job in state without full reload
+        setJobs(prevJobs => prevJobs.map(job => 
+          job.id === jobId ? { ...job, adminApproval: 'approved' } : job
+        ));
       } else {
         toast.error(result.error || "Failed to approve job");
       }
@@ -242,7 +248,7 @@ export default function JobsPage() {
     } finally {
       setUpdating(false);
     }
-  }, [updating, fetchJobs]);
+  }, [updating]);
 
   const handleReject = useCallback(async (jobId, reason) => {
     if (updating) return;
@@ -258,7 +264,10 @@ export default function JobsPage() {
         setShowConfirmModal(false);
         setSelectedJob(null);
         setRejectReason("");
-        await fetchJobs();
+        // Update the job in state without full reload
+        setJobs(prevJobs => prevJobs.map(job => 
+          job.id === jobId ? { ...job, adminApproval: 'rejected', adminRejectionReason: reason } : job
+        ));
       } else {
         toast.error(result.error || "Failed to reject job");
       }
@@ -268,7 +277,7 @@ export default function JobsPage() {
     } finally {
       setUpdating(false);
     }
-  }, [updating, fetchJobs]);
+  }, [updating]);
 
   const handleDelete = useCallback(async (jobId) => {
     if (updating) return;
@@ -279,7 +288,8 @@ export default function JobsPage() {
         toast.success("Job deleted successfully");
         setShowConfirmModal(false);
         setSelectedJob(null);
-        await fetchJobs();
+        // Remove the job from state without full reload
+        setJobs(prevJobs => prevJobs.filter(job => job.id !== jobId));
       } else {
         toast.error(result.error || "Failed to delete job");
       }
@@ -289,7 +299,7 @@ export default function JobsPage() {
     } finally {
       setUpdating(false);
     }
-  }, [updating, fetchJobs]);
+  }, [updating]);
 
   const handleJobAction = useCallback((jobId, action) => {
     if (showConfirmModal || updating) return;
@@ -488,7 +498,7 @@ export default function JobsPage() {
             <motion.button
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
-              onClick={() => fetchJobs()}
+              onClick={() => window.location.reload()}
               className="flex items-center gap-2 px-4 py-2 bg-zinc-800/50 hover:bg-zinc-700/50 text-zinc-300 rounded-lg text-sm transition-all duration-300 border border-white/5 hover:border-white/10"
             >
               <RefreshCw className="w-4 h-4" />

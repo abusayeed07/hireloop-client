@@ -1,5 +1,3 @@
-// src/app/dashboard/recruiter/jobs/new/page.jsx
-
 "use client";
 
 import React, { useState, useEffect } from "react";
@@ -12,6 +10,17 @@ import { useRouter } from "next/navigation";
 import { motion } from "framer-motion";
 import toast from "react-hot-toast";
 import Metadata from "@/components/Metadata";
+import { Zap, Sparkles } from "lucide-react"; // Added icons for the upgrade block
+
+// ✅ 1. Added: Plan Limits Configuration
+const planLimits = {
+  recruiter_free: 3,
+  free: 3,
+  recruiter_growth: 10,
+  growth: 10,
+  recruiter_enterprise: 50,
+  enterprise: 50,
+};
 
 export default function PostJobPage() {
   const router = useRouter();
@@ -21,6 +30,8 @@ export default function PostJobPage() {
   const [loading, setLoading] = useState(true);
   const [isRedirecting, setIsRedirecting] = useState(false);
   const [companyStatus, setCompanyStatus] = useState(null);
+  // ✅ 2. Added: Stats state to track limits
+  const [stats, setStats] = useState({ total: 0, max: 0, isLimitReached: false });
 
   useEffect(() => {
     let isMounted = true;
@@ -65,19 +76,30 @@ export default function PostJobPage() {
         // ✅ Set company status
         setCompanyStatus(companyData.status || 'approved');
 
+        let jobsData = [];
         // ✅ Company exists, fetch jobs (only if approved)
         if (companyData.status === 'approved') {
-          const jobsData = await getMyJobs() || [];
+          jobsData = await getMyJobs() || [];
           console.log('🔍 Jobs data received:', jobsData.length, 'jobs');
-          if (isMounted) {
-            setJobs(jobsData);
-          }
         } else {
           // ✅ If pending or rejected, set jobs to empty
           setJobs([]);
         }
         
         if (isMounted) {
+          setJobs(jobsData);
+          
+          // ✅ 3. Added: Calculate and set the limit stats
+          const userPlan = session?.user?.plan || "recruiter_free";
+          const maxJobs = planLimits[userPlan] || planLimits.recruiter_free;
+          const totalJobs = jobsData.length;
+          
+          setStats({
+            total: totalJobs,
+            max: maxJobs,
+            isLimitReached: totalJobs >= maxJobs
+          });
+
           // ✅ FIX: Ensure adminRejectionReason is passed to company
           setCompany({
             ...companyData,
@@ -171,7 +193,39 @@ export default function PostJobPage() {
               />
             </div>
           )}
-          <PostJobForm user={session.user} company={company} />
+
+          {/* ✅ 4. Added: Conditional rendering for Limit Reached */}
+          {companyStatus === 'approved' && stats.isLimitReached ? (
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="bg-[#121214]/80 backdrop-blur-sm border border-red-500/30 rounded-2xl p-12 text-center max-w-2xl mx-auto shadow-2xl shadow-red-500/5"
+            >
+              <div className="flex justify-center mb-6">
+                <div className="w-20 h-20 bg-red-500/10 rounded-full flex items-center justify-center border border-red-500/20">
+                  <Zap className="w-10 h-10 text-red-400" />
+                </div>
+              </div>
+              <h2 className="text-2xl font-bold text-white mb-3">Job Limit Reached</h2>
+              <p className="text-zinc-400 mb-2">
+                You have posted <span className="text-white font-bold">{stats.total}</span> out of your <span className="text-white font-bold">{stats.max}</span> available jobs.
+              </p>
+              <p className="text-zinc-500 text-sm mb-8">
+                To continue posting new job opportunities, please upgrade your plan.
+              </p>
+              
+              <button
+  onClick={() => router.push('/pricing?tab=recruiter')}
+  className="inline-flex items-center gap-3 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white font-semibold rounded-xl px-8 py-3 transition-all shadow-lg shadow-blue-600/20"
+>
+  <Sparkles className="w-5 h-5" />
+  Upgrade Plan
+</button>
+            </motion.div>
+          ) : (
+            /* ✅ Show form only if not at limit */
+            companyStatus === 'approved' && <PostJobForm user={session.user} company={company} />
+          )}
         </div>
       </div>
     </>

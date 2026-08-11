@@ -1,4 +1,3 @@
-// src/app/dashboard/recruiter/applications/page.jsx
 "use client";
 
 import React, { useState, useEffect, useMemo } from "react";
@@ -10,6 +9,8 @@ import {
     updateApplicationStatus,
     getApplicationStats,
 } from "@/lib/api/applications";
+// ✅ We need to import this to check if a company exists
+import { getLoggedInRecruiterCompany } from "@/lib/api/companies";
 import {
     Briefcase,
     Building2,
@@ -108,6 +109,8 @@ const ManageAllApplications = () => {
     const { data: session, isPending } = authClient.useSession();
     const user = session?.user;
 
+    // ✅ Add a state for redirection
+    const [isRedirecting, setIsRedirecting] = useState(false);
     const [applications, setApplications] = useState([]);
     const [stats, setStats] = useState({});
     const [loading, setLoading] = useState(true);
@@ -122,7 +125,7 @@ const ManageAllApplications = () => {
     const page = 1;
     const itemsPerPage = 10;
 
-    // Fetch applications
+    // ✅ Updated Fetch logic: Check Company FIRST
     useEffect(() => {
         const fetchData = async () => {
             if (!user?.id) {
@@ -131,15 +134,43 @@ const ManageAllApplications = () => {
             }
 
             try {
+                // 1. FIRST: Check if the recruiter actually has a company!
+                const company = await getLoggedInRecruiterCompany();
+                
+                if (!company || Object.keys(company).length === 0) {
+                    // Show a toast and redirect them immediately
+                    toast.error('⚠️ No company found. Please create a company profile first!', {
+                        duration: 4000,
+                        position: 'top-right',
+                    });
+                    
+                    setIsRedirecting(true);
+                    setTimeout(() => {
+                        router.push('/dashboard/recruiter/company');
+                    }, 1000);
+                    return; 
+                }
+
+                // 2. If company exists, proceed with fetching applications
                 const [appsData, statsData] = await Promise.all([
                     getRecruiterApplications(),
                     getApplicationStats(),
                 ]);
                 setApplications(appsData || []);
                 setStats(statsData || {});
+
             } catch (error) {
                 console.error("❌ Error fetching data:", error);
-                toast.error("Failed to load applications");
+                // Check if the 404 might be related to a missing company
+                if (error.message?.includes("404")) {
+                    toast.error("Company profile not found. Redirecting...");
+                    setIsRedirecting(true);
+                    setTimeout(() => {
+                        router.push('/dashboard/recruiter/company');
+                    }, 1000);
+                } else {
+                    toast.error("Failed to load applications");
+                }
             } finally {
                 setLoading(false);
             }
@@ -148,7 +179,7 @@ const ManageAllApplications = () => {
         if (!isPending) {
             fetchData();
         }
-    }, [user?.id, isPending]);
+    }, [user?.id, isPending, router]);
 
     // Filter applications
     const filteredApplications = useMemo(() => {
@@ -292,7 +323,8 @@ const ManageAllApplications = () => {
         return Array.from(statuses);
     }, [applications]);
 
-    if (loading || isPending) {
+    // Show empty loading state only if we are not redirecting
+    if ((loading || isPending) && !isRedirecting) {
         return (
             <div className="min-h-[85vh] flex items-center justify-center">
                 <div className="text-center">
@@ -301,6 +333,11 @@ const ManageAllApplications = () => {
                 </div>
             </div>
         );
+    }
+
+    // If redirecting, don't render the page
+    if (isRedirecting) {
+        return null;
     }
 
     return (
@@ -312,7 +349,7 @@ const ManageAllApplications = () => {
                     <motion.div
                         initial={{ opacity: 0, y: -20 }}
                         animate={{ opacity: 1, y: 0 }}
-                        className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-8"
+                        className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-8 md:pt-10 "
                     >
                         <div>
                             <h1 className="text-3xl font-bold bg-gradient-to-r from-white to-zinc-400 bg-clip-text text-transparent">

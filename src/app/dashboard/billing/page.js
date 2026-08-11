@@ -452,7 +452,7 @@ const BillingPage = () => {
       >
         <div className="max-w-7xl mx-auto">
           {/* Header */}
-          <div className="mb-8">
+          <div className="mb-8 md:mt-15">
             <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
               <div>
                 <h1 className="text-3xl font-bold text-white">

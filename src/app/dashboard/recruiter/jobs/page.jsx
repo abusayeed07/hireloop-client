@@ -345,6 +345,36 @@ export default function RecruiterJobs() {
     router.push(`/browse-jobs/${jobId}`);
   };
 
+  // ✅ GET ADMIN APPROVAL COLOR
+  const getAdminApprovalColor = (adminApproval) => {
+    const approval = adminApproval?.toLowerCase() || "";
+    switch (approval) {
+      case "approved":
+        return "success";
+      case "rejected":
+        return "danger";
+      case "pending":
+        return "warning";
+      default:
+        return "default";
+    }
+  };
+
+  // ✅ GET ADMIN APPROVAL TEXT
+  const getAdminApprovalText = (adminApproval) => {
+    const approval = adminApproval?.toLowerCase() || "";
+    switch (approval) {
+      case "approved":
+        return "Approved";
+      case "rejected":
+        return "Rejected";
+      case "pending":
+        return "Pending";
+      default:
+        return "N/A";
+    }
+  };
+
   // ✅ UPDATED: getStatusColor (Now uses entire Job object)
   const getStatusColor = (job) => {
     const status = job.status?.toLowerCase();
@@ -664,27 +694,30 @@ export default function RecruiterJobs() {
           >
             <Table aria-label="Company jobs management table" className="dark">
               <Table.ScrollContainer className="max-h-[70vh]">
-                <Table.Content className="min-w-[800px]">
+                <Table.Content className="min-w-[1100px]">
                   <Table.Header className="bg-[#1a1a1e]/90 sticky top-0 z-10 backdrop-blur-sm">
                     <Table.Column
                       isRowHeader
-                      className="text-zinc-300 font-medium"
+                      className="text-zinc-300 font-medium text-left px-4 py-3"
                     >
                       Job Title
                     </Table.Column>
-                    <Table.Column className="text-zinc-300 font-medium">
+                    <Table.Column className="text-zinc-300 font-medium text-left px-4 py-3">
                       Type & Category
                     </Table.Column>
-                    <Table.Column className="text-zinc-300 font-medium">
+                    <Table.Column className="text-zinc-300 font-medium text-left px-4 py-3">
                       Location
                     </Table.Column>
-                    <Table.Column className="text-zinc-300 font-medium">
+                    <Table.Column className="text-zinc-300 font-medium text-left px-4 py-3">
                       Deadline
                     </Table.Column>
-                    <Table.Column className="text-zinc-300 font-medium">
+                    <Table.Column className="text-zinc-300 font-medium text-center px-4 py-3">
                       Status
                     </Table.Column>
-                    <Table.Column className="text-zinc-300 font-medium">
+                    <Table.Column className="text-zinc-300 font-medium text-center px-4 py-3">
+                      Admin Approval
+                    </Table.Column>
+                    <Table.Column className="text-zinc-300 font-medium text-center px-4 py-3">
                       Actions
                     </Table.Column>
                   </Table.Header>
@@ -695,7 +728,7 @@ export default function RecruiterJobs() {
                           key={job._id}
                           className="border-b border-zinc-800/50 hover:bg-zinc-900/40 transition-all duration-300 group"
                         >
-                          <Table.Cell className="py-4">
+                          <Table.Cell className="py-4 px-4">
                             <motion.div
                               initial={{ opacity: 0, x: -10 }}
                               animate={{ opacity: 1, x: 0 }}
@@ -705,7 +738,7 @@ export default function RecruiterJobs() {
                               {job.jobTitle || "N/A"}
                             </motion.div>
                           </Table.Cell>
-                          <Table.Cell className="py-4">
+                          <Table.Cell className="py-4 px-4">
                             <motion.div
                               initial={{ opacity: 0 }}
                               animate={{ opacity: 1 }}
@@ -720,7 +753,7 @@ export default function RecruiterJobs() {
                               </span>
                             </motion.div>
                           </Table.Cell>
-                          <Table.Cell className="py-4">
+                          <Table.Cell className="py-4 px-4">
                             <motion.div
                               initial={{ opacity: 0 }}
                               animate={{ opacity: 1 }}
@@ -737,7 +770,7 @@ export default function RecruiterJobs() {
                               )}
                             </motion.div>
                           </Table.Cell>
-                          <Table.Cell className="py-4">
+                          <Table.Cell className="py-4 px-4">
                             <motion.div
                               initial={{ opacity: 0 }}
                               animate={{ opacity: 1 }}
@@ -749,8 +782,8 @@ export default function RecruiterJobs() {
                                 : "N/A"}
                             </motion.div>
                           </Table.Cell>
-                          <Table.Cell className="py-4 text-center">
-                            {/* ✅ Centered status chip */}
+                          <Table.Cell className="py-4 px-4">
+                            {/* ✅ Status chip - centered */}
                             <motion.div
                               initial={{ opacity: 0, scale: 0.8 }}
                               animate={{ opacity: 1, scale: 1 }}
@@ -761,36 +794,55 @@ export default function RecruiterJobs() {
                                 color={getStatusColor(job)}
                                 size="sm"
                                 variant="flat"
-                                className="capitalize font-medium flex items-center gap-1"
+                                className="capitalize font-medium"
                               >
                                 {getStatusText(job)}
                               </Chip>
                             </motion.div>
                           </Table.Cell>
-                          <Table.Cell className="py-4 text-center">
-                            {/* ✅ Centered action buttons (Rejected button tightly grouped with others) */}
+                          <Table.Cell className="py-4 px-4">
+                            {/* ✅ Admin Approval - with Rejected button for rejected jobs - centered */}
                             <motion.div
                               initial={{ opacity: 0, scale: 0.8 }}
                               animate={{ opacity: 1, scale: 1 }}
                               transition={{ delay: index * 0.05 + 0.25 }}
-                              className="flex items-center justify-center gap-2 flex-wrap"
+                              className="flex justify-center items-center"
                             >
-                              {/* ✅ If Job is Rejected, Show the Rejected Action Button */}
                               {job.adminApproval?.toLowerCase() ===
-                                "rejected" && (
+                              "rejected" ? (
                                 <Tooltip content="View rejected status actions">
                                   <motion.button
                                     whileHover={{ scale: 1.05 }}
                                     whileTap={{ scale: 0.95 }}
-                                    className="text-red-400 hover:text-red-300 border border-red-500/30 bg-red-500/10 hover:bg-red-500/20 px-3 py-1 rounded-lg text-xs font-medium flex items-center gap-1.5 transition-all"
+                                    className="text-red-400 hover:text-red-300 border border-red-500/30 bg-red-500/10 hover:bg-red-500/20 px-3 py-1.5 rounded-lg text-xs font-medium flex items-center gap-1.5 transition-all"
                                     onClick={() => openRejectModal(job)}
                                   >
                                     <X size={14} />
                                     Rejected
                                   </motion.button>
                                 </Tooltip>
+                              ) : (
+                                <Chip
+                                  color={getAdminApprovalColor(
+                                    job.adminApproval,
+                                  )}
+                                  size="sm"
+                                  variant="flat"
+                                  className="capitalize font-medium"
+                                >
+                                  {getAdminApprovalText(job.adminApproval)}
+                                </Chip>
                               )}
-
+                            </motion.div>
+                          </Table.Cell>
+                          <Table.Cell className="py-4 px-4">
+                            {/* ✅ Action buttons - centered */}
+                            <motion.div
+                              initial={{ opacity: 0, scale: 0.8 }}
+                              animate={{ opacity: 1, scale: 1 }}
+                              transition={{ delay: index * 0.05 + 0.3 }}
+                              className="flex items-center justify-center gap-2"
+                            >
                               <Tooltip content="View Details">
                                 <motion.button
                                   whileHover={{ scale: 1.1 }}
@@ -925,7 +977,7 @@ export default function RecruiterJobs() {
             </Modal.Backdrop>
           </Modal>
 
-          {/* ✅ Rejected Action Modal - SIMPLEST WORKING VERSION */}
+          {/* ✅ Rejected Action Modal */}
           {rejectModalOpen && (
             <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm">
               <div className="bg-[#0d0d0e] border border-red-500/30 rounded-2xl p-8 max-w-md w-full mx-4 relative">

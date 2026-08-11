@@ -103,6 +103,21 @@ const timeAgo = (dateString) => {
   return formatDate(dateString);
 };
 
+// Normalize any date to a "YYYY-MM-DD" key in local time
+// (avoids timezone drift and mismatches from ISO string splitting)
+const toDateKey = (date) => {
+  const y = date.getFullYear();
+  const m = String(date.getMonth() + 1).padStart(2, "0");
+  const d = String(date.getDate()).padStart(2, "0");
+  return `${y}-${m}-${d}`;
+};
+
+const toDisplayLabel = (date) =>
+  date.toLocaleDateString("en-US", { month: "short", day: "numeric" });
+
+// How many trailing days the New Users Trend chart should always show
+const CHART_DAYS_RANGE = 12;
+
 // ==========================================
 // MAIN COMPONENT
 // ==========================================
@@ -148,7 +163,7 @@ export default function AdminDashboardHomePage() {
         {
           credentials: "include",
           headers: { "Content-Type": "application/json" },
-        }
+        },
       );
       const allUsersData = await allUsersRes.json();
 
@@ -158,7 +173,7 @@ export default function AdminDashboardHomePage() {
         {
           credentials: "include",
           headers: { "Content-Type": "application/json" },
-        }
+        },
       );
       const companiesData = await companiesRes.json();
 
@@ -175,7 +190,7 @@ export default function AdminDashboardHomePage() {
         {
           credentials: "include",
           headers: { "Content-Type": "application/json" },
-        }
+        },
       );
       const billingData = await billingRes.json();
 
@@ -230,7 +245,7 @@ export default function AdminDashboardHomePage() {
         }));
         const revenue = newTransactions.reduce(
           (sum, txn) => sum + (txn.amount || 0),
-          0
+          0,
         );
         newStats.platformRevenue = revenue;
       }
@@ -297,7 +312,7 @@ export default function AdminDashboardHomePage() {
       result = result.filter(
         (txn) =>
           txn.userEmail?.toLowerCase().includes(query) ||
-          txn.transactionId?.toLowerCase().includes(query)
+          txn.transactionId?.toLowerCase().includes(query),
       );
     }
     return result;
@@ -308,7 +323,7 @@ export default function AdminDashboardHomePage() {
   const indexOfFirstItem = indexOfLastItem - pageSize;
   const currentTxns = filteredTransactions.slice(
     indexOfFirstItem,
-    indexOfLastItem
+    indexOfLastItem,
   );
 
   useEffect(() => {
@@ -334,57 +349,37 @@ export default function AdminDashboardHomePage() {
       .map(([category, count]) => ({ category, count }));
   }, [jobs]);
 
-  // User Trend Data for Area Chart
+  // User Trend Data for Area Chart — FIXED LAST 12 DAYS
+  // (always shows every day in the window, even days with 0 signups)
   const userTrendData = useMemo(() => {
-    if (!users || users.length === 0) return [];
-
-    const now = new Date();
-    const thirtyDaysAgo = new Date(now);
-    thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
-
-    const dailyCounts = {};
-
-    users.forEach((user) => {
+    // 1. Count signups per calendar day from actual user records
+    const countByDateKey = {};
+    (users || []).forEach((user) => {
       const createdAt = new Date(user.createdAt);
       if (isNaN(createdAt.getTime())) return;
 
-      if (createdAt >= thirtyDaysAgo && createdAt <= now) {
-        const dateKey = createdAt.toISOString().split("T")[0];
-        if (!dailyCounts[dateKey]) {
-          dailyCounts[dateKey] = {
-            date: createdAt.toLocaleDateString("en-US", {
-              month: "short",
-              day: "numeric",
-            }),
-            fullDate: createdAt,
-            count: 0,
-          };
-        }
-        dailyCounts[dateKey].count += 1;
-      }
+      const key = toDateKey(createdAt);
+      countByDateKey[key] = (countByDateKey[key] || 0) + 1;
     });
 
-    const sortedData = Object.values(dailyCounts)
-      .sort((a, b) => a.fullDate - b.fullDate)
-      .map((item) => ({
-        date: item.date,
-        users: item.count,
-      }));
+    // 2. Build a fixed trailing window of CHART_DAYS_RANGE days ending today,
+    //    so gaps between signups don't distort the axis/shape.
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
 
-    if (sortedData.length === 0) {
-      return [
-        { date: "Jul 10", users: 3 },
-        { date: "Jul 15", users: 2 },
-        { date: "Jul 18", users: 1 },
-        { date: "Jul 22", users: 1 },
-        { date: "Jul 27", users: 2 },
-        { date: "Jul 28", users: 1 },
-        { date: "Jul 31", users: 1 },
-        { date: "Aug 3", users: 1 },
-      ];
+    const result = [];
+    for (let i = CHART_DAYS_RANGE - 1; i >= 0; i--) {
+      const d = new Date(today);
+      d.setDate(d.getDate() - i);
+
+      const key = toDateKey(d);
+      result.push({
+        date: toDisplayLabel(d),
+        users: countByDateKey[key] || 0,
+      });
     }
 
-    return sortedData;
+    return result;
   }, [users]);
 
   const getStatusBadge = (status) => {
@@ -669,10 +664,10 @@ export default function AdminDashboardHomePage() {
             <div className="flex items-center justify-between mb-4">
               <div>
                 <h3 className="text-sm font-semibold text-white">
-                  New Users Trend (30d)
+                  New Users Trend ({CHART_DAYS_RANGE}d)
                 </h3>
                 <p className="text-xs text-zinc-500 mt-0.5">
-                  Account registrations over the past 30 days
+                  Account registrations over the last {CHART_DAYS_RANGE} days
                 </p>
               </div>
               <span className="text-xs font-mono text-emerald-400">

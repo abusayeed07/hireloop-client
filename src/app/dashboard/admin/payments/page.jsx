@@ -98,6 +98,18 @@ const timeAgo = (dateString) => {
   return formatDate(dateString);
 };
 
+// Helper: normalize any date to a "YYYY-MM-DD" key in local time
+// (avoids toLocaleDateString mismatches and timezone drift)
+const toDateKey = (date) => {
+  const y = date.getFullYear();
+  const m = String(date.getMonth() + 1).padStart(2, "0");
+  const d = String(date.getDate()).padStart(2, "0");
+  return `${y}-${m}-${d}`;
+};
+
+const toDisplayLabel = (date) =>
+  date.toLocaleDateString("en-US", { month: "short", day: "numeric" });
+
 // Plan Constants
 const SEEKER_PLANS = ["Free", "Pro", "Premium"];
 const RECRUITER_PLANS = ["Free", "Growth", "Enterprise"];
@@ -111,6 +123,9 @@ const PLAN_FILTER_OPTIONS = [
   { label: "Recruiter Growth", value: "recruiter_growth" },
   { label: "Recruiter Enterprise", value: "recruiter_enterprise" },
 ];
+
+// How many trailing days the Daily Revenue Trend chart should always show
+const CHART_DAYS_RANGE = 12;
 
 // ==========================================
 // MAIN COMPONENT
@@ -247,40 +262,43 @@ export default function PaymentPage() {
   }, [searchTerm, statusFilter, planFilter, pageSize]);
 
   // ==========================================
-  // CHART DATA (STRICT BACKEND MAPPING)
+  // CHART DATA — FIXED LAST 12 DAYS (always shows every day, even $0)
   // ==========================================
   const dailyChartData = useMemo(() => {
-    if (!transactions.length) return [];
-
-    const grouped = transactions.reduce((acc, txn) => {
+    // 1. Sum revenue per calendar day from actual transactions (paid/success only)
+    const revenueByDateKey = {};
+    transactions.forEach((txn) => {
       const rawDate = txn.createdAt;
-
-      if (!rawDate) return acc;
+      if (!rawDate) return;
 
       const date = new Date(rawDate);
-      if (isNaN(date.getTime())) return acc;
+      if (isNaN(date.getTime())) return;
 
-      const key = date.toLocaleDateString("en-US", {
-        month: "short",
-        day: "numeric",
+      if (txn.status !== "paid" && txn.status !== "success") return;
+
+      const key = toDateKey(date);
+      revenueByDateKey[key] = (revenueByDateKey[key] || 0) + Number(txn.amount || 0);
+    });
+
+    // 2. Build a fixed trailing window of CHART_DAYS_RANGE days ending today,
+    //    so every day appears on the axis regardless of whether a transaction exists for it.
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+
+    const result = [];
+    for (let i = CHART_DAYS_RANGE - 1; i >= 0; i--) {
+      const d = new Date(today);
+      d.setDate(d.getDate() - i);
+
+      const key = toDateKey(d);
+      result.push({
+        date: toDisplayLabel(d),
+        fullDate: d,
+        revenue: revenueByDateKey[key] || 0,
       });
+    }
 
-      if (!acc[key]) {
-        acc[key] = {
-          date: key,
-          fullDate: date,
-          revenue: 0,
-        };
-      }
-
-      if (txn.status === "paid" || txn.status === "success") {
-        acc[key].revenue += Number(txn.amount || 0);
-      }
-
-      return acc;
-    }, {});
-
-    return Object.values(grouped).sort((a, b) => a.fullDate - b.fullDate);
+    return result;
   }, [transactions]);
 
   // ==========================================
@@ -654,7 +672,7 @@ export default function PaymentPage() {
                     Daily Revenue Trend
                   </h3>
                   <p className="text-xs text-zinc-500 mt-0.5">
-                    Real-time daily revenue aggregation
+                    Last {CHART_DAYS_RANGE} days of revenue
                   </p>
                 </div>
                 <span className="text-xs font-mono text-zinc-500">USD ($)</span>
