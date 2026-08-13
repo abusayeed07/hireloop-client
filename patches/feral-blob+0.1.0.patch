@@ -1,0 +1,402 @@
+diff --git a/node_modules/feral-blob/dist/feral-blob.js b/node_modules/feral-blob/dist/feral-blob.js
+index 579b583..f0ebe29 100644
+--- a/node_modules/feral-blob/dist/feral-blob.js
++++ b/node_modules/feral-blob/dist/feral-blob.js
+@@ -85,10 +85,10 @@ const easeInOut = (t) => t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) /
+ const IDLE_MOODS = /* @__PURE__ */ new Set(["neutral", "hmm", "sideEye", "password"]);
+ const BODY_TRANSFORMS = {
+   // side eye — a stronger skeptical lean than "hmm" (size kept uniform: scale ≈ 1)
+-  sideEye: { x: -4, y: 1, rotate: -1.2, scaleX: 1, scaleY: 1, skewX: 0, transition: { type: "spring", stiffness: 190, damping: 18 } },
++  sideEye: { x: -4, y: 1, rotate: -1.2, scaleX: 1, scaleY: 1, skewX: 0, transition: { type:"tween", stiffness: 190, damping: 18 } },
+   password: { x: 0, y: [0, -2, 0], rotate: 0, scaleX: [1, 0.996, 1], scaleY: [1, 1.008, 1], skewX: 0, transition: { duration: 3.8, ease: "easeInOut", repeat: Infinity } },
+   // hmm — a faint skeptical skew, body otherwise calm
+-  hmm: { y: 0, scaleX: 1, scaleY: 1, skewX: 2.5, transition: { type: "spring", stiffness: 200, damping: 18 } },
++  hmm: { y: 0, scaleX: 1, scaleY: 1, skewX: 2.5, transition: { type:"tween", stiffness: 200, damping: 18 } },
+   neutral: {
+     // gentle vertical "breathing" only — the bottom-skirt slosh (the rAF bottomWave
+     // loop on the body path) now carries the jelly life, so we drop the body-wide skew
+@@ -104,7 +104,7 @@ const BODY_TRANSFORMS = {
+     y: [0, -22, -6, -10],
+     scaleX: [1, 1, 1.05, 1],
+     scaleY: [1, 1.06, 0.96, 1],
+-    transition: { type: "spring", stiffness: 220, damping: 9, mass: 0.7 }
++    transition: { type:"tween", stiffness: 220, damping: 9, mass: 0.7 }
+   },
+   sad: {
+     // the melt is the SAD_SHAPE body path itself; the body group just holds (no scaling),
+@@ -112,7 +112,7 @@ const BODY_TRANSFORMS = {
+     y: 0,
+     scaleX: 1,
+     scaleY: 1,
+-    transition: { type: "spring", stiffness: 130, damping: 20, mass: 1.05 }
++    transition: { type:"tween", stiffness: 130, damping: 20, mass: 1.05 }
+   },
+   angry: {
+     // tense — a slight downward brace, NOT a puff-up; width stays at 1 so it doesn't
+@@ -120,16 +120,16 @@ const BODY_TRANSFORMS = {
+     y: 5,
+     scaleX: 1,
+     scaleY: 0.95,
+-    transition: { type: "spring", stiffness: 260, damping: 8, mass: 0.7 }
++    transition: { type:"tween", stiffness: 260, damping: 8, mass: 0.7 }
+   }
+ };
+ const FACE_TRANSFORMS = {
+   // side eye — a tiny head tilt sells the "really?" judgment
+-  sideEye: { x: -7, y: 2, scaleX: 1, scaleY: 0.98, rotate: -2, transition: { delay: 0.05, type: "spring", stiffness: 210, damping: 18 } },
++  sideEye: { x: -7, y: 2, scaleX: 1, scaleY: 0.98, rotate: -2, transition: { delay: 0.05, type:"tween", stiffness: 210, damping: 18 } },
+   // typing a password → a calm look-DOWN tuck (the downward "︶ ︶" eyes carry the "not looking" read;
+   // a small head tuck + slight turn away from the field reinforces it without a big swing)
+-  password: { x: -4, y: 3, scale: 1, rotate: -3, transition: { delay: 0.04, type: "spring", stiffness: 210, damping: 17 } },
+-  hmm: { y: 0, scale: 1, transition: { delay: 0.05, type: "spring", stiffness: 200, damping: 18 } },
++  password: { x: -4, y: 3, scale: 1, rotate: -3, transition: { delay: 0.04, type:"tween", stiffness: 210, damping: 17 } },
++  hmm: { y: 0, scale: 1, transition: { delay: 0.05, type:"tween", stiffness: 200, damping: 18 } },
+   neutral: {
+     y: [0, -2, 0],
+     scale: 1,
+@@ -139,7 +139,7 @@ const FACE_TRANSFORMS = {
+     // track the body's bounce EXACTLY (matched y keyframes) so the face rides up with it, no detach
+     y: [0, -22, -6, -10],
+     scale: 1,
+-    transition: { delay: 0.05, type: "spring", stiffness: 220, damping: 9, mass: 0.7 }
++    transition: { delay: 0.05, type:"tween", stiffness: 220, damping: 9, mass: 0.7 }
+   },
+   sad: {
+     // the melted body sits lower, so the face drops onto it (looking down, sad). NO squash
+@@ -147,71 +147,71 @@ const FACE_TRANSFORMS = {
+     y: 12,
+     scaleX: 1,
+     scaleY: 1,
+-    transition: { delay: 0.04, type: "spring", stiffness: 145, damping: 18, mass: 0.95 }
++    transition: { delay: 0.04, type:"tween", stiffness: 145, damping: 18, mass: 0.95 }
+   },
+   angry: {
+     y: 7,
+     scaleX: 1,
+     scaleY: 0.96,
+-    transition: { delay: 0.05, type: "spring", stiffness: 260, damping: 9, mass: 0.7 }
++    transition: { delay: 0.05, type:"tween", stiffness: 260, damping: 9, mass: 0.7 }
+   }
+ };
+ const LEFT_ARM_TRANSFORMS = {
+-  sideEye: { y: 0, rotate: 0, transition: { delay: 0.1, type: "spring", stiffness: 200, damping: 16 } },
+-  password: { y: 0, rotate: -2, transition: { delay: 0.1, type: "spring", stiffness: 200, damping: 16 } },
+-  hmm: { y: 0, rotate: 0, transition: { delay: 0.1, type: "spring", stiffness: 200, damping: 16 } },
++  sideEye: { y: 0, rotate: 0, transition: { delay: 0.1, type:"tween", stiffness: 200, damping: 16 } },
++  password: { y: 0, rotate: -2, transition: { delay: 0.1, type:"tween", stiffness: 200, damping: 16 } },
++  hmm: { y: 0, rotate: 0, transition: { delay: 0.1, type:"tween", stiffness: 200, damping: 16 } },
+   neutral: {
+     // rest pose — the idle "fidget" (small random rotations/lifts, JS-driven on an
+     // inner group) carries the liveliness, so the arms never move on a fixed loop
+     y: 0,
+     rotate: 0,
+-    transition: { delay: 0.1, type: "spring", stiffness: 200, damping: 16 }
++    transition: { delay: 0.1, type:"tween", stiffness: 200, damping: 16 }
+   },
+   happy: {
+     // ride the bigger bounce + raise gently OUTWARD like a tiny excited hand; stays snug to the FAT body
+     y: [0, -19, -5, -9],
+     rotate: -8,
+-    transition: { delay: 0.1, type: "spring", stiffness: 210, damping: 11, mass: 0.8 }
++    transition: { delay: 0.1, type:"tween", stiffness: 210, damping: 11, mass: 0.8 }
+   },
+   sad: {
+     y: 13,
+     rotate: 12,
+     scaleX: 0.96,
+     scaleY: 0.96,
+-    transition: { delay: 0.1, type: "spring", stiffness: 135, damping: 18, mass: 0.95 }
++    transition: { delay: 0.1, type:"tween", stiffness: 135, damping: 18, mass: 0.95 }
+   },
+   angry: {
+     y: 2,
+     rotate: -3,
+-    transition: { delay: 0.08, type: "spring", stiffness: 250, damping: 10, mass: 0.8 }
++    transition: { delay: 0.08, type:"tween", stiffness: 250, damping: 10, mass: 0.8 }
+   }
+ };
+ const RIGHT_ARM_TRANSFORMS = {
+-  sideEye: { y: 0, rotate: 0, transition: { delay: 0.1, type: "spring", stiffness: 200, damping: 16 } },
+-  password: { y: 0, rotate: 2, transition: { delay: 0.1, type: "spring", stiffness: 200, damping: 16 } },
+-  hmm: { y: 0, rotate: 0, transition: { delay: 0.1, type: "spring", stiffness: 200, damping: 16 } },
++  sideEye: { y: 0, rotate: 0, transition: { delay: 0.1, type:"tween", stiffness: 200, damping: 16 } },
++  password: { y: 0, rotate: 2, transition: { delay: 0.1, type:"tween", stiffness: 200, damping: 16 } },
++  hmm: { y: 0, rotate: 0, transition: { delay: 0.1, type:"tween", stiffness: 200, damping: 16 } },
+   neutral: {
+     y: 0,
+     rotate: 0,
+-    transition: { delay: 0.1, type: "spring", stiffness: 200, damping: 16 }
++    transition: { delay: 0.1, type:"tween", stiffness: 200, damping: 16 }
+   },
+   happy: {
+     // ride the bigger bounce + raise gently OUTWARD like a tiny excited hand; stays snug to the FAT body
+     y: [0, -19, -5, -9],
+     rotate: 8,
+-    transition: { delay: 0.12, type: "spring", stiffness: 210, damping: 11, mass: 0.8 }
++    transition: { delay: 0.12, type:"tween", stiffness: 210, damping: 11, mass: 0.8 }
+   },
+   sad: {
+     y: 13,
+     rotate: -12,
+     scaleX: 0.96,
+     scaleY: 0.96,
+-    transition: { delay: 0.1, type: "spring", stiffness: 135, damping: 18, mass: 0.95 }
++    transition: { delay: 0.1, type:"tween", stiffness: 135, damping: 18, mass: 0.95 }
+   },
+   angry: {
+     y: 2,
+     rotate: 3,
+-    transition: { delay: 0.08, type: "spring", stiffness: 250, damping: 10, mass: 0.8 }
++    transition: { delay: 0.08, type:"tween", stiffness: 250, damping: 10, mass: 0.8 }
+   }
+ };
+ const ARM_REST_POSES = [
+@@ -225,13 +225,13 @@ const ARM_REST_POSES = [
+ const LEFT_ARM_PIVOT = "229 407";
+ const RIGHT_ARM_PIVOT = "671 407";
+ const HIGHLIGHT_TRANSFORMS = {
+-  sideEye: { x: 0, y: 0, scale: 1, transition: { type: "spring", stiffness: 200, damping: 20 } },
+-  password: { x: 0, y: 0, scale: 1, transition: { type: "spring", stiffness: 200, damping: 20 } },
+-  hmm: { x: 0, y: 0, scale: 1, transition: { type: "spring", stiffness: 200, damping: 20 } },
+-  neutral: { x: 0, y: 0, scale: 1, transition: { type: "spring", stiffness: 200, damping: 20 } },
+-  happy: { x: 0, y: 0, scale: 1, transition: { type: "spring", stiffness: 220, damping: 12 } },
+-  sad: { x: 0, y: 20, scaleX: 1.02, scaleY: 0.98, transition: { type: "spring", stiffness: 150, damping: 20, mass: 0.85 } },
+-  angry: { x: 0, y: 0, scale: 1, transition: { type: "spring", stiffness: 240, damping: 12 } }
++  sideEye: { x: 0, y: 0, scale: 1, transition: { type:"tween", stiffness: 200, damping: 20 } },
++  password: { x: 0, y: 0, scale: 1, transition: { type:"tween", stiffness: 200, damping: 20 } },
++  hmm: { x: 0, y: 0, scale: 1, transition: { type:"tween", stiffness: 200, damping: 20 } },
++  neutral: { x: 0, y: 0, scale: 1, transition: { type:"tween", stiffness: 200, damping: 20 } },
++  happy: { x: 0, y: 0, scale: 1, transition: { type:"tween", stiffness: 220, damping: 12 } },
++  sad: { x: 0, y: 20, scaleX: 1.02, scaleY: 0.98, transition: { type:"tween", stiffness: 150, damping: 20, mass: 0.85 } },
++  angry: { x: 0, y: 0, scale: 1, transition: { type:"tween", stiffness: 240, damping: 12 } }
+ };
+ const HEAD_HIGHLIGHT_TRANSFORMS = {
+   // The gloss lives INSIDE the body group, so it already rides every body move. We give it NO
+@@ -239,11 +239,11 @@ const HEAD_HIGHLIGHT_TRANSFORMS = {
+   // and visibly lag the body) — it just rides along, perfectly in sync. Only sad shifts it,
+   // dropping onto the melted dome with the SAME transition as the body path morph (no delay),
+   // so it tracks the melt instead of arriving late.
+-  sideEye: { x: 0, y: 0, scale: 1, transition: { type: "spring", stiffness: 200, damping: 20 } },
+-  password: { x: 0, y: 0, scale: 1, transition: { type: "spring", stiffness: 200, damping: 20 } },
+-  hmm: { x: 0, y: 0, scale: 1, transition: { type: "spring", stiffness: 200, damping: 20 } },
+-  neutral: { x: 0, y: 0, scale: 1, transition: { type: "spring", stiffness: 200, damping: 20 } },
+-  happy: { x: 0, y: 0, scale: 1, transition: { type: "spring", stiffness: 220, damping: 12 } },
++  sideEye: { x: 0, y: 0, scale: 1, transition: { type:"tween", stiffness: 200, damping: 20 } },
++  password: { x: 0, y: 0, scale: 1, transition: { type:"tween", stiffness: 200, damping: 20 } },
++  hmm: { x: 0, y: 0, scale: 1, transition: { type:"tween", stiffness: 200, damping: 20 } },
++  neutral: { x: 0, y: 0, scale: 1, transition: { type:"tween", stiffness: 200, damping: 20 } },
++  happy: { x: 0, y: 0, scale: 1, transition: { type:"tween", stiffness: 220, damping: 12 } },
+   sad: {
+     // drops onto the melted forehead, above the brows (top accent dot hidden in sad)
+     x: 0,
+@@ -251,9 +251,9 @@ const HEAD_HIGHLIGHT_TRANSFORMS = {
+     scaleX: 0.96,
+     scaleY: 0.96,
+     opacity: 0.9,
+-    transition: { type: "spring", stiffness: 150, damping: 20, mass: 0.85 }
++    transition: { type:"tween", stiffness: 150, damping: 20, mass: 0.85 }
+   },
+-  angry: { x: 0, y: 0, scale: 1, transition: { type: "spring", stiffness: 240, damping: 12 } }
++  angry: { x: 0, y: 0, scale: 1, transition: { type:"tween", stiffness: 240, damping: 12 } }
+ };
+ const EYE_TRANSFORMS = {
+   // side eye (meme): eyes cut HARD to the side, lids a touch narrowed + deadpan
+@@ -303,13 +303,13 @@ const BOOP_TIMES = [0, 0.2, 0.5, 0.78, 1];
+ const POKE_LIMIT = 6;
+ const POKE_WINDOW = 2500;
+ const GLOSS_MOOD = {
+-  sideEye: { x: 0, y: 0, scale: 1, opacity: 0.86, transition: { type: "spring", stiffness: 200, damping: 20 } },
+-  password: { x: 0, y: 0, scale: 1, opacity: 0.88, transition: { type: "spring", stiffness: 200, damping: 20 } },
+-  hmm: { x: 0, y: 0, scale: 1, opacity: 0.9, transition: { type: "spring", stiffness: 200, damping: 20 } },
+-  neutral: { x: 0, y: 0, scale: 1, opacity: 0.92, transition: { type: "spring", stiffness: 200, damping: 20 } },
+-  happy: { x: 0, y: 0, scale: 1, opacity: 0.95, transition: { type: "spring", stiffness: 220, damping: 12 } },
+-  sad: { x: 0, y: 0, scale: 1, opacity: 0.82, transition: { type: "spring", stiffness: 140, damping: 18, mass: 0.9 } },
+-  angry: { x: 0, y: 0, scale: 1, opacity: 0.86, transition: { type: "spring", stiffness: 240, damping: 12 } }
++  sideEye: { x: 0, y: 0, scale: 1, opacity: 0.86, transition: { type:"tween", stiffness: 200, damping: 20 } },
++  password: { x: 0, y: 0, scale: 1, opacity: 0.88, transition: { type:"tween", stiffness: 200, damping: 20 } },
++  hmm: { x: 0, y: 0, scale: 1, opacity: 0.9, transition: { type:"tween", stiffness: 200, damping: 20 } },
++  neutral: { x: 0, y: 0, scale: 1, opacity: 0.92, transition: { type:"tween", stiffness: 200, damping: 20 } },
++  happy: { x: 0, y: 0, scale: 1, opacity: 0.95, transition: { type:"tween", stiffness: 220, damping: 12 } },
++  sad: { x: 0, y: 0, scale: 1, opacity: 0.82, transition: { type:"tween", stiffness: 140, damping: 18, mass: 0.9 } },
++  angry: { x: 0, y: 0, scale: 1, opacity: 0.86, transition: { type:"tween", stiffness: 240, damping: 12 } }
+ };
+ const MOUTH_PATHS = {
+   sideEye: "M432 418 C445 418 461 415 474 409",
+@@ -448,7 +448,7 @@ function JellyBlobMascot({ mood = "neutral", className, onOverpoke, happyEyes =
+   const rarmRot = useMotionValue(0);
+   const rarmY = useMotionValue(0);
+   useEffect(() => {
+-    const settle = { type: "spring", stiffness: 170, damping: 18 };
++    const settle = { type:"tween", stiffness: 170, damping: 18 };
+     if (reduce || !IDLE_MOODS.has(mood)) {
+       animate(larmRot, 0, settle);
+       animate(larmY, 0, settle);
+@@ -506,7 +506,7 @@ function JellyBlobMascot({ mood = "neutral", className, onOverpoke, happyEyes =
+     ease: "easeInOut",
+     repeat: Infinity,
+     repeatDelay: 0.02
+-  } : { type: "spring", stiffness: 260, damping: 20 };
++  } : { type:"tween", stiffness: 260, damping: 20 };
+   const bodyDMV = useMotionValue(reduce ? BODY_PATHS[mood] : IDLE_MOODS.has(mood) ? bottomWave(0) : BODY_PATHS[mood]);
+   const moodRef = useRef(mood);
+   const fromRef = useRef(bodyDMV.get());
+@@ -585,7 +585,7 @@ function JellyBlobMascot({ mood = "neutral", className, onOverpoke, happyEyes =
+         /* @__PURE__ */ jsx("stop", { offset: "0.7", stopColor: "var(--jelly-belly-glow, #ffb2dc)", stopOpacity: "0.22" }),
+         /* @__PURE__ */ jsx("stop", { offset: "1", stopColor: "var(--jelly-belly-glow, #ffb2dc)", stopOpacity: "0" })
+       ] }),
+-      /* @__PURE__ */ jsx("clipPath", { id: bodyClip, clipPathUnits: "userSpaceOnUse", children: /* @__PURE__ */ jsx(motion.path, { initial: false, d: BODY_PATHS[mood], animate: { d: BODY_PATHS[mood] }, transition: reduce ? { duration: 0 } : { type: "spring", stiffness: 140, damping: 18, mass: 0.9 } }) }),
++      /* @__PURE__ */ jsx("clipPath", { id: bodyClip, clipPathUnits: "userSpaceOnUse", children: /* @__PURE__ */ jsx(motion.path, { initial: false, d: BODY_PATHS[mood], animate: { d: BODY_PATHS[mood] }, transition: reduce ? { duration: 0 } : { type:"tween", stiffness: 140, damping: 18, mass: 0.9 } }) }),
+       /* @__PURE__ */ jsx("filter", { id: shadowBlur, x: "-40%", y: "-80%", width: "180%", height: "260%", children: /* @__PURE__ */ jsx("feGaussianBlur", { stdDeviation: "16" }) }),
+       /* @__PURE__ */ jsx("filter", { id: softBlur, x: "-30%", y: "-30%", width: "160%", height: "160%", children: /* @__PURE__ */ jsx("feGaussianBlur", { stdDeviation: "9" }) }),
+       /* @__PURE__ */ jsx("filter", { id: wideSoftBlur, x: "-45%", y: "-45%", width: "190%", height: "190%", children: /* @__PURE__ */ jsx("feGaussianBlur", { stdDeviation: "14" }) }),
+@@ -620,7 +620,7 @@ function JellyBlobMascot({ mood = "neutral", className, onOverpoke, happyEyes =
+             // frame, which is what made the path animation stutter. Opacity is composited/cheap.
+             { rx: 212, ry: 31, opacity: [0.46, 0.36, 0.46] }
+           ) : mood === "happy" ? { rx: 152, ry: 22, opacity: 0.28 } : mood === "sad" ? { rx: 248, ry: 36, opacity: 0.52 } : mood === "hmm" ? { rx: 218, ry: 31, opacity: 0.42 } : mood === "sideEye" ? { rx: 216, ry: 31, opacity: 0.4 } : { rx: 238, ry: 34, opacity: 0.5 },
+-          transition: reduce ? { duration: 0 } : mood === "neutral" ? { duration: 3.2, ease: "easeInOut", repeat: Infinity } : { type: "spring", stiffness: 260, damping: 20 }
++          transition: reduce ? { duration: 0 } : mood === "neutral" ? { duration: 3.2, ease: "easeInOut", repeat: Infinity } : { type:"tween", stiffness: 260, damping: 20 }
+         }
+       ),
+       /* @__PURE__ */ jsx(
+@@ -635,7 +635,7 @@ function JellyBlobMascot({ mood = "neutral", className, onOverpoke, happyEyes =
+           fill: "var(--jelly-shadow, var(--jelly-outline, #9855dd))",
+           filter: `url(#${softBlur})`,
+           animate: mood === "neutral" ? { rx: 137, ry: 15, opacity: [0.14, 0.1, 0.14] } : mood === "happy" ? { rx: 104, ry: 12, opacity: 0.08 } : mood === "hmm" ? { rx: 136, ry: 15, opacity: 0.12 } : mood === "sideEye" ? { rx: 134, ry: 15, opacity: 0.12 } : mood === "sad" ? { rx: 158, ry: 18, opacity: 0.16 } : { rx: 156, ry: 18, opacity: 0.15 },
+-          transition: reduce ? { duration: 0 } : mood === "neutral" ? { duration: 3.2, ease: "easeInOut", repeat: Infinity } : { type: "spring", stiffness: 260, damping: 20 }
++          transition: reduce ? { duration: 0 } : mood === "neutral" ? { duration: 3.2, ease: "easeInOut", repeat: Infinity } : { type:"tween", stiffness: 260, damping: 20 }
+         }
+       )
+     ] }),
+@@ -644,7 +644,7 @@ function JellyBlobMascot({ mood = "neutral", className, onOverpoke, happyEyes =
+       {
+         initial: false,
+         animate: attentionPose,
+-        transition: { type: "spring", stiffness: 180, damping: 18 },
++        transition: { type:"tween", stiffness: 180, damping: 18 },
+         style: { scaleX: boopX, scaleY: boop, rotate: shake, transformBox: "fill-box", transformOrigin: "center bottom" },
+         children: /* @__PURE__ */ jsxs(motion.g, { id: "typing-nod", initial: false, animate: nodPose, transition: nodTransition, style: nodMotionStyle, children: [
+           /* @__PURE__ */ jsxs(motion.g, { id: "arms", initial: false, animate: mood, children: [
+@@ -700,7 +700,7 @@ function JellyBlobMascot({ mood = "neutral", className, onOverpoke, happyEyes =
+             ] }),
+             /* @__PURE__ */ jsx(motion.g, { id: "lower-jelly-belly", animate: mood, variants: HIGHLIGHT_TRANSFORMS, style: centerMotionStyle, children: /* @__PURE__ */ jsx("ellipse", { id: "bottom-belly-glow", cx: "450", cy: "504", rx: "240", ry: "62", fill: `url(#${bellyGlow})`, opacity: "0.95" }) }),
+             /* @__PURE__ */ jsx("g", { children: /* @__PURE__ */ jsxs(motion.g, { id: "highlights", animate: mood, variants: HEAD_HIGHLIGHT_TRANSFORMS, style: centerMotionStyle, children: [
+-              /* @__PURE__ */ jsx(motion.g, { id: "head-gloss", animate: mood, variants: GLOSS_MOOD, style: centerMotionStyle, children: /* @__PURE__ */ jsxs(motion.g, { id: "head-gloss-gaze", initial: false, animate: glossGaze, transition: { type: "spring", stiffness: 180, damping: 18 }, children: [
++              /* @__PURE__ */ jsx(motion.g, { id: "head-gloss", animate: mood, variants: GLOSS_MOOD, style: centerMotionStyle, children: /* @__PURE__ */ jsxs(motion.g, { id: "head-gloss-gaze", initial: false, animate: glossGaze, transition: { type:"tween", stiffness: 180, damping: 18 }, children: [
+                 /* @__PURE__ */ jsx("ellipse", { id: "large-highlight", cx: "372", cy: "212", rx: "37", ry: "21", fill: "#ffffff", opacity: "0.9", transform: "rotate(-36 372 212)" }),
+                 /* @__PURE__ */ jsxs("g", { id: "small-highlights", children: [
+                   /* @__PURE__ */ jsx("circle", { id: "small-head-highlight", cx: "320", cy: "268", r: "12", fill: "#ffffff", opacity: "0.86" }),
+@@ -722,8 +722,8 @@ function JellyBlobMascot({ mood = "neutral", className, onOverpoke, happyEyes =
+               /* @__PURE__ */ jsx("ellipse", { id: "right-cheek-highlight-large", cx: "602", cy: "421", rx: "6.2", ry: "4.2", fill: "#ffffff", opacity: "0.44", transform: "rotate(-20 602 421)" }),
+               /* @__PURE__ */ jsx("ellipse", { id: "right-cheek-highlight-small", cx: "627", cy: "420", rx: "5.8", ry: "4", fill: "#ffffff", opacity: "0.36", transform: "rotate(22 627 420)" })
+             ] }),
+-            /* @__PURE__ */ jsxs(motion.g, { id: "eyes", initial: false, animate: eyeGaze, transition: { type: "spring", stiffness: 220, damping: 20 }, style: centerMotionStyle, children: [
+-              /* @__PURE__ */ jsxs(motion.g, { id: "left-eye", animate: mood, variants: LEFT_EYE_MOOD, transition: { delay: 0.05, type: "spring", stiffness: 240, damping: 17 }, style: centerMotionStyle, children: [
++            /* @__PURE__ */ jsxs(motion.g, { id: "eyes", initial: false, animate: eyeGaze, transition: { type:"tween", stiffness: 220, damping: 20 }, style: centerMotionStyle, children: [
++              /* @__PURE__ */ jsxs(motion.g, { id: "left-eye", animate: mood, variants: LEFT_EYE_MOOD, transition: { delay: 0.05, type:"tween", stiffness: 240, damping: 17 }, style: centerMotionStyle, children: [
+                 /* @__PURE__ */ jsx(motion.g, { initial: false, animate: { opacity: mood === "happy" && happyEyes === "smile" || mood === "password" || mood === "sideEye" ? 0 : 1 }, transition: { duration: 0.13, ease: "easeOut" }, children: /* @__PURE__ */ jsx(motion.g, { animate: mood, variants: EYE_TRANSFORMS, style: centerMotionStyle, children: /* @__PURE__ */ jsxs(motion.g, { style: { ...centerMotionStyle, scaleX: blinkLX, scaleY: blinkL }, children: [
+                   /* @__PURE__ */ jsx("ellipse", { id: "left-eye-base", cx: "353", cy: "371", rx: "32", ry: "39", fill: `url(#${eyeFill})` }),
+                   /* @__PURE__ */ jsx("ellipse", { id: "left-eye-lower-shade", cx: "353", cy: "393", rx: "23", ry: "12", fill: "var(--jelly-eye-light, #2a1640)", opacity: "0.3" }),
+@@ -736,7 +736,7 @@ function JellyBlobMascot({ mood = "neutral", className, onOverpoke, happyEyes =
+                       fill: "#ffffff",
+                       initial: false,
+                       animate: { opacity: mood === "happy" && happyEyes === "star" ? 1 : 0, scale: mood === "happy" && happyEyes === "star" ? 1 : 0.5 },
+-                      transition: { delay: mood === "happy" ? 0.12 : 0, type: "spring", stiffness: 300, damping: 16 },
++                      transition: { delay: mood === "happy" ? 0.12 : 0, type:"tween", stiffness: 300, damping: 16 },
+                       style: { transformBox: "fill-box", transformOrigin: "center" }
+                     }
+                   ),
+@@ -754,12 +754,12 @@ function JellyBlobMascot({ mood = "neutral", className, onOverpoke, happyEyes =
+                     strokeLinecap: "round",
+                     initial: false,
+                     animate: { opacity: mood === "happy" && happyEyes === "smile" ? 1 : 0, scaleY: mood === "happy" && happyEyes === "smile" ? 1 : 0.4 },
+-                    transition: { delay: mood === "happy" && happyEyes === "smile" ? 0.1 : 0, type: "spring", stiffness: 260, damping: 18 },
++                    transition: { delay: mood === "happy" && happyEyes === "smile" ? 0.1 : 0, type:"tween", stiffness: 260, damping: 18 },
+                     style: { transformBox: "fill-box", transformOrigin: "center bottom" }
+                   }
+                 )
+               ] }),
+-              /* @__PURE__ */ jsxs(motion.g, { id: "right-eye", animate: mood, variants: RIGHT_EYE_MOOD, transition: { delay: 0.05, type: "spring", stiffness: 240, damping: 17 }, style: centerMotionStyle, children: [
++              /* @__PURE__ */ jsxs(motion.g, { id: "right-eye", animate: mood, variants: RIGHT_EYE_MOOD, transition: { delay: 0.05, type:"tween", stiffness: 240, damping: 17 }, style: centerMotionStyle, children: [
+                 /* @__PURE__ */ jsx(motion.g, { initial: false, animate: { opacity: mood === "happy" && happyEyes === "smile" || mood === "password" || mood === "sideEye" ? 0 : 1 }, transition: { duration: 0.13, ease: "easeOut" }, children: /* @__PURE__ */ jsx(motion.g, { animate: mood, variants: EYE_TRANSFORMS, style: centerMotionStyle, children: /* @__PURE__ */ jsxs(motion.g, { style: { ...centerMotionStyle, scaleX: blinkRX, scaleY: blinkR }, children: [
+                   /* @__PURE__ */ jsx("ellipse", { id: "right-eye-base", cx: "551", cy: "371", rx: "32", ry: "39", fill: `url(#${eyeFill})` }),
+                   /* @__PURE__ */ jsx("ellipse", { id: "right-eye-lower-shade", cx: "551", cy: "393", rx: "23", ry: "12", fill: "var(--jelly-eye-light, #2a1640)", opacity: "0.3" }),
+@@ -772,7 +772,7 @@ function JellyBlobMascot({ mood = "neutral", className, onOverpoke, happyEyes =
+                       fill: "#ffffff",
+                       initial: false,
+                       animate: { opacity: mood === "happy" && happyEyes === "star" ? 1 : 0, scale: mood === "happy" && happyEyes === "star" ? 1 : 0.5 },
+-                      transition: { delay: mood === "happy" ? 0.12 : 0, type: "spring", stiffness: 300, damping: 16 },
++                      transition: { delay: mood === "happy" ? 0.12 : 0, type:"tween", stiffness: 300, damping: 16 },
+                       style: { transformBox: "fill-box", transformOrigin: "center" }
+                     }
+                   ),
+@@ -790,7 +790,7 @@ function JellyBlobMascot({ mood = "neutral", className, onOverpoke, happyEyes =
+                     strokeLinecap: "round",
+                     initial: false,
+                     animate: { opacity: mood === "happy" && happyEyes === "smile" ? 1 : 0, scaleY: mood === "happy" && happyEyes === "smile" ? 1 : 0.4 },
+-                    transition: { delay: mood === "happy" && happyEyes === "smile" ? 0.1 : 0, type: "spring", stiffness: 260, damping: 18 },
++                    transition: { delay: mood === "happy" && happyEyes === "smile" ? 0.1 : 0, type:"tween", stiffness: 260, damping: 18 },
+                     style: { transformBox: "fill-box", transformOrigin: "center bottom" }
+                   }
+                 )
+@@ -850,7 +850,7 @@ function JellyBlobMascot({ mood = "neutral", className, onOverpoke, happyEyes =
+                   x: mood === "sideEye" ? -4 : 0,
+                   y: mood === "sideEye" ? 1 : 0
+                 },
+-                transition: { type: "spring", stiffness: 230, damping: 18, opacity: { duration: 0.13, ease: "easeOut" } },
++                transition: { type:"tween", stiffness: 230, damping: 18, opacity: { duration: 0.13, ease: "easeOut" } },
+                 style: centerMotionStyle,
+                 children: [
+                   /* @__PURE__ */ jsx(
+@@ -893,7 +893,7 @@ function JellyBlobMascot({ mood = "neutral", className, onOverpoke, happyEyes =
+                   x: mood === "hmm" ? -2 : 0,
+                   y: 2
+                 },
+-                transition: { type: "spring", stiffness: 230, damping: 18 },
++                transition: { type:"tween", stiffness: 230, damping: 18 },
+                 style: centerMotionStyle,
+                 children: [
+                   /* @__PURE__ */ jsx(
+@@ -975,7 +975,7 @@ function JellyBlobMascot({ mood = "neutral", className, onOverpoke, happyEyes =
+                 id: "mouth",
+                 d: MOUTH_PATHS[mood],
+                 animate: { d: MOUTH_PATHS[mood], opacity: mouth || mood === "password" ? 0 : 1 },
+-                transition: reduce ? { duration: 0 } : { delay: 0.05, type: "spring", stiffness: 240, damping: 16 },
++                transition: reduce ? { duration: 0 } : { delay: 0.05, type:"tween", stiffness: 240, damping: 16 },
+                 fill: "none",
+                 stroke: "#21102f",
+                 strokeWidth: mood === "sad" ? 9 : 8,
+@@ -1003,7 +1003,7 @@ function JellyBlobMascot({ mood = "neutral", className, onOverpoke, happyEyes =
+                   scaleX: { duration: 0.56, ease: "easeInOut", repeat: Infinity },
+                   scaleY: { duration: 0.56, ease: "easeInOut", repeat: Infinity },
+                   opacity: { duration: 0.1 }
+-                } : { type: "spring", stiffness: 320, damping: 26 },
++                } : { type:"tween", stiffness: 320, damping: 26 },
+                 style: centerMotionStyle
+               }
+             )
+@@ -1077,11 +1077,11 @@ function bubblePath(w) {
+ }
+ const CLOUD_FOLLOW = {
+   neutral: { y: [0, -3, 0], rotate: 0, ty: { duration: 3.6, ease: "easeInOut", repeat: Infinity, delay: 0.55 }, tr: { duration: 0.5 } },
+-  happy: { y: [0, -16, -5, -9], rotate: [0, -1.5, 0], ty: { delay: 0.1, type: "spring", stiffness: 200, damping: 11, mass: 0.8 }, tr: { delay: 0.1, type: "spring", stiffness: 180, damping: 14 } },
+-  sad: { y: 6, rotate: 0, ty: { delay: 0.1, type: "spring", stiffness: 130, damping: 14, mass: 1 }, tr: { duration: 0.3 } },
+-  angry: { y: 4, rotate: [0, -3, 3, -1.5, 0], ty: { delay: 0.04, type: "spring", stiffness: 260, damping: 14 }, tr: { duration: 0.42, ease: "easeInOut" } },
+-  hmm: { y: 2, rotate: 4, ty: { delay: 0.1, type: "spring", stiffness: 200, damping: 18 }, tr: { delay: 0.1, type: "spring", stiffness: 200, damping: 18 } },
+-  sideEye: { y: 2, rotate: 4, ty: { delay: 0.1, type: "spring", stiffness: 200, damping: 18 }, tr: { delay: 0.1, type: "spring", stiffness: 200, damping: 18 } }
++  happy: { y: [0, -16, -5, -9], rotate: [0, -1.5, 0], ty: { delay: 0.1, type:"tween", stiffness: 200, damping: 11, mass: 0.8 }, tr: { delay: 0.1, type:"tween", stiffness: 180, damping: 14 } },
++  sad: { y: 6, rotate: 0, ty: { delay: 0.1, type:"tween", stiffness: 130, damping: 14, mass: 1 }, tr: { duration: 0.3 } },
++  angry: { y: 4, rotate: [0, -3, 3, -1.5, 0], ty: { delay: 0.04, type:"tween", stiffness: 260, damping: 14 }, tr: { duration: 0.42, ease: "easeInOut" } },
++  hmm: { y: 2, rotate: 4, ty: { delay: 0.1, type:"tween", stiffness: 200, damping: 18 }, tr: { delay: 0.1, type:"tween", stiffness: 200, damping: 18 } },
++  sideEye: { y: 2, rotate: 4, ty: { delay: 0.1, type:"tween", stiffness: 200, damping: 18 }, tr: { delay: 0.1, type:"tween", stiffness: 200, damping: 18 } }
+ };
+ const NEUTRAL_FOLLOW = CLOUD_FOLLOW.neutral;
+ function BlobSpeech({ mood = "neutral", messages, className }) {
+@@ -1117,7 +1117,7 @@ function BlobSpeech({ mood = "neutral", messages, className }) {
+         // pop out from the tail, then the y/rotate TRACK the blob's body per mood (a softer,
+         // lagged echo) so the cloud reads as tethered to the head rather than floating alone.
+         opacity: { duration: 0.22, ease: [0.19, 1, 0.22, 1] },
+-        scale: { type: "spring", bounce: 0.16, duration: 0.4 },
++        scale: { type:"tween", bounce: 0.16, duration: 0.4 },
+         y: follow.ty,
+         rotate: follow.tr
+       },

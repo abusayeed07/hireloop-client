@@ -180,7 +180,7 @@ function JobDetailsContent({ jobId }) {
   if (loading) {
     return (
       <LoadingPage 
-        title="Loading Job"
+        title="Loading Job Details"
         message="Fetching job details for you..."
         customStats={[
           { icon: BriefcaseIcon, label: "Loading job details", animate: "spin" },

@@ -263,7 +263,7 @@ function CompanyDetailContent({ companyId }) {
   if (loading) {
     return (
       <LoadingPage 
-        title="Loading Company"
+        title="Loading Company Details"
         message="Fetching company details and opportunities..."
         customStats={[
           { icon: Building, label: "Loading company", animate: "spin" },

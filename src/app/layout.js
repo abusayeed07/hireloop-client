@@ -2,6 +2,8 @@ import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { Toaster } from "react-hot-toast";
 import Metadata from "@/components/Metadata";
+// ✅ Import the AI Assistant component
+import AIAssistant from "@/components/ai/AIAssistant";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -34,6 +36,9 @@ export default function RootLayout({
         {children}
 
         <Toaster position="top-right" />
+        
+        {/* ✅ AI Assistant - Available on all pages */}
+        <AIAssistant />
       </body>
     </html>
   );

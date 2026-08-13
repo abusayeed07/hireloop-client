@@ -35,6 +35,8 @@ import {
 import toast from "react-hot-toast";
 import Pagination from "@/components/Pagination";
 import Metadata from "@/components/Metadata";
+// ✅ Import your LoadingPage component
+import LoadingPage from "@/app/loading"; // Adjust path as needed
 
 // 🎨 Animation Variants
 const containerVariants = {
@@ -323,15 +325,24 @@ const ManageAllApplications = () => {
         return Array.from(statuses);
     }, [applications]);
 
-    // Show empty loading state only if we are not redirecting
+    // ✅ Use your LoadingPage component instead of inline spinner
     if ((loading || isPending) && !isRedirecting) {
         return (
-            <div className="min-h-[85vh] flex items-center justify-center">
-                <div className="text-center">
-                    <div className="w-16 h-16 border-4 border-cyan-500 border-t-transparent rounded-full animate-spin mx-auto mb-4" />
-                    <p className="text-zinc-400 text-sm font-medium tracking-wide">Loading applications...</p>
-                </div>
-            </div>
+            <LoadingPage 
+                title="Loading Applications"
+                message="Please wait while we fetch your job applications..."
+                step="loading"
+                showProgress={true}
+                showStats={true}
+                showTips={true}
+                customColor="from-cyan-400 via-blue-400 to-purple-400"
+                customStats={[
+                    { icon: Briefcase, label: "Loading jobs", animate: "spin" },
+                    { icon: Users, label: "Fetching candidates", animate: "pulse" },
+                    { icon: TrendingUp, label: "Analyzing data", animate: "bounce" },
+                ]}
+                estimatedTime="~2 seconds"
+            />
         );
     }
 
@@ -541,10 +552,11 @@ const ManageAllApplications = () => {
                                                             >
                                                                 <MessageSquare className="w-4 h-4" />
                                                             </button>
+                                                            {/* ✅ Updated View button - Navigates to detail page */}
                                                             <button
-                                                                onClick={() => router.push(`/browse-jobs/${app.jobId}`)}
+                                                                onClick={() => router.push(`/dashboard/recruiter/applications/${app._id}`)}
                                                                 className="p-1.5 hover:bg-zinc-700/50 rounded-lg text-zinc-400 hover:text-white transition-colors"
-                                                                title="View Job"
+                                                                title="View Full Application"
                                                             >
                                                                 <Eye className="w-4 h-4" />
                                                             </button>

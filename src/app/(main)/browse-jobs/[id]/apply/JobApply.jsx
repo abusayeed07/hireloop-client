@@ -35,6 +35,8 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 import toast from "react-hot-toast";
+// ✅ Import your LoadingPage component
+import LoadingPage from "@/app/loading";
 
 // 🎨 Animation Variants
 const containerVariants = {
@@ -263,11 +265,10 @@ const JobApplyForm = ({ job, applicant }) => {
 
       console.log("Submitting Application:", submissionData);
 
-      // ✅ FIXED: Use native fetch with credentials: "include" instead of Server Action
       const response = await fetch(`${baseUrl}/api/applications`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        credentials: "include", // ✅ This automatically sends the browser cookie!
+        credentials: "include",
         body: JSON.stringify(submissionData),
       });
 
@@ -279,7 +280,7 @@ const JobApplyForm = ({ job, applicant }) => {
         setFormData({
           fullName: applicant?.name || "",
           email: applicant?.email || "",
-          phone: applicant?.email || "",
+          phone: applicant?.phone || "",
           location: "",
           currentCompany: "",
           currentRole: "",
@@ -293,19 +294,40 @@ const JobApplyForm = ({ job, applicant }) => {
         setResumeFile(null);
         setCoverLetterFile(null);
         
-        // ✅ CRITICAL FIX: Force a hard reload to the exact same page to update the counter!
+        // Redirect to browse jobs
         window.location.href = `/browse-jobs`;
         
       } else {
         toast.error(result.error || "Something went wrong. Please try again.");
+        setIsSubmitting(false);
       }
     } catch (error) {
       console.error("Submission error:", error);
       toast.error(error.message || "Something went wrong. Please try again.");
-    } finally {
       setIsSubmitting(false);
     }
   };
+
+  // ✅ Show LoadingPage when submitting
+  if (isSubmitting) {
+    return (
+      <LoadingPage 
+        title="Submitting Application"
+        message="Please wait while we submit your application..."
+        step="loading"
+        showProgress={true}
+        showStats={true}
+        showTips={true}
+        customColor="from-blue-400 via-purple-400 to-pink-400"
+        customStats={[
+          { icon: FileText, label: "Uploading resume", animate: "spin" },
+          { icon: User, label: "Saving your details", animate: "pulse" },
+          { icon: Send, label: "Submitting application", animate: "bounce" },
+        ]}
+        estimatedTime="~5 seconds"
+      />
+    );
+  }
 
   return (
     <motion.div

@@ -113,3 +113,19 @@ export const getMyApplications = async () => {
         return [];
     }
 };
+
+// ✅ Get single application by ID (Recruiter)
+export const getApplicationById = async (applicationId) => {
+    try {
+        const data = await serverFetch(`/api/applications/recruiter/${applicationId}`);
+        if (data === null) {
+            throw new Error('Application not found');
+        }
+        if (data && data.success && data.data) return data.data;
+        if (data && data._id) return data;
+        return data;
+    } catch (error) {
+        console.error('❌ getApplicationById error:', error);
+        throw error;
+    }
+};

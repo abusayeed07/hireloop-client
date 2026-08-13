@@ -36,7 +36,7 @@ export const getCompanies = async () => {
     }
 };
 
-// ✅ FIXED: Unwrap the data property (PUBLIC ROUTE)
+// ✅ FIXED: Unwrap the data property (PUBLIC ROUTE) - ERROR HANDLING FIXED
 export const getCompanyById = async (companyId) => {
     try {
         if (!companyId) return null;
@@ -50,6 +50,10 @@ export const getCompanyById = async (companyId) => {
         // Fallback if the API returns the raw object
         return response || null;
     } catch (error) {
+        // ✅ FIX: If it's a 404, throw a specific error so the UI can redirect gracefully
+        if (error.message?.includes('404') || error.message?.includes('not found')) {
+            throw new Error('404: Company not found');
+        }
         console.error(`❌ getCompanyById error for ${companyId}:`, error);
         return null;
     }

@@ -26,7 +26,14 @@ export const serverFetch = async (path, options = {}) => {
         }
         
         if (!res.ok) {
+            // ✅ FIX: If it's a 404, silently return it WITHOUT logging an error to the console
+            if (res.status === 404) {
+                return { success: false, error: 'Not Found', status: 404 };
+            }
+
+            // ✅ Only log console errors for non-404 errors (500, 400, etc.)
             console.error(`❌ API Error: ${res.status} ${res.statusText}`);
+            
             // ✅ Handle 400 specifically by extracting the error message
             try {
                 const errorData = await res.json();
