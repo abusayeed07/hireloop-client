@@ -60,14 +60,12 @@ const ROLE_PALETTES = {
 
 /**
  * Feral Blob Wrapper - fixes the "only two keyframes" error, re-skins the
- * mascot per user role, and (new) can show a BlobSpeech cloud above the
- * mascot when the caller passes speechText.
+ * mascot per user role, and shows a BlobSpeech cloud ABOVE the mascot.
  *
- * BlobSpeech's real API (confirmed from feral-blob's .d.ts) is
- * `{ mood, messages, className }` — it always shows exactly one line, keyed
- * by `mood`, and `messages` lets you override that mood's default copy. It
- * has no visibility/open prop of its own, so we control show/hide here by
- * only rendering it (via AnimatePresence) when speechText is truthy.
+ * NOTE: feral-blob's BlobSpeech bubble is designed with its tail pointing
+ * DOWN by default (i.e. meant to sit above a character). We position the
+ * bubble above the blob and rely on that default orientation directly —
+ * no flip transform needed.
  */
 const BlobWrapper = ({
   mood = "neutral",
@@ -75,13 +73,16 @@ const BlobWrapper = ({
   size = 80,
   onOverpoke,
   className = "",
-  themeColors = null, // { role: 'guest' | 'seeker' | 'recruiter' | 'admin' }
-  speechText = null,  // string | null — pass a line to show it, null/"" to hide
-  speechMood = null,  // which mood key BlobSpeech's `messages` override targets; defaults to `mood`
+  themeColors = null,
+  speechText = null,
+  speechMood = null,
 }) => {
   const role = themeColors?.role || 'guest';
   const cssVars = ROLE_PALETTES[role] || ROLE_PALETTES.guest;
   const resolvedSpeechMood = speechMood || mood;
+
+  // Only show speech if there's text
+  const showSpeech = speechText && speechText.length > 0;
 
   return (
     <MotionConfig
@@ -97,23 +98,38 @@ const BlobWrapper = ({
         style={{
           width: size,
           height: size,
-          ...cssVars // Apply role-based palette as CSS custom properties
+          ...cssVars
         }}
       >
+        {/* Speech Bubble - positioned ABOVE the blob. The default bubble
+            shape already points its tail down toward the blob, so this
+            works for both the small header avatar and the larger
+            floating-button avatar without any extra transforms. */}
         <AnimatePresence>
-          {speechText && (
+          {showSpeech && (
             <motion.div
               key={speechText}
-              initial={{ opacity: 0, y: -6, scale: 0.9 }}
+              initial={{ opacity: 0, y: 8, scale: 0.9 }}
               animate={{ opacity: 1, y: 0, scale: 1 }}
-              exit={{ opacity: 0, y: -6, scale: 0.9 }}
-              transition={{ type: "keyframes", duration: 0.2 }}
-              className="absolute top-full left-1/2 -translate-x-1/2 mt-2 z-20 pointer-events-none"
+              exit={{ opacity: 0, y: 8, scale: 0.9 }}
+              transition={{
+                type: "keyframes",
+                duration: 0.25,
+                ease: "easeOut"
+              }}
+              className="absolute left-1/2 -translate-x-1/2 z-20"
+              style={{
+                bottom: 'calc(100% + 8px)',
+                minWidth: '80px',
+                maxWidth: size > 60 ? '240px' : '180px',
+              }}
             >
-              <BlobSpeech
-                mood={resolvedSpeechMood}
-                messages={{ [resolvedSpeechMood]: speechText }}
-              />
+              <div className="relative flex flex-col items-center">
+                <BlobSpeech
+                  mood={resolvedSpeechMood}
+                  messages={{ [resolvedSpeechMood]: speechText }}
+                />
+              </div>
             </motion.div>
           )}
         </AnimatePresence>

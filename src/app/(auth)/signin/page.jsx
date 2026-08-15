@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import Link from "next/link";
 import { useSearchParams, useRouter } from "next/navigation";
 import { FcGoogle } from "react-icons/fc";
@@ -19,6 +19,25 @@ import {
   Label,
   TextField,
 } from "@heroui/react";
+import { MotionConfig } from "framer-motion";
+import dynamic from "next/dynamic";
+import "feral-blob/blob.css";
+
+// ✅ feral-blob's JellyBlobMascot seeds its idle-wobble animation with
+// something non-deterministic (its very first render already differs from
+// call to call — see the mismatched arm `transform` values in the
+// hydration warning). That guarantees a hydration mismatch if it's
+// server-rendered, since the server's markup can never match what the
+// client generates a moment later. Loading it with `ssr: false` skips
+// server-rendering it entirely, so there's nothing for the client to
+// mismatch against — it only ever renders after mount, client-side.
+const JellyBlobMascot = dynamic(
+  () => import("feral-blob").then((mod) => mod.JellyBlobMascot),
+  {
+    ssr: false,
+    loading: () => <div style={{ width: 110, height: 110 }} />,
+  }
+);
 
 import { authClient } from "@/lib/auth-client";
 import toast from "react-hot-toast";
@@ -34,6 +53,22 @@ export default function SigninPage() {
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState("");
   const [isRedirecting, setIsRedirecting] = useState(false);
+
+  // ✅ Mascot reactivity: which field is currently focused, and a brief
+  // "typing" pulse used to drive the mascot's subtle talking wobble.
+  const [focusedField, setFocusedField] = useState(null); // 'email' | 'password' | null
+  const [isTyping, setIsTyping] = useState(false);
+  const typingTimeoutRef = useRef(null);
+
+  const pulseTyping = () => {
+    setIsTyping(true);
+    clearTimeout(typingTimeoutRef.current);
+    typingTimeoutRef.current = setTimeout(() => setIsTyping(false), 400);
+  };
+
+  useEffect(() => {
+    return () => clearTimeout(typingTimeoutRef.current);
+  }, []);
 
   const redirectPath = searchParams.get('redirect') || '/browse-jobs';
   const errorParam = searchParams.get('error');
@@ -182,6 +217,7 @@ export default function SigninPage() {
 
         <Card className="signup-card">
           <div className="signup-card-inner">
+
             {error && (
               <div className={`mb-4 p-3 border rounded-lg text-sm text-center ${
                 error.toLowerCase().includes('suspended') 
@@ -193,46 +229,86 @@ export default function SigninPage() {
             )}
 
             <Form onSubmit={onSubmit} className="signup-form">
-              <TextField isRequired name="email" type="email">
-                <Label className="form-label">Email Address</Label>
-                <div className="input-wrapper">
-                  <Envelope className="input-icon" size={18} />
-                  <Input
-                    placeholder="you@example.com"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    className="custom-input"
-                  />
-                </div>
-                <FieldError />
-              </TextField>
-
-              <TextField isRequired name="password">
-                <Label className="form-label">Password</Label>
-                <div className="password-wrapper">
-                  <div className="input-wrapper">
-                    <LockIcon className="input-icon" size={18} />
-                    <Input
-                      type={showPassword ? "text" : "password"}
-                      placeholder="Enter password"
-                      value={password}
-                      onChange={(e) => setPassword(e.target.value)}
-                      className="custom-input"
+              {/* ✅ Mascot beside the fields (not above the form) — it
+                  reacts to whichever field is focused, same as the docs'
+                  side-by-side widget layout. */}
+              <div className="flex items-center gap-5">
+                <MotionConfig
+                  transition={{ type: "keyframes", duration: 0.5, ease: "easeInOut" }}
+                  reducedMotion="user"
+                >
+                  <div className="flex-shrink-0" style={{ width: 110, height: 110 }}>
+                    <JellyBlobMascot
+                      mood={focusedField === "password" ? "password" : "neutral"}
+                      gaze={
+                        focusedField === "email"
+                          ? { x: 18, y: -8 }
+                          : focusedField === "password"
+                          ? { x: 16, y: -10 }
+                          : { x: 0, y: 0 }
+                      }
+                      nod={isTyping}
                     />
                   </div>
-                  <button
-                    type="button"
-                    className="password-toggle"
-                    onClick={() => setShowPassword(!showPassword)}
-                  >
-                    {showPassword ? <EyeSlash size={18} /> : <Eye size={18} />}
-                  </button>
+                </MotionConfig>
+
+                <div className="flex-1 min-w-0 flex flex-col gap-5">
+                  <TextField isRequired name="email" type="email">
+                    <Label className="form-label">Email Address</Label>
+                    <div className="input-wrapper">
+                      <Envelope className="input-icon" size={18} />
+                      <Input
+                        placeholder="you@example.com"
+                        value={email}
+                        onChange={(e) => {
+                          setEmail(e.target.value);
+                          pulseTyping();
+                        }}
+                        onFocus={() => setFocusedField("email")}
+                        onBlur={() =>
+                          setFocusedField((prev) => (prev === "email" ? null : prev))
+                        }
+                        className="custom-input"
+                      />
+                    </div>
+                    <FieldError />
+                  </TextField>
+
+                  <TextField isRequired name="password">
+                    <Label className="form-label">Password</Label>
+                    <div className="password-wrapper">
+                      <div className="input-wrapper">
+                        <LockIcon className="input-icon" size={18} />
+                        <Input
+                          type={showPassword ? "text" : "password"}
+                          placeholder="Enter password"
+                          value={password}
+                          onChange={(e) => {
+                            setPassword(e.target.value);
+                            pulseTyping();
+                          }}
+                          onFocus={() => setFocusedField("password")}
+                          onBlur={() =>
+                            setFocusedField((prev) => (prev === "password" ? null : prev))
+                          }
+                          className="custom-input"
+                        />
+                      </div>
+                      <button
+                        type="button"
+                        className="password-toggle"
+                        onClick={() => setShowPassword(!showPassword)}
+                      >
+                        {showPassword ? <EyeSlash size={18} /> : <Eye size={18} />}
+                      </button>
+                    </div>
+                    <Description className="password-description">
+                      Enter your account password
+                    </Description>
+                    <FieldError />
+                  </TextField>
                 </div>
-                <Description className="password-description">
-                  Enter your account password
-                </Description>
-                <FieldError />
-              </TextField>
+              </div>
 
               <div className="text-right">
                 <Link

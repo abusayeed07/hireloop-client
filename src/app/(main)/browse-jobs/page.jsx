@@ -8,7 +8,7 @@ import toast from "react-hot-toast";
 import { Filter, Search, MapPin, X, ChevronDown, Building2, Wifi, Briefcase, Users, Sparkles } from "lucide-react";
 import Pagination from "@/components/Pagination";
 import JobCard from "@/components/jobs/JobCard";
-import LoadingPage from "@/app/loading"; // ✅ Import dynamic loading page
+import LoadingPage from "@/app/loading";
 
 // =============================================
 // FILTER SIDEBAR COMPONENT
@@ -84,7 +84,7 @@ const FilterSidebar = ({ filters, setFilters, categories, categoryCounts, onClos
                     type="radio"
                     name="category"
                     value={cat}
-                    checked={filters.category === cat}
+                    checked={filters.category.toLowerCase() === cat.toLowerCase()}
                     onChange={() => setFilters((prev) => ({ ...prev, category: cat }))}
                     className="w-3.5 h-3.5 accent-blue-500"
                   />
@@ -220,8 +220,21 @@ const containerVariants = {
 
 export default function BrowseJobsPage() {
   const searchParams = useSearchParams();
-  const initialSearch = searchParams.get("q") || "";
-  const initialLocation = searchParams.get("location") || "";
+
+  // ✅ Support both 'search' (AI) and 'q' (homepage) parameters
+  const initialSearch =
+    searchParams.get("search") ||
+    searchParams.get("q") ||
+    "";
+
+  const initialLocation =
+    searchParams.get("location") || "";
+
+  // ✅ FIX: read the 'category' param the AI assistant redirects with
+  // (e.g. /browse-jobs?category=Marketing) — this was previously ignored,
+  // so category-based redirects from the chat assistant showed all jobs.
+  const initialCategory =
+    searchParams.get("category") || "";
 
   const [jobs, setJobs] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -230,7 +243,7 @@ export default function BrowseJobsPage() {
   const [locationQuery, setLocationQuery] = useState(initialLocation);
 
   const [filters, setFilters] = useState({
-    category: "",
+    category: initialCategory, // ✅ was ""
     jobType: "",
     remote: "",
   });
@@ -239,6 +252,21 @@ export default function BrowseJobsPage() {
   const [currentPage, setCurrentPage] = useState(1);
   const [showMobileFilters, setShowMobileFilters] = useState(false);
   const itemsPerPage = 6;
+
+  // ✅ Keep filters in sync if the URL changes after mount
+  // (e.g. user sends another chat message that redirects again
+  // while already on /browse-jobs)
+  useEffect(() => {
+    setSearchQuery(initialSearch);
+  }, [initialSearch]);
+
+  useEffect(() => {
+    setLocationQuery(initialLocation);
+  }, [initialLocation]);
+
+  useEffect(() => {
+    setFilters((prev) => ({ ...prev, category: initialCategory }));
+  }, [initialCategory]);
 
   // Fetch data
   useEffect(() => {
@@ -262,12 +290,31 @@ export default function BrowseJobsPage() {
 
     if (searchQuery.trim()) {
       const query = searchQuery.toLowerCase().trim();
-      result = result.filter(
-        (job) =>
-          job.jobTitle?.toLowerCase().includes(query) ||
-          job.companyName?.toLowerCase().includes(query) ||
-          job.jobCategory?.toLowerCase().includes(query)
-      );
+      result = result.filter((job) => {
+        const searchableFields = [
+          job.jobTitle,
+          job.companyName,
+          job.jobCategory,
+          job.location,
+          job.jobType,
+          job.description,
+        ].filter(Boolean);
+
+        // Handle skills (string or array)
+        let skillsText = "";
+        if (job.skills) {
+          if (Array.isArray(job.skills)) {
+            skillsText = job.skills.join(" ");
+          } else {
+            skillsText = job.skills;
+          }
+        }
+        searchableFields.push(skillsText);
+
+        return searchableFields.some(field =>
+          field.toLowerCase().includes(query)
+        );
+      });
     }
 
     if (locationQuery.trim()) {
@@ -279,8 +326,13 @@ export default function BrowseJobsPage() {
     }
 
     if (filters.category) {
+      // ✅ FIX: case-insensitive comparison. The AI assistant sends
+      // display-cased categories like "Marketing" / "Human Resources";
+      // job documents may store jobCategory with different casing.
+      const targetCategory = filters.category.toLowerCase();
       result = result.filter(
-        (job) => (job.jobCategory || "Uncategorized") === filters.category
+        (job) =>
+          (job.jobCategory || "Uncategorized").toLowerCase() === targetCategory
       );
     }
 
@@ -317,7 +369,6 @@ export default function BrowseJobsPage() {
     setCurrentPage(1);
   };
 
-  // ✅ USE DYNAMIC LOADING PAGE INSTEAD OF SKELETON
   if (loading) {
     return (
       <LoadingPage 
@@ -363,7 +414,7 @@ export default function BrowseJobsPage() {
             <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-500" />
             <input
               type="text"
-              placeholder="Job title, keyword, or company"
+              placeholder="Job title, keyword, company, or category..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               className="w-full pl-10 pr-4 py-2.5 bg-[#111214]/80 backdrop-blur-sm border border-white/5 rounded-xl text-white placeholder-zinc-500 focus:outline-none focus:border-blue-500/50 transition-colors text-sm"
@@ -426,6 +477,23 @@ export default function BrowseJobsPage() {
               <span className="inline-flex items-center gap-2 px-3 py-1 bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 rounded-full text-xs">
                 Location: "{locationQuery}"
                 <button onClick={() => setLocationQuery("")} className="hover:text-emerald-300 transition-colors">
+                  <X size={12} />
+                </button>
+              </span>
+            </motion.div>
+          )}
+          {/* ✅ NEW: category chip so it's visible/clearable when arriving via AI redirect */}
+          {filters.category && (
+            <motion.div
+              initial={{ opacity: 0, scale: 0.8 }}
+              animate={{ opacity: 1, scale: 1 }}
+            >
+              <span className="inline-flex items-center gap-2 px-3 py-1 bg-purple-500/10 text-purple-400 border border-purple-500/20 rounded-full text-xs">
+                Category: {filters.category}
+                <button
+                  onClick={() => setFilters((prev) => ({ ...prev, category: "" }))}
+                  className="hover:text-purple-300 transition-colors"
+                >
                   <X size={12} />
                 </button>
               </span>

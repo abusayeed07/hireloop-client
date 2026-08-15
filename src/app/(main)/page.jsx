@@ -997,7 +997,7 @@ export default function HomePage() {
       </section>
 
       {/* Floating Job Alerts Toast - Mobile Optimized */}
-      <motion.div
+      {/* <motion.div
         initial={{ opacity: 0, y: 100 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 3, duration: 0.8, type: "spring" }}
@@ -1021,7 +1021,7 @@ export default function HomePage() {
             </motion.button>
           </div>
         </div>
-      </motion.div>
+      </motion.div> */}
 
       {/* Custom CSS for Marquee Animation */}
       <style jsx>{`

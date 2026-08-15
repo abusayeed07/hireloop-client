@@ -398,7 +398,7 @@ export default function PostJobForm({
                 }}
                 className="bg-gradient-to-r from-purple-600 to-purple-700 text-white font-semibold hover:from-purple-700 hover:to-purple-800 rounded-xl px-6 h-11"
               >
-                <ArrowRotateLeft size={16}/>
+                <ArrowRotateLeft size={16} />
                 Request Re-Review
               </Button>
             </motion.div>
@@ -480,12 +480,19 @@ export default function PostJobForm({
         "Please provide at least 20 characters of requirements";
     }
 
+    // ✅ If there are errors, set them and show toast, but DON'T return early
+    // This allows the user to see all errors at once
     if (Object.keys(newErrors).length > 0) {
       setErrors(newErrors);
-      toast.error("Please fix all errors before submitting");
+      toast.error("Please fill full form before submitting");
+      // ✅ Clear errors after 3 seconds to allow user to fix and retry
+      setTimeout(() => {
+        setErrors({});
+      }, 3000);
       return;
     }
 
+    // ✅ Clear errors before submitting
     setErrors({});
     setIsSubmitting(true);
 
@@ -506,6 +513,8 @@ export default function PostJobForm({
           currency: data.currency || "USD",
         },
         skills: data.skills ? data.skills.split(",").map((s) => s.trim()) : [],
+        // ✅ Default vacancies to 5 if not provided
+        vacancies: data.vacancies ? parseInt(data.vacancies) : 5,
       };
 
       let result;
@@ -541,6 +550,14 @@ export default function PostJobForm({
     } finally {
       setIsSubmitting(false);
     }
+  };
+
+  // ✅ Helper to get default vacancies value (default to "5" if not provided)
+  const getDefaultVacancies = () => {
+    if (initialData?.vacancies) {
+      return String(initialData.vacancies);
+    }
+    return "5";
   };
 
   return (
@@ -809,8 +826,8 @@ export default function PostJobForm({
                               </div>
                             </ListBox.Item>
                             <ListBox.Item
-                              key="hr"
-                              id="hr"
+                              key="human resources"
+                              id="human resources"
                               className="flex items-center justify-between p-2.5 rounded-lg hover:bg-zinc-800 cursor-pointer text-sm text-zinc-200 outline-none data-[focused=true]:bg-zinc-800 transition-colors duration-150"
                               textValue="👥 Human Resources"
                             >
@@ -846,6 +863,16 @@ export default function PostJobForm({
                             >
                               <div className="flex items-center gap-2">
                                 <span>📚</span> Education
+                              </div>
+                            </ListBox.Item>
+                            <ListBox.Item
+                              key="manufacturing"
+                              id="manufacturing"
+                              className="flex items-center justify-between p-2.5 rounded-lg hover:bg-zinc-800 cursor-pointer text-sm text-zinc-200 outline-none data-[focused=true]:bg-zinc-800 transition-colors duration-150"
+                              textValue="🔧 Manufacturing"
+                            >
+                              <div className="flex items-center gap-2">
+                                <span>🔧</span> Manufacturing
                               </div>
                             </ListBox.Item>
                           </ListBox>
@@ -1414,32 +1441,32 @@ export default function PostJobForm({
                         <Select.Popover className="bg-[#1c1c1e] border border-zinc-800 text-white rounded-xl shadow-2xl p-1 backdrop-blur-sm max-h-[300px] overflow-y-auto">
                           <ListBox className="outline-none">
                             <ListBox.Item
-                              key="entry"
-                              id="entry"
+                              key="entry level (0-2 years)"
+                              id="entry level (0-2 years)"
                               className="flex items-center justify-between p-2.5 rounded-lg hover:bg-zinc-800 cursor-pointer text-sm text-zinc-200 outline-none data-[focused=true]:bg-zinc-800 transition-colors duration-150"
                               textValue="Entry Level (0-2 years)"
                             >
                               Entry Level (0-2 years)
                             </ListBox.Item>
                             <ListBox.Item
-                              key="mid"
-                              id="mid"
+                              key="mid level (3-5 years)"
+                              id="mid level (3-5 years)"
                               className="flex items-center justify-between p-2.5 rounded-lg hover:bg-zinc-800 cursor-pointer text-sm text-zinc-200 outline-none data-[focused=true]:bg-zinc-800 transition-colors duration-150"
                               textValue="Mid Level (3-5 years)"
                             >
                               Mid Level (3-5 years)
                             </ListBox.Item>
                             <ListBox.Item
-                              key="senior"
-                              id="senior"
+                              key="senior (6-9 years)"
+                              id="senior (6-9 years)"
                               className="flex items-center justify-between p-2.5 rounded-lg hover:bg-zinc-800 cursor-pointer text-sm text-zinc-200 outline-none data-[focused=true]:bg-zinc-800 transition-colors duration-150"
                               textValue="Senior (6-9 years)"
                             >
                               Senior (6-9 years)
                             </ListBox.Item>
                             <ListBox.Item
-                              key="lead"
-                              id="lead"
+                              key="lead/principal (10+ years)"
+                              id="lead/principal (10+ years)"
                               className="flex items-center justify-between p-2.5 rounded-lg hover:bg-zinc-800 cursor-pointer text-sm text-zinc-200 outline-none data-[focused=true]:bg-zinc-800 transition-colors duration-150"
                               textValue="Lead/Principal (10+ years)"
                             >
@@ -1460,7 +1487,7 @@ export default function PostJobForm({
                         name="vacancies"
                         type="number"
                         className="flex flex-col gap-1.5"
-                        defaultValue={initialData?.vacancies || ""}
+                        defaultValue={getDefaultVacancies()}
                       >
                         <Label
                           className="text-zinc-400 text-xs"

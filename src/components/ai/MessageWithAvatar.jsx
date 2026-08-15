@@ -6,32 +6,17 @@ import { Zap } from "lucide-react";
 import Image from "next/image";
 import BlobWrapper from "./BlobWrapper";
 
-// Role-based color themes for the BOT AVATAR (using CSS custom properties)
 const BOT_ROLE_THEMES = {
-  admin: {
-    role: 'admin',
-    label: 'Admin',
-  },
-  recruiter: {
-    role: 'recruiter',
-    label: 'Recruiter',
-  },
-  seeker: {
-    role: 'seeker',
-    label: 'Seeker',
-  },
-  guest: {
-    role: 'guest',
-    label: 'Guest',
-  }
+  admin: { role: 'admin', label: 'Admin' },
+  recruiter: { role: 'recruiter', label: 'Recruiter' },
+  seeker: { role: 'seeker', label: 'Seeker' },
+  guest: { role: 'guest', label: 'Guest' }
 };
 
-// Get bot theme based on user role
 const getBotTheme = (role) => {
   return BOT_ROLE_THEMES[role] || BOT_ROLE_THEMES.guest;
 };
 
-// Get initials from name
 const getInitials = (name) => {
   if (!name) return '?';
   return name
@@ -42,7 +27,6 @@ const getInitials = (name) => {
     .slice(0, 2);
 };
 
-// User Avatar Component
 const UserAvatar = ({ user, size = 32 }) => {
   const hasImage = user?.image && user.image !== '';
   const initials = getInitials(user?.name);
@@ -73,7 +57,6 @@ const UserAvatar = ({ user, size = 32 }) => {
   );
 };
 
-// Bot Avatar Component - changes color based on user role!
 const BotAvatar = ({ 
   mood = "neutral", 
   gaze = { x: 0, y: 0 }, 
@@ -89,14 +72,13 @@ const BotAvatar = ({
           mood={mood}
           gaze={gaze}
           size={size}
-          themeColors={theme} // Pass theme with role
+          themeColors={theme}
         />
       </div>
     </div>
   );
 };
 
-// Message with Avatar Component
 const MessageWithAvatar = ({ 
   message, 
   isUser = false, 
@@ -118,15 +100,15 @@ const MessageWithAvatar = ({
     <motion.div
       initial={{ opacity: 0, y: 10, scale: 0.95 }}
       animate={{ opacity: 1, y: 0, scale: 1 }}
-      className={`flex ${isUser ? "justify-end" : "justify-start"} gap-2`}
+      className={`flex ${isUser ? "justify-end" : "justify-start"} gap-2 items-end`}
     >
-      {/* Bot Avatar - Left side for bot messages with role-based color! */}
+      {/* Bot Avatar - Left side */}
       {!isUser && (
-        <div className="flex-shrink-0 self-end">
+        <div className="flex-shrink-0 self-end pb-1">
           <BotAvatar 
             mood={botMood} 
             gaze={botGaze}
-            size={32}
+            size={28}
             userRole={role}
           />
         </div>
@@ -154,16 +136,23 @@ const MessageWithAvatar = ({
             </button>
           )}
           
-          <p className="text-[10px] text-zinc-500 mt-1">
+          {/* Timestamp - color depends on bubble background so it
+              stays readable: light/translucent white on the user's
+              blue-purple gradient, muted zinc on the bot's dark bubble. */}
+          <p
+            className={`text-[10px] mt-1.5 text-right ${
+              isUser ? "text-white/70" : "text-zinc-500"
+            }`}
+          >
             {formatTime(timestamp)}
           </p>
         </div>
       </div>
 
-      {/* User Avatar - Right side for user messages */}
+      {/* User Avatar - Right side */}
       {isUser && (
-        <div className="flex-shrink-0 self-end">
-          <UserAvatar user={user} size={32} />
+        <div className="flex-shrink-0 self-end pb-1">
+          <UserAvatar user={user} size={28} />
         </div>
       )}
     </motion.div>
