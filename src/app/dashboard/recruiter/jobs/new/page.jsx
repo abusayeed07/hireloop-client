@@ -130,10 +130,10 @@ export default function PostJobPage() {
   // Show loading state
   if (isPending || loading) {
     return (
-      <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="min-h-[85vh] flex items-center justify-center">
+      <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="min-h-[85vh] flex items-center justify-center bg-zinc-50 dark:bg-[#0d0d0e]">
         <div className="text-center">
           <div className="w-16 h-16 border-4 border-cyan-500 border-t-transparent rounded-full animate-spin mx-auto mb-4" />
-          <p className="text-zinc-400 text-sm font-medium tracking-wide">Loading your workspace...</p>
+          <p className="text-zinc-600 dark:text-zinc-400 text-sm font-medium tracking-wide">Loading your workspace...</p>
         </div>
       </motion.div>
     );
@@ -155,14 +155,14 @@ export default function PostJobPage() {
       <motion.div
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
-        className="min-h-[85vh] flex items-center justify-center p-8"
+        className="min-h-[85vh] flex items-center justify-center p-8 bg-zinc-50 dark:bg-[#0d0d0e]"
       >
-        <div className="bg-[#121214]/80 backdrop-blur-sm border border-zinc-800/50 rounded-2xl p-8 text-center max-w-md">
-          <div className="w-16 h-16 bg-amber-500/10 rounded-full flex items-center justify-center mx-auto mb-4">
+        <div className="bg-white/80 dark:bg-[#121214]/80 backdrop-blur-sm border border-zinc-200/50 dark:border-zinc-800/50 rounded-2xl p-8 text-center max-w-md">
+          <div className="w-16 h-16 bg-amber-100 dark:bg-amber-500/10 rounded-full flex items-center justify-center mx-auto mb-4">
             <span className="text-3xl">🏢</span>
           </div>
-          <h3 className="text-xl font-semibold text-white mb-2">Company Required</h3>
-          <p className="text-zinc-400 text-sm mb-6">
+          <h3 className="text-xl font-semibold text-zinc-900 dark:text-white mb-2">Company Required</h3>
+          <p className="text-zinc-600 dark:text-zinc-400 text-sm mb-6">
             You need to set up your company profile before you can post jobs.
           </p>
           <button
@@ -180,7 +180,7 @@ export default function PostJobPage() {
   return (
     <>
       <Metadata page="recruiter-post-job" />
-      <div className="min-h-screen bg-gradient-to-br from-[#0d0d0e] via-[#0f0f11] to-[#0d0d0e] p-8">
+      <div className="min-h-screen bg-zinc-50 dark:bg-[#0d0d0e] p-8">
         <div className="max-w-5xl mx-auto">
           {/* ✅ Show tracker only if company is approved */}
           {companyStatus === 'approved' && (
@@ -203,16 +203,16 @@ export default function PostJobPage() {
               <motion.div
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
-                className="bg-[#121214]/80 backdrop-blur-sm border border-red-500/30 rounded-2xl p-12 text-center max-w-2xl mx-auto shadow-2xl shadow-red-500/5"
+                className="bg-white/80 dark:bg-[#121214]/80 backdrop-blur-sm border border-red-400/30 dark:border-red-500/30 rounded-2xl p-12 text-center max-w-2xl mx-auto shadow-2xl shadow-red-500/5"
               >
                 <div className="flex justify-center mb-6">
-                  <div className="w-20 h-20 bg-red-500/10 rounded-full flex items-center justify-center border border-red-500/20">
-                    <Zap className="w-10 h-10 text-red-400" />
+                  <div className="w-20 h-20 bg-red-100 dark:bg-red-500/10 rounded-full flex items-center justify-center border border-red-400/30 dark:border-red-500/20">
+                    <Zap className="w-10 h-10 text-red-600 dark:text-red-400" />
                   </div>
                 </div>
-                <h2 className="text-2xl font-bold text-white mb-3">Job Limit Reached</h2>
-                <p className="text-zinc-400 mb-2">
-                  You have posted <span className="text-white font-bold">{stats.total}</span> out of your <span className="text-white font-bold">{stats.max}</span> available jobs.
+                <h2 className="text-2xl font-bold text-zinc-900 dark:text-white mb-3">Job Limit Reached</h2>
+                <p className="text-zinc-600 dark:text-zinc-400 mb-2">
+                  You have posted <span className="text-zinc-900 dark:text-white font-bold">{stats.total}</span> out of your <span className="text-zinc-900 dark:text-white font-bold">{stats.max}</span> available jobs.
                 </p>
                 <p className="text-zinc-500 text-sm mb-8">
                   To continue posting new job opportunities, please upgrade your plan.

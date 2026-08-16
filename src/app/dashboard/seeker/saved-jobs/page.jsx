@@ -18,7 +18,7 @@ export default function SavedJobsPage() {
   
   // 🟢 Pagination States
   const [currentPage, setCurrentPage] = useState(1);
-  const itemsPerPage = 6; // 3 columns x 2 rows
+  const itemsPerPage = 6;
 
   // ✅ Fetch saved jobs on load
   useEffect(() => {
@@ -46,7 +46,6 @@ export default function SavedJobsPage() {
   const handleRemoveJob = async (jobId) => {
     if (!jobId) return;
 
-    // Optimistically remove the job from the UI immediately
     setRemovingIds(prev => new Set(prev).add(jobId));
     const originalJobs = [...savedJobs];
     setSavedJobs(prev => prev.filter(job => job._id !== jobId));
@@ -55,7 +54,6 @@ export default function SavedJobsPage() {
       const result = await unsaveJob(jobId, session.user.id);
       if (result && result.success === true) {
         toast.success("Job removed from saved");
-        // If current page has no items after removal, go to previous page
         const remainingJobs = savedJobs.filter(job => job._id !== jobId);
         const totalPages = Math.ceil(remainingJobs.length / itemsPerPage);
         if (currentPage > totalPages && totalPages > 0) {
@@ -85,7 +83,6 @@ export default function SavedJobsPage() {
   const endIndex = startIndex + itemsPerPage;
   const currentJobs = savedJobs.slice(startIndex, endIndex);
 
-  // Reset to page 1 when jobs change (e.g., after removal)
   useEffect(() => {
     if (currentPage > totalPages && totalPages > 0) {
       setCurrentPage(totalPages);
@@ -95,7 +92,7 @@ export default function SavedJobsPage() {
   // ---------- LOADING STATE ----------
   if (loading) {
     return (
-      <div className="min-h-screen bg-[#090a0f] py-8 px-4 md:px-8 flex items-center justify-center">
+      <div className="min-h-screen bg-zinc-50 dark:bg-[#090a0f] py-8 px-4 md:px-8 flex items-center justify-center">
         <motion.div
           initial={{ opacity: 0, scale: 0.8 }}
           animate={{ opacity: 1, scale: 1 }}
@@ -110,18 +107,18 @@ export default function SavedJobsPage() {
   // ---------- NOT LOGGED IN ----------
   if (!session?.user) {
     return (
-      <div className="min-h-screen bg-[#090a0f] py-8 px-4 md:px-8 flex flex-col items-center justify-center">
+      <div className="min-h-screen bg-zinc-50 dark:bg-[#090a0f] py-8 px-4 md:px-8 flex flex-col items-center justify-center">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6 }}
           className="text-center"
         >
-          <div className="w-20 h-20 bg-zinc-800/50 rounded-full flex items-center justify-center mx-auto mb-6 border border-white/10">
+          <div className="w-20 h-20 bg-zinc-200 dark:bg-zinc-800/50 rounded-full flex items-center justify-center mx-auto mb-6 border border-zinc-200/50 dark:border-white/10">
             <Heart className="w-10 h-10 text-zinc-400" />
           </div>
-          <h2 className="text-2xl font-bold text-white mb-2">Sign in to view saved jobs</h2>
-          <p className="text-zinc-400 text-sm">
+          <h2 className="text-2xl font-bold text-zinc-900 dark:text-white mb-2">Sign in to view saved jobs</h2>
+          <p className="text-zinc-500 dark:text-zinc-400 text-sm">
             Please sign in to see your saved jobs.
           </p>
         </motion.div>
@@ -132,8 +129,7 @@ export default function SavedJobsPage() {
   // ---------- 🎨 ANIMATED EMPTY STATE ----------
   if (savedJobs.length === 0) {
     return (
-      <div className="min-h-screen bg-[#090a0f] py-12 px-4 md:px-8 flex flex-col items-center justify-center relative overflow-hidden">
-        {/* Background Glow Effect */}
+      <div className="min-h-screen bg-zinc-50 dark:bg-[#090a0f] py-12 px-4 md:px-8 flex flex-col items-center justify-center relative overflow-hidden">
         <div className="absolute w-[500px] h-[500px] bg-blue-500/10 rounded-full blur-[80px] -z-10 top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2" />
         
         <motion.div
@@ -142,24 +138,23 @@ export default function SavedJobsPage() {
           transition={{ duration: 0.6, type: "spring", bounce: 0.4 }}
           className="text-center max-w-md relative z-10"
         >
-          {/* Floating Hearts Background */}
           <motion.div
             animate={{ y: [0, -10, 0] }}
             transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}
-            className="absolute -top-12 -left-12 text-zinc-800/30"
+            className="absolute -top-12 -left-12 text-zinc-200 dark:text-zinc-800/30"
           >
             <Heart className="w-24 h-24 fill-current" />
           </motion.div>
           <motion.div
             animate={{ y: [0, 10, 0] }}
             transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
-            className="absolute -bottom-12 -right-12 text-zinc-800/30"
+            className="absolute -bottom-12 -right-12 text-zinc-200 dark:text-zinc-800/30"
           >
             <Heart className="w-32 h-32 fill-current" />
           </motion.div>
 
           <div className="relative inline-block mb-6">
-            <div className="w-24 h-24 bg-gradient-to-br from-blue-500/20 to-purple-500/20 rounded-2xl flex items-center justify-center mx-auto border border-white/10 backdrop-blur-sm shadow-2xl">
+            <div className="w-24 h-24 bg-gradient-to-br from-blue-500/20 to-purple-500/20 rounded-2xl flex items-center justify-center mx-auto border border-zinc-200/50 dark:border-white/10 backdrop-blur-sm shadow-2xl">
               <Heart className="w-12 h-12 text-blue-400" />
             </div>
             <motion.div
@@ -171,8 +166,8 @@ export default function SavedJobsPage() {
             </motion.div>
           </div>
 
-          <h2 className="text-3xl font-bold text-white mb-3">No saved jobs yet</h2>
-          <p className="text-zinc-400 mb-8 text-lg">
+          <h2 className="text-3xl font-bold text-zinc-900 dark:text-white mb-3">No saved jobs yet</h2>
+          <p className="text-zinc-500 dark:text-zinc-400 mb-8 text-lg">
             Start browsing and save jobs you're interested in.
           </p>
 
@@ -190,7 +185,7 @@ export default function SavedJobsPage() {
 
   // ---------- 🎨 STYLISH MAIN CONTENT ----------
   return (
-    <div className="min-h-screen bg-[#090a0f] py-8 px-4 md:px-8">
+    <div className="min-h-screen bg-zinc-50 dark:bg-[#090a0f] py-8 px-4 md:px-8">
       <div className="max-w-7xl mx-auto">
         <motion.div
           initial={{ opacity: 0, y: -20 }}
@@ -198,17 +193,16 @@ export default function SavedJobsPage() {
           className="flex items-center justify-between mb-8"
         >
           <div>
-            <h1 className="text-3xl font-bold text-white flex items-center gap-3">
+            <h1 className="text-3xl font-bold text-zinc-900 dark:text-white flex items-center gap-3">
               Saved Jobs 
-              <span className="bg-zinc-800 text-zinc-300 text-sm font-medium px-3 py-1 rounded-full border border-white/10">
+              <span className="bg-zinc-200 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-300 text-sm font-medium px-3 py-1 rounded-full border border-zinc-200/50 dark:border-white/10">
                 {savedJobs.length}
               </span>
             </h1>
-            <p className="text-zinc-400 text-sm mt-1">Jobs you've bookmarked for later</p>
+            <p className="text-zinc-500 dark:text-zinc-400 text-sm mt-1">Jobs you've bookmarked for later</p>
           </div>
         </motion.div>
 
-        {/* ✅ Enhanced Grid Layout */}
         <motion.div 
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
@@ -231,11 +225,9 @@ export default function SavedJobsPage() {
                 }}
                 className="relative group"
               >
-                <div className="relative rounded-2xl bg-[#121316] border border-white/5 hover:border-blue-500/30 transition-all duration-300 shadow-lg hover:shadow-blue-500/5 overflow-hidden">
-                  {/* Job Card */}
+                <div className="relative rounded-2xl bg-white dark:bg-[#121316] border border-zinc-200/50 dark:border-white/5 hover:border-blue-500/30 transition-all duration-300 shadow-lg hover:shadow-blue-500/5 overflow-hidden">
                   <JobCard job={job} index={index} />
                   
-                  {/* Stylish Remove Button */}
                   <motion.button
                     onClick={(e) => {
                       e.preventDefault();
@@ -260,7 +252,6 @@ export default function SavedJobsPage() {
           </AnimatePresence>
         </motion.div>
 
-        {/* 🟢 PAGINATION */}
         {totalPages > 1 && (
           <motion.div
             initial={{ opacity: 0, y: 20 }}

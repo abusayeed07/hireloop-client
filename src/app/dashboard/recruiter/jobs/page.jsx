@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useEffect, useMemo } from "react";
-import { Table, Chip, Tooltip, Modal } from "@heroui/react";
+import { Table, Chip, Tooltip } from "@heroui/react";
 import { Briefcase, Plus, Eye, Pencil, TrashBin } from "@gravity-ui/icons";
 import Link from "next/link";
 import { authClient } from "@/lib/auth-client";
@@ -58,7 +58,7 @@ export default function RecruiterJobs() {
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 5;
 
-  // Delete Modal State
+  // Delete Modal State - Using custom modal (not HeroUI Modal)
   const [deleteModalOpen, setDeleteModalOpen] = useState(false);
   const [jobToDelete, setJobToDelete] = useState(null);
   const [isDeleting, setIsDeleting] = useState(false);
@@ -430,7 +430,7 @@ export default function RecruiterJobs() {
       <motion.div
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
-        className="min-h-[85vh] flex items-center justify-center bg-gradient-to-br from-[#0d0d0e] via-[#0f0f11] to-[#0d0d0e]"
+        className="min-h-[85vh] flex items-center justify-center bg-zinc-50 dark:bg-[#0d0d0e]"
       >
         <div className="text-center">
           <motion.div
@@ -438,7 +438,7 @@ export default function RecruiterJobs() {
             transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
             className="w-16 h-16 border-4 border-purple-500 border-t-transparent rounded-full mx-auto mb-4"
           />
-          <p className="text-zinc-400 text-sm font-medium tracking-wide">
+          <p className="text-zinc-600 dark:text-zinc-400 text-sm font-medium tracking-wide">
             Loading your workspace...
           </p>
         </div>
@@ -462,16 +462,16 @@ export default function RecruiterJobs() {
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
-        className="min-h-[85vh] flex items-center justify-center p-8 bg-gradient-to-br from-[#0d0d0e] via-[#0f0f11] to-[#0d0d0e]"
+        className="min-h-[85vh] flex items-center justify-center p-8 bg-zinc-50 dark:bg-[#0d0d0e]"
       >
-        <div className="bg-[#121214]/80 backdrop-blur-sm border border-zinc-800/50 rounded-2xl p-8 text-center max-w-md">
-          <div className="w-16 h-16 bg-amber-500/10 rounded-full flex items-center justify-center mx-auto mb-4">
+        <div className="bg-white/80 dark:bg-[#121214]/80 backdrop-blur-sm border border-zinc-200/50 dark:border-zinc-800/50 rounded-2xl p-8 text-center max-w-md">
+          <div className="w-16 h-16 bg-amber-100 dark:bg-amber-500/10 rounded-full flex items-center justify-center mx-auto mb-4">
             <span className="text-3xl">🏢</span>
           </div>
-          <h3 className="text-xl font-semibold text-white mb-2">
+          <h3 className="text-xl font-semibold text-zinc-900 dark:text-white mb-2">
             Company Required
           </h3>
-          <p className="text-zinc-400 text-sm mb-6">
+          <p className="text-zinc-600 dark:text-zinc-400 text-sm mb-6">
             You need to set up your company profile before you can manage jobs.
           </p>
           <motion.button
@@ -492,7 +492,7 @@ export default function RecruiterJobs() {
     return (
       <>
         <Metadata page="recruiter-manage-jobs" />
-        <div className="min-h-screen bg-gradient-to-br from-[#0d0d0e] via-[#0f0f11] to-[#0d0d0e] p-8">
+        <div className="min-h-screen bg-zinc-50 dark:bg-[#0d0d0e] p-8">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
@@ -501,10 +501,10 @@ export default function RecruiterJobs() {
             <div className="mb-8">
               <div className="flex items-center justify-between flex-wrap gap-4">
                 <div>
-                  <h1 className="text-3xl font-bold bg-gradient-to-r from-white to-zinc-400 bg-clip-text text-transparent">
+                  <h1 className="text-3xl font-bold bg-gradient-to-r from-zinc-900 to-zinc-500 dark:from-white dark:to-zinc-400 bg-clip-text text-transparent">
                     Company Jobs
                   </h1>
-                  <p className="text-zinc-400 text-sm mt-1">
+                  <p className="text-zinc-600 dark:text-zinc-400 text-sm mt-1">
                     Manage and monitor all your job postings
                   </p>
                 </div>
@@ -524,15 +524,15 @@ export default function RecruiterJobs() {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.2 }}
-              className="bg-[#121214]/80 backdrop-blur-sm border border-zinc-800/50 rounded-2xl p-12 text-center"
+              className="bg-white/80 dark:bg-[#121214]/80 backdrop-blur-sm border border-zinc-200/50 dark:border-zinc-800/50 rounded-2xl p-12 text-center"
             >
               <div className="w-20 h-20 bg-gradient-to-br from-purple-500/10 to-purple-600/5 rounded-full flex items-center justify-center mx-auto mb-4">
-                <Briefcase size={32} className="text-purple-400" />
+                <Briefcase size={32} className="text-purple-600 dark:text-purple-400" />
               </div>
-              <h3 className="text-xl font-semibold text-white mb-2">
+              <h3 className="text-xl font-semibold text-zinc-900 dark:text-white mb-2">
                 No jobs yet
               </h3>
-              <p className="text-zinc-400 mb-6">
+              <p className="text-zinc-600 dark:text-zinc-400 mb-6">
                 Get started by posting your first job opening
               </p>
               <Link href="/dashboard/recruiter/jobs/new">
@@ -554,7 +554,7 @@ export default function RecruiterJobs() {
   return (
     <>
       <Metadata page="recruiter-manage-jobs" />
-      <div className="min-h-screen bg-gradient-to-br from-[#0d0d0e] via-[#0f0f11] to-[#0d0d0e] p-8">
+      <div className="min-h-screen bg-zinc-50 dark:bg-[#0d0d0e] p-8">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
@@ -566,12 +566,12 @@ export default function RecruiterJobs() {
               <motion.h2
                 initial={{ opacity: 0, x: -20 }}
                 animate={{ opacity: 1, x: 0 }}
-                className="text-2xl font-bold tracking-tight text-white flex items-center gap-2"
+                className="text-2xl font-bold tracking-tight text-zinc-900 dark:text-white flex items-center gap-2"
               >
                 Manage All Jobs
-                <Sparkles className="w-5 h-5 text-purple-400" />
+                <Sparkles className="w-5 h-5 text-purple-600 dark:text-purple-400" />
               </motion.h2>
-              <p className="text-sm text-zinc-400">
+              <p className="text-sm text-zinc-600 dark:text-zinc-400">
                 View, update, and manage your current job postings.
               </p>
             </div>
@@ -603,7 +603,7 @@ export default function RecruiterJobs() {
             {/* Search Input */}
             <div className="relative flex-1 group">
               <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                <Search className="w-4 h-4 text-zinc-500 group-hover:text-zinc-300 transition-colors" />
+                <Search className="w-4 h-4 text-zinc-400 dark:text-zinc-500 group-hover:text-zinc-600 dark:group-hover:text-zinc-300 transition-colors" />
               </div>
               <input
                 type="text"
@@ -613,14 +613,14 @@ export default function RecruiterJobs() {
                   setSearchQuery(e.target.value);
                   setCurrentPage(1);
                 }}
-                className="w-full bg-zinc-900/50 border border-zinc-800 hover:border-zinc-600 focus:border-purple-500/50 rounded-xl pl-10 pr-10 py-2.5 text-white placeholder:text-zinc-500 outline-none transition-all focus:ring-2 focus:ring-purple-500/20"
+                className="w-full bg-white/80 dark:bg-zinc-900/50 border border-zinc-300/50 dark:border-zinc-800 hover:border-zinc-400 dark:hover:border-zinc-600 focus:border-purple-500/50 dark:focus:border-purple-500/50 rounded-xl pl-10 pr-10 py-2.5 text-zinc-900 dark:text-white placeholder:text-zinc-400 dark:placeholder:text-zinc-500 outline-none transition-all focus:ring-2 focus:ring-purple-500/20"
               />
               {searchQuery && (
                 <motion.button
                   initial={{ opacity: 0, scale: 0.8 }}
                   animate={{ opacity: 1, scale: 1 }}
                   onClick={() => setSearchQuery("")}
-                  className="absolute inset-y-0 right-0 pr-3 flex items-center text-zinc-500 hover:text-zinc-300 transition-colors"
+                  className="absolute inset-y-0 right-0 pr-3 flex items-center text-zinc-400 dark:text-zinc-500 hover:text-zinc-600 dark:hover:text-zinc-300 transition-colors"
                 >
                   <X className="w-4 h-4" />
                 </motion.button>
@@ -635,29 +635,29 @@ export default function RecruiterJobs() {
                   setStatusFilter(e.target.value);
                   setCurrentPage(1);
                 }}
-                className="w-full bg-zinc-900/50 border border-zinc-800 hover:border-zinc-600 focus:border-purple-500/50 rounded-xl px-4 py-2.5 pr-10 text-white placeholder:text-zinc-500 outline-none transition-all appearance-none cursor-pointer focus:ring-2 focus:ring-purple-500/20"
+                className="w-full bg-white/80 dark:bg-zinc-900/50 border border-zinc-300/50 dark:border-zinc-800 hover:border-zinc-400 dark:hover:border-zinc-600 focus:border-purple-500/50 dark:focus:border-purple-500/50 rounded-xl px-4 py-2.5 pr-10 text-zinc-900 dark:text-white placeholder:text-zinc-400 dark:placeholder:text-zinc-500 outline-none transition-all appearance-none cursor-pointer focus:ring-2 focus:ring-purple-500/20"
               >
-                <option value="all" className="bg-zinc-900">
+                <option value="all" className="bg-white dark:bg-zinc-900">
                   📋 All Status
                 </option>
-                <option value="pending" className="bg-zinc-900">
+                <option value="pending" className="bg-white dark:bg-zinc-900">
                   ⏳ Pending
                 </option>
-                <option value="approved" className="bg-zinc-900">
+                <option value="approved" className="bg-white dark:bg-zinc-900">
                   ✅ Approved
                 </option>
-                <option value="rejected" className="bg-zinc-900">
+                <option value="rejected" className="bg-white dark:bg-zinc-900">
                   ❌ Rejected
                 </option>
-                <option value="active" className="bg-zinc-900">
+                <option value="active" className="bg-white dark:bg-zinc-900">
                   🟢 Active
                 </option>
-                <option value="inactive" className="bg-zinc-900">
+                <option value="inactive" className="bg-white dark:bg-zinc-900">
                   🔴 Inactive
                 </option>
               </select>
               <div className="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
-                <ChevronDown className="w-4 h-4 text-zinc-500" />
+                <ChevronDown className="w-4 h-4 text-zinc-400 dark:text-zinc-500" />
               </div>
             </div>
 
@@ -671,7 +671,7 @@ export default function RecruiterJobs() {
                   setStatusFilter("all");
                   setCurrentPage(1);
                 }}
-                className="text-zinc-400 hover:text-white text-sm font-medium transition-colors px-3 py-2 hover:bg-zinc-800/50 rounded-lg whitespace-nowrap"
+                className="text-zinc-500 dark:text-zinc-400 hover:text-zinc-700 dark:hover:text-white text-sm font-medium transition-colors px-3 py-2 hover:bg-zinc-100 dark:hover:bg-zinc-800/50 rounded-lg whitespace-nowrap"
               >
                 Clear Filters ✕
               </motion.button>
@@ -679,7 +679,7 @@ export default function RecruiterJobs() {
           </motion.div>
 
           {/* Results Count */}
-          <div className="flex justify-between items-center text-sm text-zinc-500">
+          <div className="flex justify-between items-center text-sm text-zinc-500 dark:text-zinc-500">
             <span>
               Showing {totalItems} job{totalItems !== 1 ? "s" : ""}
             </span>
@@ -690,34 +690,34 @@ export default function RecruiterJobs() {
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.2 }}
-            className="bg-[#121214]/60 backdrop-blur-sm border border-zinc-800/50 rounded-2xl overflow-hidden"
+            className="bg-white/80 dark:bg-[#121214]/60 backdrop-blur-sm border border-zinc-200/50 dark:border-zinc-800/50 rounded-2xl overflow-hidden"
           >
-            <Table aria-label="Company jobs management table" className="dark">
+            <Table aria-label="Company jobs management table">
               <Table.ScrollContainer className="max-h-[70vh]">
                 <Table.Content className="min-w-[1100px]">
-                  <Table.Header className="bg-[#1a1a1e]/90 sticky top-0 z-10 backdrop-blur-sm">
+                  <Table.Header className="bg-zinc-100/50 dark:bg-[#1a1a1e]/90 sticky top-0 z-10 backdrop-blur-sm border-b border-zinc-200/50 dark:border-zinc-800/50">
                     <Table.Column
                       isRowHeader
-                      className="text-zinc-300 font-medium text-left px-4 py-3"
+                      className="text-zinc-700 dark:text-zinc-300 font-medium text-left px-4 py-3"
                     >
                       Job Title
                     </Table.Column>
-                    <Table.Column className="text-zinc-300 font-medium text-left px-4 py-3">
+                    <Table.Column className="text-zinc-700 dark:text-zinc-300 font-medium text-left px-4 py-3">
                       Type & Category
                     </Table.Column>
-                    <Table.Column className="text-zinc-300 font-medium text-left px-4 py-3">
+                    <Table.Column className="text-zinc-700 dark:text-zinc-300 font-medium text-left px-4 py-3">
                       Location
                     </Table.Column>
-                    <Table.Column className="text-zinc-300 font-medium text-left px-4 py-3">
+                    <Table.Column className="text-zinc-700 dark:text-zinc-300 font-medium text-left px-4 py-3">
                       Deadline
                     </Table.Column>
-                    <Table.Column className="text-zinc-300 font-medium text-center px-4 py-3">
+                    <Table.Column className="text-zinc-700 dark:text-zinc-300 font-medium text-center px-4 py-3">
                       Status
                     </Table.Column>
-                    <Table.Column className="text-zinc-300 font-medium text-center px-4 py-3">
+                    <Table.Column className="text-zinc-700 dark:text-zinc-300 font-medium text-center px-4 py-3">
                       Admin Approval
                     </Table.Column>
-                    <Table.Column className="text-zinc-300 font-medium text-center px-4 py-3">
+                    <Table.Column className="text-zinc-700 dark:text-zinc-300 font-medium text-center px-4 py-3">
                       Actions
                     </Table.Column>
                   </Table.Header>
@@ -726,14 +726,14 @@ export default function RecruiterJobs() {
                       {currentJobs.map((job, index) => (
                         <Table.Row
                           key={job._id}
-                          className="border-b border-zinc-800/50 hover:bg-zinc-900/40 transition-all duration-300 group"
+                          className="border-b border-zinc-200/50 dark:border-zinc-800/50 hover:bg-zinc-100/50 dark:hover:bg-zinc-900/40 transition-all duration-300 group"
                         >
                           <Table.Cell className="py-4 px-4">
                             <motion.div
                               initial={{ opacity: 0, x: -10 }}
                               animate={{ opacity: 1, x: 0 }}
                               transition={{ delay: index * 0.05 }}
-                              className="font-medium text-white group-hover:text-purple-400 transition-colors"
+                              className="font-medium text-zinc-900 dark:text-white group-hover:text-purple-600 dark:group-hover:text-purple-400 transition-colors"
                             >
                               {job.jobTitle || "N/A"}
                             </motion.div>
@@ -745,7 +745,7 @@ export default function RecruiterJobs() {
                               transition={{ delay: index * 0.05 + 0.05 }}
                               className="flex flex-col gap-0.5"
                             >
-                              <span className="text-sm capitalize font-medium text-zinc-300">
+                              <span className="text-sm capitalize font-medium text-zinc-800 dark:text-zinc-300">
                                 {job.jobType || "N/A"}
                               </span>
                               <span className="text-xs text-zinc-500 capitalize">
@@ -760,11 +760,11 @@ export default function RecruiterJobs() {
                               transition={{ delay: index * 0.05 + 0.1 }}
                             >
                               {job.isRemote ? (
-                                <span className="flex items-center gap-1 text-zinc-300">
+                                <span className="flex items-center gap-1 text-zinc-800 dark:text-zinc-300">
                                   <span>🌍</span> Remote
                                 </span>
                               ) : (
-                                <span className="text-zinc-300">
+                                <span className="text-zinc-800 dark:text-zinc-300">
                                   {job.location || "N/A"}
                                 </span>
                               )}
@@ -775,7 +775,7 @@ export default function RecruiterJobs() {
                               initial={{ opacity: 0 }}
                               animate={{ opacity: 1 }}
                               transition={{ delay: index * 0.05 + 0.15 }}
-                              className="text-zinc-300"
+                              className="text-zinc-800 dark:text-zinc-300"
                             >
                               {job.deadline
                                 ? new Date(job.deadline).toLocaleDateString()
@@ -783,7 +783,6 @@ export default function RecruiterJobs() {
                             </motion.div>
                           </Table.Cell>
                           <Table.Cell className="py-4 px-4">
-                            {/* ✅ Status chip - centered */}
                             <motion.div
                               initial={{ opacity: 0, scale: 0.8 }}
                               animate={{ opacity: 1, scale: 1 }}
@@ -801,7 +800,6 @@ export default function RecruiterJobs() {
                             </motion.div>
                           </Table.Cell>
                           <Table.Cell className="py-4 px-4">
-                            {/* ✅ Admin Approval - with Rejected button for rejected jobs - centered */}
                             <motion.div
                               initial={{ opacity: 0, scale: 0.8 }}
                               animate={{ opacity: 1, scale: 1 }}
@@ -814,7 +812,7 @@ export default function RecruiterJobs() {
                                   <motion.button
                                     whileHover={{ scale: 1.05 }}
                                     whileTap={{ scale: 0.95 }}
-                                    className="text-red-400 hover:text-red-300 border border-red-500/30 bg-red-500/10 hover:bg-red-500/20 px-3 py-1.5 rounded-lg text-xs font-medium flex items-center gap-1.5 transition-all"
+                                    className="text-red-600 dark:text-red-400 hover:text-red-700 dark:hover:text-red-300 border border-red-400/30 dark:border-red-500/30 bg-red-100/50 dark:bg-red-500/10 hover:bg-red-100 dark:hover:bg-red-500/20 px-3 py-1.5 rounded-lg text-xs font-medium flex items-center gap-1.5 transition-all"
                                     onClick={() => openRejectModal(job)}
                                   >
                                     <X size={14} />
@@ -836,7 +834,6 @@ export default function RecruiterJobs() {
                             </motion.div>
                           </Table.Cell>
                           <Table.Cell className="py-4 px-4">
-                            {/* ✅ Action buttons - centered */}
                             <motion.div
                               initial={{ opacity: 0, scale: 0.8 }}
                               animate={{ opacity: 1, scale: 1 }}
@@ -847,7 +844,7 @@ export default function RecruiterJobs() {
                                 <motion.button
                                   whileHover={{ scale: 1.1 }}
                                   whileTap={{ scale: 0.9 }}
-                                  className="text-zinc-400 hover:text-white p-1.5 rounded-lg hover:bg-zinc-800/50 transition-all"
+                                  className="text-zinc-500 dark:text-zinc-400 hover:text-zinc-800 dark:hover:text-white p-1.5 rounded-lg hover:bg-zinc-200/50 dark:hover:bg-zinc-800/50 transition-all"
                                   onClick={() => handleViewJob(job._id)}
                                 >
                                   <Eye size={16} />
@@ -858,7 +855,7 @@ export default function RecruiterJobs() {
                                 <motion.button
                                   whileHover={{ scale: 1.1 }}
                                   whileTap={{ scale: 0.9 }}
-                                  className="text-zinc-400 hover:text-purple-400 p-1.5 rounded-lg hover:bg-purple-500/10 transition-all"
+                                  className="text-zinc-500 dark:text-zinc-400 hover:text-purple-600 dark:hover:text-purple-400 p-1.5 rounded-lg hover:bg-purple-100/50 dark:hover:bg-purple-500/10 transition-all"
                                   onClick={() => handleEditJob(job._id)}
                                 >
                                   <Pencil size={16} />
@@ -869,7 +866,7 @@ export default function RecruiterJobs() {
                                 <motion.button
                                   whileHover={{ scale: 1.1 }}
                                   whileTap={{ scale: 0.9 }}
-                                  className="text-red-400 hover:text-red-300 p-1.5 rounded-lg hover:bg-red-500/10 transition-all"
+                                  className="text-red-500 dark:text-red-400 hover:text-red-700 dark:hover:text-red-300 p-1.5 rounded-lg hover:bg-red-100/50 dark:hover:bg-red-500/10 transition-all"
                                   onClick={() => openDeleteModal(job)}
                                 >
                                   <TrashBin size={16} />
@@ -907,115 +904,120 @@ export default function RecruiterJobs() {
             </motion.div>
           )}
 
-          {/* Delete Modal */}
-          <Modal isOpen={deleteModalOpen} onOpenChange={setDeleteModalOpen}>
-            <Modal.Backdrop>
-              <Modal.Container>
-                <motion.div
-                  initial={{ opacity: 0, scale: 0.9 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  exit={{ opacity: 0, scale: 0.9 }}
-                  className="sm:max-w-[420px] bg-gradient-to-br from-zinc-900 to-[#1a1a1e] border border-zinc-800 rounded-2xl p-6"
+          {/* ✅ DELETE MODAL - Custom Modal (not using HeroUI Modal) */}
+          {deleteModalOpen && (
+            <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 dark:bg-black/80 backdrop-blur-sm">
+              <div className="relative bg-white dark:bg-gradient-to-br dark:from-zinc-900 dark:to-[#1a1a1e] border border-zinc-200/50 dark:border-zinc-800 rounded-2xl p-8 max-w-md w-full mx-4 shadow-2xl">
+                {/* Close Button */}
+                <button
+                  onClick={() => setDeleteModalOpen(false)}
+                  className="absolute top-4 right-4 text-zinc-500 dark:text-zinc-400 hover:text-zinc-700 dark:hover:text-white transition-colors p-1 rounded-lg hover:bg-zinc-100 dark:hover:bg-zinc-800"
                 >
-                  <Modal.CloseTrigger />
-                  <Modal.Header>
-                    <Modal.Icon className="bg-red-500/10 text-red-400 rounded-full p-2">
-                      <AlertTriangle className="size-5" />
-                    </Modal.Icon>
-                    <Modal.Heading className="text-white text-lg font-semibold">
-                      Delete Job Posting
-                    </Modal.Heading>
-                  </Modal.Header>
-                  <Modal.Body className="space-y-4">
-                    <p className="text-zinc-300">
-                      Are you sure you want to delete the job posting{" "}
-                      <span className="font-semibold text-white">
-                        "{jobToDelete?.jobTitle || "Unknown"}"
-                      </span>
-                      ?
-                    </p>
-                    <div className="p-3 bg-red-500/10 border border-red-500/20 rounded-xl">
-                      <p className="text-sm text-red-400 flex items-start gap-2">
-                        <span>⚠️</span>
-                        <span>
-                          This action cannot be undone. All applications
-                          associated with this job will also be permanently
-                          removed.
-                        </span>
-                      </p>
-                    </div>
-                  </Modal.Body>
-                  <Modal.Footer className="flex gap-3 mt-4">
-                    <motion.button
-                      whileHover={{ scale: 1.02 }}
-                      whileTap={{ scale: 0.98 }}
-                      className="flex-1 bg-zinc-800 hover:bg-zinc-700 text-white rounded-xl font-medium px-4 py-2 transition-all"
-                      onClick={() => setDeleteModalOpen(false)}
-                      disabled={isDeleting}
-                    >
-                      Cancel
-                    </motion.button>
-                    <motion.button
-                      whileHover={{ scale: 1.02 }}
-                      whileTap={{ scale: 0.98 }}
-                      className="flex-1 bg-red-500/10 hover:bg-red-500/20 text-red-400 border border-red-500/20 rounded-xl font-medium px-4 py-2 transition-all disabled:opacity-50 flex items-center justify-center gap-2"
-                      onClick={confirmDelete}
-                      disabled={isDeleting}
-                    >
-                      {isDeleting ? (
-                        <>
-                          <Loader2 className="w-4 h-4 animate-spin" />{" "}
-                          Deleting...
-                        </>
-                      ) : (
-                        "Yes, Delete"
-                      )}
-                    </motion.button>
-                  </Modal.Footer>
-                </motion.div>
-              </Modal.Container>
-            </Modal.Backdrop>
-          </Modal>
+                  <X size={20} />
+                </button>
 
-          {/* ✅ Rejected Action Modal */}
+                {/* Header */}
+                <div className="flex items-center gap-3 mb-4">
+                  <div className="bg-red-100 dark:bg-red-500/10 text-red-600 dark:text-red-400 rounded-full p-2 flex-shrink-0">
+                    <AlertTriangle className="size-5" />
+                  </div>
+                  <h3 className="text-lg font-semibold text-zinc-900 dark:text-white">
+                    Delete Job Posting
+                  </h3>
+                </div>
+
+                {/* Body */}
+                <div className="space-y-4">
+                  <p className="text-zinc-700 dark:text-zinc-300">
+                    Are you sure you want to delete the job posting{" "}
+                    <span className="font-semibold text-zinc-900 dark:text-white">
+                      "{jobToDelete?.jobTitle || "Unknown"}"
+                    </span>
+                    ?
+                  </p>
+                  <div className="p-3 bg-red-100/50 dark:bg-red-500/10 border border-red-400/30 dark:border-red-500/20 rounded-xl">
+                    <p className="text-sm text-red-700 dark:text-red-400 flex items-start gap-2">
+                      <span className="text-base">⚠️</span>
+                      <span>
+                        This action cannot be undone. All applications
+                        associated with this job will also be permanently
+                        removed.
+                      </span>
+                    </p>
+                  </div>
+                </div>
+
+                {/* Footer */}
+                <div className="flex gap-3 mt-6">
+                  <motion.button
+                    whileHover={{ scale: 1.02 }}
+                    whileTap={{ scale: 0.98 }}
+                    className="flex-1 bg-zinc-200 dark:bg-zinc-800 hover:bg-zinc-300 dark:hover:bg-zinc-700 text-zinc-900 dark:text-white rounded-xl font-medium px-4 py-2.5 transition-all"
+                    onClick={() => setDeleteModalOpen(false)}
+                    disabled={isDeleting}
+                  >
+                    Cancel
+                  </motion.button>
+                  <motion.button
+                    whileHover={{ scale: 1.02 }}
+                    whileTap={{ scale: 0.98 }}
+                    className="flex-1 bg-red-100/50 dark:bg-red-500/10 hover:bg-red-100 dark:hover:bg-red-500/20 text-red-700 dark:text-red-400 border border-red-400/30 dark:border-red-500/20 rounded-xl font-medium px-4 py-2.5 transition-all disabled:opacity-50 flex items-center justify-center gap-2"
+                    onClick={confirmDelete}
+                    disabled={isDeleting}
+                  >
+                    {isDeleting ? (
+                      <>
+                        <Loader2 className="w-4 h-4 animate-spin" />
+                        Deleting...
+                      </>
+                    ) : (
+                      "Yes, Delete"
+                    )}
+                  </motion.button>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* ✅ Rejected Action Modal - Custom modal */}
           {rejectModalOpen && (
-            <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm">
-              <div className="bg-[#0d0d0e] border border-red-500/30 rounded-2xl p-8 max-w-md w-full mx-4 relative">
+            <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 dark:bg-black/80 backdrop-blur-sm">
+              <div className="relative bg-white dark:bg-[#0d0d0e] border border-red-400/30 dark:border-red-500/30 rounded-2xl p-8 max-w-md w-full mx-4 shadow-2xl">
                 {/* Close Button */}
                 <button
                   onClick={() => setRejectModalOpen(false)}
-                  className="absolute top-4 right-4 text-zinc-500 hover:text-white transition-colors"
+                  className="absolute top-4 right-4 text-zinc-500 dark:text-zinc-500 hover:text-zinc-800 dark:hover:text-white transition-colors p-1 rounded-lg hover:bg-zinc-100 dark:hover:bg-zinc-800"
                 >
                   <X size={20} />
                 </button>
 
                 {/* Large Red X Icon */}
                 <div className="flex justify-center mb-6">
-                  <div className="w-20 h-20 bg-red-500/10 rounded-full flex items-center justify-center">
-                    <X className="w-10 h-10 text-red-500" strokeWidth={3} />
+                  <div className="w-20 h-20 bg-red-100/50 dark:bg-red-500/10 rounded-full flex items-center justify-center">
+                    <X className="w-10 h-10 text-red-600 dark:text-red-500" strokeWidth={3} />
                   </div>
                 </div>
 
                 {/* Header */}
                 <div className="text-center mb-4">
-                  <h3 className="text-xl font-bold text-white mb-2">
+                  <h3 className="text-xl font-bold text-zinc-900 dark:text-white mb-2">
                     Job Rejected
                   </h3>
-                  <p className="text-zinc-400 text-sm">
+                  <p className="text-zinc-600 dark:text-zinc-400 text-sm">
                     Your job posting has been rejected by the admin.
                   </p>
                 </div>
 
                 {/* Admin Note Box */}
-                <div className="bg-[#1c1010] border border-red-500/30 rounded-xl p-4 mb-6 flex gap-3 items-start">
-                  <div className="mt-0.5 shrink-0 text-red-400">
+                <div className="bg-red-50 dark:bg-[#1c1010] border border-red-400/30 dark:border-red-500/30 rounded-xl p-4 mb-6 flex gap-3 items-start">
+                  <div className="mt-0.5 shrink-0 text-red-600 dark:text-red-400">
                     <span className="text-sm">📄</span>
                   </div>
                   <div>
-                    <p className="text-red-400 text-xs font-semibold mb-0.5">
+                    <p className="text-red-700 dark:text-red-400 text-xs font-semibold mb-0.5">
                       Admin Note:
                     </p>
-                    <p className="text-zinc-300 text-sm">
+                    <p className="text-zinc-700 dark:text-zinc-300 text-sm">
                       {rejectedJob?.adminRejectionReason ||
                         rejectedJob?.rejectionReason ||
                         "No specific reason provided by the admin."}
@@ -1024,7 +1026,7 @@ export default function RecruiterJobs() {
                 </div>
 
                 {/* Instruction Text */}
-                <p className="text-zinc-500 text-sm text-center mb-6">
+                <p className="text-zinc-500 dark:text-zinc-500 text-sm text-center mb-6">
                   Please update your job information and request a re-review.
                 </p>
 
@@ -1035,7 +1037,7 @@ export default function RecruiterJobs() {
                       setRejectModalOpen(false);
                       if (rejectedJob?._id) handleEditJob(rejectedJob._id);
                     }}
-                    className="w-full bg-zinc-800 hover:bg-zinc-700 text-white font-medium rounded-xl py-3 transition-all flex items-center justify-center gap-2"
+                    className="w-full bg-zinc-100 dark:bg-zinc-800 hover:bg-zinc-200 dark:hover:bg-zinc-700 text-zinc-900 dark:text-white font-medium rounded-xl py-3 transition-all flex items-center justify-center gap-2"
                   >
                     <Pencil size={16} /> Update Job
                   </button>

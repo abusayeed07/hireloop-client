@@ -9,9 +9,7 @@ import toast from "react-hot-toast";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
 
-// ✅ Prevent FormData from being intercepted by extensions
 const safeFetch = async (url, options) => {
-  // If the body is FormData, clone it and send as JSON
   if (options.body instanceof FormData) {
     const formData = options.body;
     const obj = {};
@@ -177,8 +175,8 @@ export default function ProfilePage() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-zinc-950 via-black to-zinc-950 text-zinc-100 py-8 px-4 md:px-8 overflow-hidden">
-      {/* Background Orbs */}
+    <div className="min-h-screen bg-gradient-to-b from-zinc-50 to-white dark:from-zinc-950 dark:via-black dark:to-zinc-950 text-zinc-900 dark:text-zinc-100 py-8 px-4 md:px-8 overflow-hidden">
+      {/* Background Orbs - lighter in light mode */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
         <motion.div
           animate={{
@@ -191,7 +189,7 @@ export default function ProfilePage() {
             repeatType: "reverse",
             ease: "easeInOut",
           }}
-          className="absolute -top-40 -right-40 w-[500px] h-[500px] bg-blue-600/10 rounded-full blur-[120px]"
+          className="absolute -top-40 -right-40 w-[500px] h-[500px] bg-blue-300/30 dark:bg-blue-600/10 rounded-full blur-[120px]"
         />
         <motion.div
           animate={{
@@ -205,7 +203,7 @@ export default function ProfilePage() {
             ease: "easeInOut",
             delay: 2,
           }}
-          className="absolute -bottom-40 -left-40 w-[500px] h-[500px] bg-purple-600/10 rounded-full blur-[120px]"
+          className="absolute -bottom-40 -left-40 w-[500px] h-[500px] bg-purple-300/30 dark:bg-purple-600/10 rounded-full blur-[120px]"
         />
         <motion.div
           animate={{
@@ -217,7 +215,7 @@ export default function ProfilePage() {
             repeatType: "reverse",
             ease: "easeInOut",
           }}
-          className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-cyan-500/5 rounded-full blur-[140px]"
+          className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-cyan-300/20 dark:bg-cyan-500/5 rounded-full blur-[140px]"
         />
       </div>
 
@@ -228,19 +226,19 @@ export default function ProfilePage() {
         className="max-w-3xl mx-auto space-y-6 relative z-10"
       >
         <motion.div variants={itemVariants}>
-          <h1 className="text-2xl font-bold bg-gradient-to-r from-white via-zinc-200 to-zinc-400 bg-clip-text text-transparent">
+          <h1 className="text-2xl font-bold bg-gradient-to-r from-zinc-900 via-zinc-700 to-zinc-500 dark:from-white dark:via-zinc-200 dark:to-zinc-400 bg-clip-text text-transparent">
             My Profile
           </h1>
-          <p className="text-zinc-400 text-sm mt-1">Manage your account identity settings.</p>
+          <p className="text-zinc-500 dark:text-zinc-400 text-sm mt-1">Manage your account identity settings.</p>
         </motion.div>
 
         <motion.div variants={itemVariants}>
-          <Card className="bg-zinc-900/50 backdrop-blur-xl border border-zinc-800/60 rounded-2xl p-6 shadow-2xl shadow-black/30">
+          <Card className="bg-white/80 dark:bg-zinc-900/50 backdrop-blur-xl border border-zinc-200/50 dark:border-zinc-800/60 rounded-2xl p-6 shadow-2xl shadow-black/5 dark:shadow-black/30">
             <form onSubmit={handleUpdateProfile} className="space-y-6">
-              {/* Avatar Row - Simple display only */}
+              {/* Avatar Row */}
               <motion.div 
                 variants={itemVariants}
-                className="flex flex-col sm:flex-row items-center gap-5 pb-6 border-b border-zinc-800/60"
+                className="flex flex-col sm:flex-row items-center gap-5 pb-6 border-b border-zinc-200/50 dark:border-zinc-800/60"
               >
                 <motion.div 
                   whileHover={{ scale: 1.05 }}
@@ -259,85 +257,85 @@ export default function ProfilePage() {
                   )}
                 </motion.div>
                 <div className="text-center sm:text-left">
-                  <h3 className="text-sm font-semibold text-white">Profile Photo</h3>
-                  <p className="text-xs text-zinc-500">Your profile image</p>
-                  <p className="text-xs text-zinc-600 mt-1">Update your avatar through your account provider</p>
+                  <h3 className="text-sm font-semibold text-zinc-800 dark:text-white">Profile Photo</h3>
+                  <p className="text-xs text-zinc-500 dark:text-zinc-500">Your profile image</p>
+                  <p className="text-xs text-zinc-400 dark:text-zinc-600 mt-1">Update your avatar through your account provider</p>
                 </div>
               </motion.div>
 
               {/* Inputs Grid */}
               <motion.div variants={itemVariants} className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="space-y-1.5">
-                  <label className="text-xs font-medium text-zinc-400">Full Name</label>
+                  <label className="text-xs font-medium text-zinc-600 dark:text-zinc-400">Full Name</label>
                   <div className="relative">
-                    <User className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-500 z-10" />
+                    <User className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-400 dark:text-zinc-500 z-10" />
                     <Input
                       type="text"
                       value={formData.name}
                       onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                       placeholder="John Doe"
-                      className="bg-zinc-950 text-white rounded-xl border border-zinc-800 pl-7 focus:border-blue-500 transition-all"
+                      className="bg-white/80 dark:bg-zinc-950 text-zinc-900 dark:text-white rounded-xl border border-zinc-300/50 dark:border-zinc-800 pl-7 focus:border-blue-500 transition-all"
                     />
                   </div>
                 </div>
 
                 <div className="space-y-1.5">
-                  <label className="text-xs font-medium text-zinc-400">Email Address</label>
+                  <label className="text-xs font-medium text-zinc-600 dark:text-zinc-400">Email Address</label>
                   <div className="relative">
-                    <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-600 z-10" />
+                    <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-400 dark:text-zinc-600 z-10" />
                     <Input
                       type="email"
                       value={user?.email || ""}
                       disabled
                       placeholder="email@example.com"
-                      className="bg-zinc-950/40 text-zinc-500 rounded-xl border border-zinc-900/50 cursor-not-allowed opacity-60 pl-7"
+                      className="bg-zinc-100/50 dark:bg-zinc-950/40 text-zinc-500 dark:text-zinc-500 rounded-xl border border-zinc-300/30 dark:border-zinc-900/50 cursor-not-allowed opacity-60 pl-7"
                     />
                   </div>
                 </div>
 
                 <div className="space-y-1.5 md:col-span-2">
-                  <label className="text-xs font-medium text-zinc-400 flex items-center gap-2">
+                  <label className="text-xs font-medium text-zinc-600 dark:text-zinc-400 flex items-center gap-2">
                     Phone Number
                     {formData.phone && isPhoneValid && (
-                      <CheckCircle className="w-3.5 h-3.5 text-emerald-400" />
+                      <CheckCircle className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400" />
                     )}
                   </label>
                   <div className="relative">
-                    <Phone className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-500 z-10" />
+                    <Phone className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-400 dark:text-zinc-500 z-10" />
                     <Input
                       type="text"
                       inputMode="numeric"
                       value={formData.phone}
                       onChange={handlePhoneChange}
                       placeholder="01712345678"
-                      className={`bg-zinc-950 text-white rounded-xl border ${
+                      className={`bg-white/80 dark:bg-zinc-950 text-zinc-900 dark:text-white rounded-xl border ${
                         phoneError ? 'border-rose-500/50 focus:border-rose-500' : 
                         isPhoneValid && formData.phone ? 'border-emerald-500/50 focus:border-emerald-500' : 
-                        'border-zinc-800 focus:border-blue-500'
+                        'border-zinc-300/50 dark:border-zinc-800 focus:border-blue-500'
                       } pl-7 transition-all`}
                     />
                     {phoneError && (
-                      <AlertCircle className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-rose-400" />
+                      <AlertCircle className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-rose-500 dark:text-rose-400" />
                     )}
                     {formData.phone && isPhoneValid && !phoneError && (
-                      <CheckCircle className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-emerald-400" />
+                      <CheckCircle className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-emerald-600 dark:text-emerald-400" />
                     )}
                   </div>
                   {phoneError && (
                     <motion.p
                       initial={{ opacity: 0, x: -10 }}
                       animate={{ opacity: 1, x: 0 }}
-                      className="text-[10px] text-rose-400 mt-1 font-medium"
+                      className="text-[10px] text-rose-600 dark:text-rose-400 mt-1 font-medium"
                     >
                       {phoneError}
                     </motion.p>
                   )}
                   <div className="flex items-center gap-2 mt-0.5">
-                    <p className="text-[10px] text-zinc-500">
+                    <p className="text-[10px] text-zinc-500 dark:text-zinc-500">
                       Enter 11-digit Bangladesh number (e.g., 01712345678)
                     </p>
                     {formData.phone && (
-                      <span className="text-[10px] text-zinc-600">
+                      <span className="text-[10px] text-zinc-400 dark:text-zinc-600">
                         ({formData.phone.replace(/\D/g, '').length}/11)
                       </span>
                     )}
@@ -345,14 +343,14 @@ export default function ProfilePage() {
                 </div>
 
                 <div className="space-y-1.5">
-                  <label className="text-xs font-medium text-zinc-400">Account Role</label>
+                  <label className="text-xs font-medium text-zinc-600 dark:text-zinc-400">Account Role</label>
                   <div className="relative">
-                    <Shield className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-600 z-10" />
+                    <Shield className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-400 dark:text-zinc-600 z-10" />
                     <Input
                       type="text"
                       value={user?.role || "seeker"}
                       disabled
-                      className="bg-zinc-950/40 text-zinc-500 rounded-xl border border-zinc-900/50 cursor-not-allowed opacity-60 capitalize pl-7"
+                      className="bg-zinc-100/50 dark:bg-zinc-950/40 text-zinc-500 dark:text-zinc-500 rounded-xl border border-zinc-300/30 dark:border-zinc-900/50 cursor-not-allowed opacity-60 capitalize pl-7"
                     />
                   </div>
                 </div>
@@ -361,7 +359,7 @@ export default function ProfilePage() {
               {/* Actions */}
               <motion.div 
                 variants={itemVariants}
-                className="flex justify-end pt-4 border-t border-zinc-800/60"
+                className="flex justify-end pt-4 border-t border-zinc-200/50 dark:border-zinc-800/60"
               >
                 <motion.div
                   whileHover={{ scale: 1.02 }}

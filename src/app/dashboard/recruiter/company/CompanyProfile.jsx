@@ -52,47 +52,47 @@ import { motion, AnimatePresence } from "framer-motion";
 import { useRouter } from "next/navigation";
 
 // ========================================================
-// 🎨 SHARED STYLES
+// 🎨 SHARED STYLES - Updated for theme support
 // ========================================================
 const textInputClass =
-  "w-full bg-zinc-900/50 border border-zinc-800 text-white rounded-lg px-3 py-2.5 outline-none placeholder:text-zinc-600 focus:border-zinc-700 transition duration-200";
+  "w-full bg-white/80 dark:bg-zinc-900/50 border border-zinc-300/50 dark:border-zinc-800 text-zinc-900 dark:text-white rounded-lg px-3 py-2.5 outline-none placeholder:text-zinc-400 dark:placeholder:text-zinc-600 focus:border-zinc-400 dark:focus:border-zinc-700 transition duration-200";
 const selectTriggerClass =
-  "w-full bg-zinc-900/50 border border-zinc-800 text-white rounded-lg px-3 py-2.5 flex items-center justify-between outline-none data-[hover=true]:border-zinc-700 transition duration-200";
+  "w-full bg-white/80 dark:bg-zinc-900/50 border border-zinc-300/50 dark:border-zinc-800 text-zinc-900 dark:text-white rounded-lg px-3 py-2.5 flex items-center justify-between outline-none data-[hover=true]:border-zinc-400 dark:data-[hover=true]:border-zinc-700 transition duration-200";
 const selectPopoverClass =
-  "bg-zinc-950 border border-zinc-800 rounded-lg p-1 shadow-xl min-w-[200px]";
+  "bg-white dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-lg p-1 shadow-xl min-w-[200px]";
 const selectItemClass =
-  "text-zinc-300 px-3 py-2 rounded-md cursor-pointer hover:bg-zinc-900 hover:text-white outline-none data-[focused=true]:bg-zinc-900";
+  "text-zinc-700 dark:text-zinc-300 px-3 py-2 rounded-md cursor-pointer hover:bg-zinc-100 dark:hover:bg-zinc-900 hover:text-zinc-900 dark:hover:text-white outline-none data-[focused=true]:bg-zinc-100 dark:data-[focused=true]:bg-zinc-900";
 const textAreaClass =
-  "w-full bg-zinc-900/50 border border-zinc-800 text-white rounded-lg p-3 outline-none placeholder:text-zinc-600 focus:border-zinc-700 transition duration-200 resize-none";
+  "w-full bg-white/80 dark:bg-zinc-900/50 border border-zinc-300/50 dark:border-zinc-800 text-zinc-900 dark:text-white rounded-lg p-3 outline-none placeholder:text-zinc-400 dark:placeholder:text-zinc-600 focus:border-zinc-400 dark:focus:border-zinc-700 transition duration-200 resize-none";
 
 // ========================================================
-// 📦 COMPONENTS
+// 📦 COMPONENTS - Updated for theme support
 // ========================================================
 
 // Info Box Component
 const InfoBox = ({ icon: Icon, label, value, className = "" }) => (
   <motion.div
-    whileHover={{ y: -3, borderColor: "rgba(255,255,255,0.1)" }}
-    className={`bg-zinc-900/30 border border-zinc-900 p-4 rounded-lg ${className}`}
+    whileHover={{ y: -3, borderColor: "rgba(0,0,0,0.1)" }}
+    className={`bg-white/80 dark:bg-zinc-900/30 border border-zinc-200/50 dark:border-zinc-900 p-4 rounded-lg ${className}`}
   >
     <div className="flex items-center gap-2 mb-1">
       <Icon className="w-4 h-4 text-zinc-500" />
       <span className="text-xs text-zinc-500 uppercase font-semibold">{label}</span>
     </div>
-    <span className="text-zinc-300 font-medium">{value || "Not specified"}</span>
+    <span className="text-zinc-700 dark:text-zinc-300 font-medium">{value || "Not specified"}</span>
   </motion.div>
 );
 
 // Contact Info Component
 const ContactInfo = ({ icon: Icon, label, value }) => (
   <motion.div
-    whileHover={{ x: 6, backgroundColor: "rgba(255,255,255,0.03)" }}
+    whileHover={{ x: 6, backgroundColor: "rgba(0,0,0,0.02)" }}
     className="flex items-center gap-3 p-2 rounded-lg transition-colors cursor-default"
   >
     <Icon className="w-4 h-4 text-zinc-500" />
     <div>
       <p className="text-xs text-zinc-500">{label}</p>
-      <p className="text-sm text-zinc-300">{value || "Not provided"}</p>
+      <p className="text-sm text-zinc-700 dark:text-zinc-300">{value || "Not provided"}</p>
     </div>
   </motion.div>
 );
@@ -104,7 +104,7 @@ const SocialLink = ({ icon: Icon, href, label, color = "text-zinc-500" }) => (
     target="_blank"
     rel="noreferrer"
     whileHover={{ scale: 1.1, borderColor: "rgba(59,130,246,0.5)" }}
-    className="w-9 h-9 rounded-full bg-zinc-900/50 border border-zinc-800 flex items-center justify-center transition-all hover:bg-zinc-800 group"
+    className="w-9 h-9 rounded-full bg-white/80 dark:bg-zinc-900/50 border border-zinc-200/50 dark:border-zinc-800 flex items-center justify-center transition-all hover:bg-zinc-100 dark:hover:bg-zinc-800 group"
   >
     <Icon className={`w-4 h-4 ${color} group-hover:text-blue-400 transition-colors`} />
     <span className="sr-only">{label}</span>
@@ -114,13 +114,13 @@ const SocialLink = ({ icon: Icon, href, label, color = "text-zinc-500" }) => (
 // Stat Card Component
 const StatCard = ({ icon: Icon, label, value, color = "text-blue-400" }) => (
   <motion.div
-    whileHover={{ y: -4, borderColor: "rgba(255,255,255,0.1)" }}
-    className="bg-zinc-900/30 border border-zinc-900 rounded-lg p-4 text-center"
+    whileHover={{ y: -4, borderColor: "rgba(0,0,0,0.1)" }}
+    className="bg-white/80 dark:bg-zinc-900/30 border border-zinc-200/50 dark:border-zinc-900 rounded-lg p-4 text-center"
   >
     <div className={`flex items-center justify-center ${color} mb-1`}>
       <Icon className="w-5 h-5" />
     </div>
-    <p className="text-xl font-bold text-white">{value || 0}</p>
+    <p className="text-xl font-bold text-zinc-900 dark:text-white">{value || 0}</p>
     <p className="text-xs text-zinc-500">{label}</p>
   </motion.div>
 );
@@ -381,15 +381,15 @@ export default function CompanyProfile({ recruiter, recruiterCompany }) {
   };
 
   // ========================================================
-  // 🚀 1. MODERN EMPTY STATE (REGISTER YOUR COMPANY)
+  // 🚀 1. MODERN EMPTY STATE (REGISTER YOUR COMPANY) - Updated for theme
   // ========================================================
   if (!company?._id && !isEditing) {
     return (
-      <div className="min-h-screen bg-[#090a0f] flex items-center justify-center px-4 sm:px-6 py-12 relative overflow-hidden">
+      <div className="min-h-screen bg-zinc-50 dark:bg-[#090a0f] flex items-center justify-center px-4 sm:px-6 py-12 relative overflow-hidden">
         
-        {/* 🎨 Animated Gradient Background Orbs */}
+        {/* 🎨 Animated Gradient Background Orbs - Updated for theme */}
         <motion.div
-          className="absolute -top-40 -left-40 w-[600px] h-[600px] bg-blue-600/10 rounded-full blur-[120px] pointer-events-none"
+          className="absolute -top-40 -left-40 w-[600px] h-[600px] bg-blue-600/10 dark:bg-blue-600/10 rounded-full blur-[120px] pointer-events-none"
           animate={{
             x: [0, 60, -30, 0],
             y: [0, -40, 30, 0],
@@ -397,7 +397,7 @@ export default function CompanyProfile({ recruiter, recruiterCompany }) {
           transition={{ duration: 20, repeat: Infinity, ease: "easeInOut" }}
         />
         <motion.div
-          className="absolute -bottom-40 -right-40 w-[600px] h-[600px] bg-purple-600/10 rounded-full blur-[120px] pointer-events-none"
+          className="absolute -bottom-40 -right-40 w-[600px] h-[600px] bg-purple-600/10 dark:bg-purple-600/10 rounded-full blur-[120px] pointer-events-none"
           animate={{
             x: [0, -50, 40, 0],
             y: [0, 50, -20, 0],
@@ -405,7 +405,7 @@ export default function CompanyProfile({ recruiter, recruiterCompany }) {
           transition={{ duration: 25, repeat: Infinity, ease: "easeInOut" }}
         />
         <motion.div
-          className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[400px] h-[400px] bg-cyan-500/10 rounded-full blur-[100px] pointer-events-none"
+          className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[400px] h-[400px] bg-cyan-500/10 dark:bg-cyan-500/10 rounded-full blur-[100px] pointer-events-none"
           animate={{
             scale: [1, 1.1, 1],
             opacity: [0.3, 0.6, 0.3],
@@ -415,11 +415,11 @@ export default function CompanyProfile({ recruiter, recruiterCompany }) {
 
         {/* ✨ Subtle Grid Pattern */}
         <div
-          className="absolute inset-0 opacity-[0.03] pointer-events-none"
+          className="absolute inset-0 opacity-[0.03] dark:opacity-[0.03] pointer-events-none"
           style={{
             backgroundImage: `
-              linear-gradient(rgba(255,255,255,.05) 1px, transparent 1px),
-              linear-gradient(90deg, rgba(255,255,255,.05) 1px, transparent 1px)
+              linear-gradient(rgba(0,0,0,.05) 1px, transparent 1px),
+              linear-gradient(90deg, rgba(0,0,0,.05) 1px, transparent 1px)
             `,
             backgroundSize: "40px 40px",
           }}
@@ -429,7 +429,7 @@ export default function CompanyProfile({ recruiter, recruiterCompany }) {
         {Array.from({ length: 20 }).map((_, i) => (
           <motion.div
             key={i}
-            className="absolute h-1 w-1 rounded-full bg-blue-400/30 pointer-events-none"
+            className="absolute h-1 w-1 rounded-full bg-blue-400/30 dark:bg-blue-400/30 pointer-events-none"
             initial={{
               x: Math.random() * 1600,
               y: Math.random() * 900,
@@ -460,7 +460,7 @@ export default function CompanyProfile({ recruiter, recruiterCompany }) {
             transition={{ delay: 0.2 }}
             className="flex justify-center mb-8"
           >
-            <div className="inline-flex items-center gap-2 rounded-full border border-amber-500/20 bg-amber-500/10 px-4 py-2 text-xs text-amber-400 backdrop-blur-sm">
+            <div className="inline-flex items-center gap-2 rounded-full border border-amber-500/20 bg-amber-500/10 px-4 py-2 text-xs text-amber-600 dark:text-amber-400 backdrop-blur-sm">
               <span className="h-2 w-2 rounded-full bg-amber-400 animate-pulse" />
               Setup Required
             </div>
@@ -476,7 +476,7 @@ export default function CompanyProfile({ recruiter, recruiterCompany }) {
             }}
             className="relative flex justify-center mb-10"
           >
-            <div className="absolute w-64 h-64 bg-white/[0.03] blur-3xl rounded-full" />
+            <div className="absolute w-64 h-64 bg-white/50 dark:bg-white/[0.03] blur-3xl rounded-full" />
 
             <motion.div
               animate={{
@@ -487,9 +487,9 @@ export default function CompanyProfile({ recruiter, recruiterCompany }) {
                 repeat: Infinity,
                 ease: "easeInOut",
               }}
-              className="relative w-44 h-44 rounded-[36px] border border-white/10 bg-white/[0.03] backdrop-blur-xl flex items-center justify-center shadow-2xl"
+              className="relative w-44 h-44 rounded-[36px] border border-zinc-200/50 dark:border-white/10 bg-white/50 dark:bg-white/[0.03] backdrop-blur-xl flex items-center justify-center shadow-2xl"
             >
-              <Factory size={62} className="text-zinc-500" />
+              <Factory size={62} className="text-zinc-400 dark:text-zinc-500" />
 
               <motion.div
                 animate={{
@@ -511,10 +511,10 @@ export default function CompanyProfile({ recruiter, recruiterCompany }) {
             animate={{ opacity: 1 }}
             transition={{ delay: 0.4 }}
           >
-            <h2 className="text-4xl md:text-5xl font-bold text-white bg-clip-text bg-gradient-to-r from-white via-zinc-200 to-zinc-500">
+            <h2 className="text-4xl md:text-5xl font-bold text-zinc-900 dark:text-white bg-clip-text bg-gradient-to-r from-zinc-900 to-zinc-500 dark:from-white dark:via-zinc-200 dark:to-zinc-500">
               Register Your Company
             </h2>
-            <p className="mt-5 text-zinc-400 leading-relaxed max-w-xl mx-auto text-sm md:text-base">
+            <p className="mt-5 text-zinc-600 dark:text-zinc-400 leading-relaxed max-w-xl mx-auto text-sm md:text-base">
               Create your company profile to publish job listings, manage
               applicants, build your employer brand and start hiring top talent.
             </p>
@@ -528,13 +528,13 @@ export default function CompanyProfile({ recruiter, recruiterCompany }) {
           >
             <Button
               onPress={startRegistration}
-              className="bg-white text-black min-w-[220px] h-12 font-medium rounded-xl hover:scale-105 transition-transform shadow-lg shadow-white/10"
+              className="bg-zinc-900 dark:bg-white text-white dark:text-black min-w-[220px] h-12 font-medium rounded-xl hover:scale-105 transition-transform shadow-lg shadow-zinc-900/10 dark:shadow-white/10"
             >
               Register Company
             </Button>
             <Button
               variant="bordered"
-              className="border-zinc-700 text-zinc-300 min-w-[160px] h-12 rounded-xl hover:border-zinc-500 transition-colors"
+              className="border-zinc-300/50 dark:border-zinc-700 text-zinc-700 dark:text-zinc-300 min-w-[160px] h-12 rounded-xl hover:border-zinc-400 dark:hover:border-zinc-500 transition-colors"
             >
               Learn More
             </Button>
@@ -555,17 +555,17 @@ export default function CompanyProfile({ recruiter, recruiterCompany }) {
   }
 
   // ========================================================
-  // 👁️ 2. VIEW MODE - PROFESSIONAL COMPANY PROFILE
+  // 👁️ 2. VIEW MODE - PROFESSIONAL COMPANY PROFILE - Updated for theme
   // ========================================================
   if (company?._id && !isEditing) {
     const getStatusStyles = (status) => {
       switch (status?.toLowerCase()) {
         case "approved":
-          return "bg-emerald-500/10 text-emerald-400 border-emerald-500/20";
+          return "bg-emerald-100 dark:bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 border-emerald-200/50 dark:border-emerald-500/20";
         case "rejected":
-          return "bg-rose-500/10 text-rose-400 border-rose-500/20";
+          return "bg-rose-100 dark:bg-rose-500/10 text-rose-700 dark:text-rose-400 border-rose-200/50 dark:border-rose-500/20";
         default:
-          return "bg-amber-500/10 text-amber-400 border-amber-500/20";
+          return "bg-amber-100 dark:bg-amber-500/10 text-amber-700 dark:text-amber-400 border-amber-200/50 dark:border-amber-500/20";
       }
     };
 
@@ -585,17 +585,17 @@ export default function CompanyProfile({ recruiter, recruiterCompany }) {
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.6, ease: "easeOut" }}
-        className="min-h-screen bg-[#090a0f] py-8 px-4 sm:px-6"
+        className="min-h-screen bg-zinc-50 dark:bg-[#090a0f] py-8 px-4 sm:px-6"
       >
         <div className="max-w-5xl mx-auto space-y-6">
           {/* Header Card */}
           <motion.div
-            whileHover={{ borderColor: "rgba(255,255,255,0.1)" }}
-            className="bg-zinc-950 border border-zinc-900 rounded-xl p-8 transition-all"
+            whileHover={{ borderColor: "rgba(0,0,0,0.1)" }}
+            className="bg-white/80 dark:bg-zinc-950 border border-zinc-200/50 dark:border-zinc-900 rounded-xl p-8 transition-all"
           >
-            <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 border-b border-zinc-900 pb-6">
+            <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 border-b border-zinc-200/50 dark:border-zinc-900 pb-6">
               <div className="flex items-center gap-5">
-                <div className="w-20 h-20 rounded-xl bg-zinc-900 border border-zinc-800 flex items-center justify-center overflow-hidden">
+                <div className="w-20 h-20 rounded-xl bg-zinc-100 dark:bg-zinc-900 border border-zinc-200/50 dark:border-zinc-800 flex items-center justify-center overflow-hidden">
                   {company.logo ? (
                     <Image
                       src={company.logo}
@@ -605,23 +605,23 @@ export default function CompanyProfile({ recruiter, recruiterCompany }) {
                       className="w-full h-full object-contain p-2"
                     />
                   ) : (
-                    <Building2 size={40} className="text-zinc-600" />
+                    <Building2 size={40} className="text-zinc-400 dark:text-zinc-600" />
                   )}
                 </div>
                 <div>
-                  <h1 className="text-2xl font-bold text-white">
+                  <h1 className="text-2xl font-bold text-zinc-900 dark:text-white">
                     {company.name}
                   </h1>
                   <div className="flex flex-wrap items-center gap-2 mt-1">
-                    <span className="text-sm text-zinc-400">
+                    <span className="text-sm text-zinc-600 dark:text-zinc-400">
                       {company.industry || "General"}
                     </span>
-                    <span className="text-zinc-600">•</span>
-                    <span className="text-sm text-zinc-400 flex items-center gap-1">
+                    <span className="text-zinc-300 dark:text-zinc-600">•</span>
+                    <span className="text-sm text-zinc-600 dark:text-zinc-400 flex items-center gap-1">
                       <MapPin className="w-3 h-3" />
                       {company.location || "Location not specified"}
                     </span>
-                    <span className="text-zinc-600">•</span>
+                    <span className="text-zinc-300 dark:text-zinc-600">•</span>
                     <span
                       className={`text-xs px-2.5 py-0.5 rounded-full font-medium border flex items-center gap-1 ${getStatusStyles(company.status)}`}
                     >
@@ -640,7 +640,7 @@ export default function CompanyProfile({ recruiter, recruiterCompany }) {
                     href={company.websiteUrl}
                     target="_blank"
                     rel="noreferrer"
-                    className="text-sm text-blue-400 hover:underline flex items-center gap-1 mt-2"
+                    className="text-sm text-blue-600 dark:text-blue-400 hover:underline flex items-center gap-1 mt-2"
                   >
                     <Link2 size={14} />
                     {company.websiteUrl}
@@ -650,7 +650,7 @@ export default function CompanyProfile({ recruiter, recruiterCompany }) {
               <Button
                 onPress={startEditing}
                 variant="bordered"
-                className="border-zinc-800 text-zinc-300 hover:bg-zinc-900 rounded-lg px-4 font-medium h-10 flex items-center gap-2 transition-all hover:border-zinc-600"
+                className="border-zinc-300/50 dark:border-zinc-800 text-zinc-700 dark:text-zinc-300 hover:bg-zinc-100 dark:hover:bg-zinc-900 rounded-lg px-4 font-medium h-10 flex items-center gap-2 transition-all hover:border-zinc-400 dark:hover:border-zinc-600"
               >
                 <Pencil size={14} /> Edit Profile
               </Button>
@@ -676,14 +676,14 @@ export default function CompanyProfile({ recruiter, recruiterCompany }) {
           {/* About Section */}
           {company.description && (
             <motion.div
-              whileHover={{ borderColor: "rgba(255,255,255,0.1)" }}
-              className="bg-zinc-950 border border-zinc-900 rounded-xl p-6 transition-all"
+              whileHover={{ borderColor: "rgba(0,0,0,0.1)" }}
+              className="bg-white/80 dark:bg-zinc-950 border border-zinc-200/50 dark:border-zinc-900 rounded-xl p-6 transition-all"
             >
-              <h3 className="text-sm font-semibold text-zinc-400 uppercase tracking-wider flex items-center gap-2 mb-3">
+              <h3 className="text-sm font-semibold text-zinc-500 dark:text-zinc-400 uppercase tracking-wider flex items-center gap-2 mb-3">
                 <FileText size={14} />
                 About the Company
               </h3>
-              <p className="text-zinc-300 text-sm leading-relaxed whitespace-pre-wrap">
+              <p className="text-zinc-700 dark:text-zinc-300 text-sm leading-relaxed whitespace-pre-wrap">
                 {company.description}
               </p>
             </motion.div>
@@ -694,44 +694,44 @@ export default function CompanyProfile({ recruiter, recruiterCompany }) {
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               {company.mission && (
                 <motion.div
-                  whileHover={{ borderColor: "rgba(255,255,255,0.1)" }}
-                  className="bg-zinc-950 border border-zinc-900 rounded-xl p-5 transition-all"
+                  whileHover={{ borderColor: "rgba(0,0,0,0.1)" }}
+                  className="bg-white/80 dark:bg-zinc-950 border border-zinc-200/50 dark:border-zinc-900 rounded-xl p-5 transition-all"
                 >
                   <div className="flex items-center gap-2 mb-2">
-                    <Target className="w-4 h-4 text-blue-400" />
-                    <h4 className="text-xs font-semibold text-zinc-400 uppercase tracking-wider">
+                    <Target className="w-4 h-4 text-blue-600 dark:text-blue-400" />
+                    <h4 className="text-xs font-semibold text-zinc-500 dark:text-zinc-400 uppercase tracking-wider">
                       Mission
                     </h4>
                   </div>
-                  <p className="text-zinc-300 text-sm">{company.mission}</p>
+                  <p className="text-zinc-700 dark:text-zinc-300 text-sm">{company.mission}</p>
                 </motion.div>
               )}
               {company.vision && (
                 <motion.div
-                  whileHover={{ borderColor: "rgba(255,255,255,0.1)" }}
-                  className="bg-zinc-950 border border-zinc-900 rounded-xl p-5 transition-all"
+                  whileHover={{ borderColor: "rgba(0,0,0,0.1)" }}
+                  className="bg-white/80 dark:bg-zinc-950 border border-zinc-200/50 dark:border-zinc-900 rounded-xl p-5 transition-all"
                 >
                   <div className="flex items-center gap-2 mb-2">
-                    <Eye className="w-4 h-4 text-purple-400" />
-                    <h4 className="text-xs font-semibold text-zinc-400 uppercase tracking-wider">
+                    <Eye className="w-4 h-4 text-purple-600 dark:text-purple-400" />
+                    <h4 className="text-xs font-semibold text-zinc-500 dark:text-zinc-400 uppercase tracking-wider">
                       Vision
                     </h4>
                   </div>
-                  <p className="text-zinc-300 text-sm">{company.vision}</p>
+                  <p className="text-zinc-700 dark:text-zinc-300 text-sm">{company.vision}</p>
                 </motion.div>
               )}
               {company.values && (
                 <motion.div
-                  whileHover={{ borderColor: "rgba(255,255,255,0.1)" }}
-                  className="bg-zinc-950 border border-zinc-900 rounded-xl p-5 transition-all"
+                  whileHover={{ borderColor: "rgba(0,0,0,0.1)" }}
+                  className="bg-white/80 dark:bg-zinc-950 border border-zinc-200/50 dark:border-zinc-900 rounded-xl p-5 transition-all"
                 >
                   <div className="flex items-center gap-2 mb-2">
-                    <Heart className="w-4 h-4 text-red-400" />
-                    <h4 className="text-xs font-semibold text-zinc-400 uppercase tracking-wider">
+                    <Heart className="w-4 h-4 text-red-600 dark:text-red-400" />
+                    <h4 className="text-xs font-semibold text-zinc-500 dark:text-zinc-400 uppercase tracking-wider">
                       Values
                     </h4>
                   </div>
-                  <p className="text-zinc-300 text-sm">{company.values}</p>
+                  <p className="text-zinc-700 dark:text-zinc-300 text-sm">{company.values}</p>
                 </motion.div>
               )}
             </div>
@@ -740,10 +740,10 @@ export default function CompanyProfile({ recruiter, recruiterCompany }) {
           {/* Contact & Social */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <motion.div
-              whileHover={{ borderColor: "rgba(255,255,255,0.1)" }}
-              className="bg-zinc-950 border border-zinc-900 rounded-xl p-6 transition-all"
+              whileHover={{ borderColor: "rgba(0,0,0,0.1)" }}
+              className="bg-white/80 dark:bg-zinc-950 border border-zinc-200/50 dark:border-zinc-900 rounded-xl p-6 transition-all"
             >
-              <h4 className="text-xs font-semibold text-zinc-400 uppercase tracking-wider mb-4">
+              <h4 className="text-xs font-semibold text-zinc-500 dark:text-zinc-400 uppercase tracking-wider mb-4">
                 Contact Information
               </h4>
               <div className="space-y-2">
@@ -759,10 +759,10 @@ export default function CompanyProfile({ recruiter, recruiterCompany }) {
               </div>
             </motion.div>
             <motion.div
-              whileHover={{ borderColor: "rgba(255,255,255,0.1)" }}
-              className="bg-zinc-950 border border-zinc-900 rounded-xl p-6 transition-all"
+              whileHover={{ borderColor: "rgba(0,0,0,0.1)" }}
+              className="bg-white/80 dark:bg-zinc-950 border border-zinc-200/50 dark:border-zinc-900 rounded-xl p-6 transition-all"
             >
-              <h4 className="text-xs font-semibold text-zinc-400 uppercase tracking-wider mb-4">
+              <h4 className="text-xs font-semibold text-zinc-500 dark:text-zinc-400 uppercase tracking-wider mb-4">
                 Social Links
               </h4>
               <div className="flex flex-wrap gap-2">
@@ -780,7 +780,7 @@ export default function CompanyProfile({ recruiter, recruiterCompany }) {
                 )}
                 <a
                   href="#"
-                  className="w-9 h-9 rounded-full bg-zinc-900/50 border border-zinc-800 hover:border-blue-500/50 flex items-center justify-center transition-all hover:bg-zinc-800 group"
+                  className="w-9 h-9 rounded-full bg-white/80 dark:bg-zinc-900/50 border border-zinc-200/50 dark:border-zinc-800 hover:border-blue-500/50 flex items-center justify-center transition-all hover:bg-zinc-100 dark:hover:bg-zinc-800 group"
                 >
                   <span className="text-xs text-zinc-500 group-hover:text-blue-400 transition-colors font-semibold">FB</span>
                   <span className="sr-only">Facebook</span>
@@ -805,24 +805,24 @@ export default function CompanyProfile({ recruiter, recruiterCompany }) {
   }
 
   // ========================================================
-  // ✏️ 3. EDIT/CREATE FORM - MODERN ANIMATED FORM
+  // ✏️ 3. EDIT/CREATE FORM - Updated for theme
   // ========================================================
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.6, ease: "easeOut" }}
-      className="min-h-screen bg-[#090a0f] py-8 px-4 sm:px-6 md:pt-15"
+      className="min-h-screen bg-zinc-50 dark:bg-[#090a0f] py-8 px-4 sm:px-6 md:pt-15"
     >
-      <div className="max-w-4xl mx-auto bg-zinc-950 p-8 border border-zinc-900 rounded-xl shadow-2xl shadow-black/50">
+      <div className="max-w-4xl mx-auto bg-white/80 dark:bg-zinc-950 p-8 border border-zinc-200/50 dark:border-zinc-900 rounded-xl shadow-2xl shadow-black/5 dark:shadow-black/50">
         <Form onSubmit={handleSubmit} className="space-y-8">
           <motion.div
             initial={{ opacity: 0, y: -10 }}
             animate={{ opacity: 1, y: 0 }}
             className="space-y-6"
           >
-            <h2 className="text-xl font-semibold text-zinc-200 border-b border-zinc-900 pb-3 flex items-center gap-2">
-              <Sparkles className="w-5 h-5 text-zinc-400" />
+            <h2 className="text-xl font-semibold text-zinc-900 dark:text-zinc-200 border-b border-zinc-200/50 dark:border-zinc-900 pb-3 flex items-center gap-2">
+              <Sparkles className="w-5 h-5 text-zinc-500 dark:text-zinc-400" />
               {company && company._id
                 ? "Update Company Profile"
                 : "Configure Workspace Platform"}
@@ -836,7 +836,7 @@ export default function CompanyProfile({ recruiter, recruiterCompany }) {
               className="grid grid-cols-1 md:grid-cols-2 gap-6"
             >
               <TextField name="companyName" isRequired className="w-full">
-                <Label className="text-zinc-400 font-medium text-sm">
+                <Label className="text-zinc-600 dark:text-zinc-400 font-medium text-sm">
                   Company Name
                 </Label>
                 <Input
@@ -855,7 +855,7 @@ export default function CompanyProfile({ recruiter, recruiterCompany }) {
               </TextField>
 
               <div className="flex flex-col gap-1">
-                <Label className="text-zinc-400 font-medium text-sm">
+                <Label className="text-zinc-600 dark:text-zinc-400 font-medium text-sm">
                   Industry / Category
                 </Label>
                 <Select
@@ -903,11 +903,11 @@ export default function CompanyProfile({ recruiter, recruiterCompany }) {
               className="grid grid-cols-1 md:grid-cols-2 gap-6"
             >
               <TextField name="websiteUrl" isRequired className="w-full">
-                <Label className="text-zinc-400 font-medium text-sm">
+                <Label className="text-zinc-600 dark:text-zinc-400 font-medium text-sm">
                   Website URL
                 </Label>
                 <div className="relative">
-                  <span className="absolute left-3 top-1/2 -translate-y-1/2 text-zinc-600 text-sm border-r border-zinc-800 pr-2 z-10">
+                  <span className="absolute left-3 top-1/2 -translate-y-1/2 text-zinc-500 dark:text-zinc-600 text-sm border-r border-zinc-300/50 dark:border-zinc-800 pr-2 z-10">
                     https://
                   </span>
                   <Input
@@ -927,13 +927,13 @@ export default function CompanyProfile({ recruiter, recruiterCompany }) {
               </TextField>
 
               <TextField name="location" isRequired className="w-full">
-                <Label className="text-zinc-400 font-medium text-sm">
+                <Label className="text-zinc-600 dark:text-zinc-400 font-medium text-sm">
                   Location
                 </Label>
                 <div className="relative">
                   <Globe
                     size={16}
-                    className="absolute left-3 top-1/2 -translate-y-1/2 text-zinc-600 z-10"
+                    className="absolute left-3 top-1/2 -translate-y-1/2 text-zinc-500 dark:text-zinc-600 z-10"
                   />
                   <Input
                     placeholder="e.g. San Francisco, CA"
@@ -952,7 +952,7 @@ export default function CompanyProfile({ recruiter, recruiterCompany }) {
               </TextField>
             </motion.div>
 
-            {/* Row 3: Employee Count + Logo */}
+            {/* Row 3: Employee Count + Logo - FIXED: Employee Count now displays selected value */}
             <motion.div
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
@@ -960,12 +960,12 @@ export default function CompanyProfile({ recruiter, recruiterCompany }) {
               className="grid grid-cols-1 md:grid-cols-2 gap-6"
             >
               <div className="flex flex-col gap-1">
-                <Label className="text-zinc-400 font-medium text-sm mb-2">
+                <Label className="text-zinc-600 dark:text-zinc-400 font-medium text-sm">
                   Employee Count Range
                 </Label>
                 <Select
                   name="employeeCount"
-                  selectedKeys={[formValues.employeeCount]}
+                  selectedKeys={formValues.employeeCount ? [formValues.employeeCount] : []}
                   onSelectionChange={(keys) => {
                     const selected = Array.from(keys)[0];
                     if (selected)
@@ -1002,11 +1002,11 @@ export default function CompanyProfile({ recruiter, recruiterCompany }) {
               </div>
 
               <div className="flex flex-col gap-1">
-                <Label className="text-zinc-400 font-medium text-sm">
+                <Label className="text-zinc-600 dark:text-zinc-400 font-medium text-sm">
                   Company Logo
                 </Label>
                 <div className="flex items-center gap-4 mt-1">
-                  <label className="w-14 h-14 border-2 border-dashed border-zinc-700 hover:border-zinc-500 bg-zinc-900/40 rounded-xl flex items-center justify-center cursor-pointer transition-colors overflow-hidden group">
+                  <label className="w-14 h-14 border-2 border-dashed border-zinc-300/50 dark:border-zinc-700 hover:border-zinc-400 dark:hover:border-zinc-500 bg-white/50 dark:bg-zinc-900/40 rounded-xl flex items-center justify-center cursor-pointer transition-colors overflow-hidden group">
                     <input
                       type="file"
                       accept="image/png, image/jpeg"
@@ -1024,12 +1024,12 @@ export default function CompanyProfile({ recruiter, recruiterCompany }) {
                     ) : (
                       <ArrowUpToLine
                         size={18}
-                        className="text-zinc-400 group-hover:text-zinc-300 transition-colors"
+                        className="text-zinc-500 dark:text-zinc-400 group-hover:text-zinc-700 dark:group-hover:text-zinc-300 transition-colors"
                       />
                     )}
                   </label>
                   <div className="flex flex-col">
-                    <span className="text-sm text-zinc-300">
+                    <span className="text-sm text-zinc-700 dark:text-zinc-300">
                       {isUploading ? "Uploading..." : "Upload image"}
                     </span>
                     <span className="text-xs text-zinc-500">
@@ -1052,7 +1052,7 @@ export default function CompanyProfile({ recruiter, recruiterCompany }) {
               transition={{ delay: 0.25 }}
             >
               <TextField name="description" className="w-full">
-                <Label className="text-zinc-400 font-medium text-sm">
+                <Label className="text-zinc-600 dark:text-zinc-400 font-medium text-sm">
                   Brief Description
                 </Label>
                 <TextArea
@@ -1073,14 +1073,14 @@ export default function CompanyProfile({ recruiter, recruiterCompany }) {
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.3 }}
-              className="border-t border-zinc-900 pt-6 mt-4"
+              className="border-t border-zinc-200/50 dark:border-zinc-900 pt-6 mt-4"
             >
-              <h3 className="text-md font-semibold text-zinc-200 mb-4">
+              <h3 className="text-md font-semibold text-zinc-900 dark:text-zinc-200 mb-4">
                 Additional Information
               </h3>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <TextField name="foundedYear" className="w-full">
-                  <Label className="text-zinc-400 font-medium text-sm">
+                  <Label className="text-zinc-600 dark:text-zinc-400 font-medium text-sm">
                     Founded Year
                   </Label>
                   <Input
@@ -1094,7 +1094,7 @@ export default function CompanyProfile({ recruiter, recruiterCompany }) {
                 </TextField>
 
                 <TextField name="companyType" className="w-full">
-                  <Label className="text-zinc-400 font-medium text-sm">
+                  <Label className="text-zinc-600 dark:text-zinc-400 font-medium text-sm">
                     Company Type
                   </Label>
                   <Input
@@ -1108,7 +1108,7 @@ export default function CompanyProfile({ recruiter, recruiterCompany }) {
                 </TextField>
 
                 <TextField name="mission" className="w-full">
-                  <Label className="text-zinc-400 font-medium text-sm">
+                  <Label className="text-zinc-600 dark:text-zinc-400 font-medium text-sm">
                     Mission Statement
                   </Label>
                   <Input
@@ -1122,7 +1122,7 @@ export default function CompanyProfile({ recruiter, recruiterCompany }) {
                 </TextField>
 
                 <TextField name="vision" className="w-full">
-                  <Label className="text-zinc-400 font-medium text-sm">
+                  <Label className="text-zinc-600 dark:text-zinc-400 font-medium text-sm">
                     Vision Statement
                   </Label>
                   <Input
@@ -1136,7 +1136,7 @@ export default function CompanyProfile({ recruiter, recruiterCompany }) {
                 </TextField>
 
                 <TextField name="values" className="w-full md:col-span-2">
-                  <Label className="text-zinc-400 font-medium text-sm">
+                  <Label className="text-zinc-600 dark:text-zinc-400 font-medium text-sm">
                     Core Values
                   </Label>
                   <Input
@@ -1150,7 +1150,7 @@ export default function CompanyProfile({ recruiter, recruiterCompany }) {
                 </TextField>
 
                 <TextField name="phone" className="w-full">
-                  <Label className="text-zinc-400 font-medium text-sm">
+                  <Label className="text-zinc-600 dark:text-zinc-400 font-medium text-sm">
                     Phone Number
                   </Label>
                   <Input
@@ -1164,7 +1164,7 @@ export default function CompanyProfile({ recruiter, recruiterCompany }) {
                 </TextField>
 
                 <TextField name="email" className="w-full">
-                  <Label className="text-zinc-400 font-medium text-sm">
+                  <Label className="text-zinc-600 dark:text-zinc-400 font-medium text-sm">
                     Contact Email
                   </Label>
                   <Input
@@ -1185,12 +1185,12 @@ export default function CompanyProfile({ recruiter, recruiterCompany }) {
                 transition={{ delay: 0.35 }}
                 className="mt-4"
               >
-                <h4 className="text-sm font-semibold text-zinc-400 mb-3">
+                <h4 className="text-sm font-semibold text-zinc-500 dark:text-zinc-400 mb-3">
                   Social Links
                 </h4>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   <TextField name="twitter" className="w-full">
-                    <Label className="text-zinc-400 font-medium text-sm">
+                    <Label className="text-zinc-600 dark:text-zinc-400 font-medium text-sm">
                       Twitter URL
                     </Label>
                     <Input
@@ -1204,7 +1204,7 @@ export default function CompanyProfile({ recruiter, recruiterCompany }) {
                   </TextField>
 
                   <TextField name="linkedin" className="w-full">
-                    <Label className="text-zinc-400 font-medium text-sm">
+                    <Label className="text-zinc-600 dark:text-zinc-400 font-medium text-sm">
                       LinkedIn URL
                     </Label>
                     <Input
@@ -1218,7 +1218,7 @@ export default function CompanyProfile({ recruiter, recruiterCompany }) {
                   </TextField>
 
                   <TextField name="instagram" className="w-full">
-                    <Label className="text-zinc-400 font-medium text-sm">
+                    <Label className="text-zinc-600 dark:text-zinc-400 font-medium text-sm">
                       Instagram URL
                     </Label>
                     <Input
@@ -1232,7 +1232,7 @@ export default function CompanyProfile({ recruiter, recruiterCompany }) {
                   </TextField>
 
                   <TextField name="youtube" className="w-full">
-                    <Label className="text-zinc-400 font-medium text-sm">
+                    <Label className="text-zinc-600 dark:text-zinc-400 font-medium text-sm">
                       YouTube URL
                     </Label>
                     <Input
@@ -1254,14 +1254,14 @@ export default function CompanyProfile({ recruiter, recruiterCompany }) {
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.4 }}
-            className="flex justify-end gap-3 pt-5 border-t border-zinc-900"
+            className="flex justify-end gap-3 pt-5 border-t border-zinc-200/50 dark:border-zinc-900"
           >
             {company && company._id && (
               <Button
                 type="button"
                 variant="bordered"
                 onPress={() => setIsEditing(false)}
-                className="border-zinc-800 text-zinc-400 hover:bg-zinc-900 rounded-lg px-5 h-11 transition-all"
+                className="border-zinc-300/50 dark:border-zinc-800 text-zinc-700 dark:text-zinc-400 hover:bg-zinc-100 dark:hover:bg-zinc-900 rounded-lg px-5 h-11 transition-all"
               >
                 Cancel
               </Button>
@@ -1270,7 +1270,7 @@ export default function CompanyProfile({ recruiter, recruiterCompany }) {
               <Button
                 type="submit"
                 isLoading={isSubmitting}
-                className="bg-white text-black font-semibold hover:bg-zinc-200 rounded-lg px-6 h-11 shadow-lg shadow-white/10 transition-all"
+                className="bg-gradient-to-r from-blue-600 to-purple-600 text-white font-semibold rounded-xl px-8 h-11 shadow-lg shadow-blue-600/20"
               >
                 {company && company._id ? "Save Updates" : "Complete Setup"}
               </Button>

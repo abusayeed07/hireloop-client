@@ -93,24 +93,22 @@ const LoadingPage = ({
   title = "Loading",
   message = "Please wait while we prepare everything for you...",
   showProgress = true,
-  progress = null, // 0-100 or null for animated
+  progress = null,
   showStats = true,
   showTips = true,
   customStats = null,
   customIcon = null,
   customColor = "from-cyan-400 via-blue-400 to-purple-400",
-  size = "default", // "sm", "default", "lg"
-  variant = "default", // "default", "minimal", "full"
+  size = "default",
+  variant = "default",
   step = "loading",
   estimatedTime = null,
 }) => {
   
-  // Get step configuration
   const stepConfig = loadingSteps[step] || loadingSteps.loading;
   const StepIcon = stepConfig.icon || Loader2;
   const stepColor = stepConfig.color || "from-cyan-400 to-blue-400";
 
-  // Size configurations
   const sizes = {
     sm: {
       card: "p-6 md:p-8",
@@ -140,7 +138,6 @@ const LoadingPage = ({
 
   const sizeConfig = sizes[size] || sizes.default;
 
-  // Default stats
   const defaultStats = [
     { icon: Loader2, label: "Loading assets", animate: "spin" },
     { icon: Cloud, label: "Preparing UI", animate: "pulse" },
@@ -149,7 +146,6 @@ const LoadingPage = ({
 
   const stats = customStats || defaultStats;
 
-  // Tips
   const tips = [
     "Built with Next.js 16 + HeroUI",
     "Secure & Fast",
@@ -157,15 +153,14 @@ const LoadingPage = ({
     "Powered by AI",
   ];
 
-  // Progress value
   const progressValue = progress !== null ? progress : null;
 
   return (
-    <div className="min-h-screen flex items-center justify-center relative overflow-hidden bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900">
+    <div className="min-h-screen flex items-center justify-center relative overflow-hidden bg-gradient-to-br from-zinc-100 to-white dark:from-slate-900 dark:via-purple-900 dark:to-slate-900">
       
-      {/* 🔮 Animated Background Orbs */}
+      {/* Animated Background Orbs - lighter in light mode */}
       <motion.div
-        className="absolute -top-40 -left-40 w-80 h-80 bg-cyan-500 rounded-full mix-blend-multiply filter blur-3xl opacity-20"
+        className="absolute -top-40 -left-40 w-80 h-80 bg-cyan-300/30 dark:bg-cyan-500 rounded-full mix-blend-multiply filter blur-3xl opacity-20 dark:opacity-20"
         animate={{
           x: [0, 50, -30, 0],
           y: [0, -40, 20, 0],
@@ -178,7 +173,7 @@ const LoadingPage = ({
       />
       
       <motion.div
-        className="absolute -bottom-40 -right-40 w-80 h-80 bg-purple-500 rounded-full mix-blend-multiply filter blur-3xl opacity-20"
+        className="absolute -bottom-40 -right-40 w-80 h-80 bg-purple-300/30 dark:bg-purple-500 rounded-full mix-blend-multiply filter blur-3xl opacity-20 dark:opacity-20"
         animate={{
           x: [0, -60, 40, 0],
           y: [0, 30, -20, 0],
@@ -191,7 +186,7 @@ const LoadingPage = ({
       />
       
       <motion.div
-        className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-blue-500 rounded-full mix-blend-multiply filter blur-3xl opacity-20"
+        className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-blue-300/30 dark:bg-blue-500 rounded-full mix-blend-multiply filter blur-3xl opacity-20 dark:opacity-20"
         animate={{
           scale: [1, 1.1, 1],
           opacity: [0.2, 0.3, 0.2],
@@ -203,23 +198,23 @@ const LoadingPage = ({
         }}
       />
       
-      {/* ✨ Grid Pattern */}
+      {/* Grid Pattern */}
       <div 
         className="absolute inset-0 opacity-30 pointer-events-none"
         style={{
-          backgroundImage: `url("data:image/svg+xml,%3Csvg width='60' height='60' xmlns='http://www.w3.org/2000/svg'%3E%3Cdefs%3E%3Cpattern id='grid' width='60' height='60' patternUnits='userSpaceOnUse'%3E%3Cpath d='M 60 0 L 0 0 0 60' fill='none' stroke='rgba(255,255,255,0.05)' stroke-width='1'/%3E%3C/pattern%3E%3C/defs%3E%3Crect width='100%25' height='100%25' fill='url(%23grid)'/%3E%3C/svg%3E")`,
+          backgroundImage: `url("data:image/svg+xml,%3Csvg width='60' height='60' xmlns='http://www.w3.org/2000/svg'%3E%3Cdefs%3E%3Cpattern id='grid' width='60' height='60' patternUnits='userSpaceOnUse'%3E%3Cpath d='M 60 0 L 0 0 0 60' fill='none' stroke='rgba(0,0,0,0.05)' stroke-width='1'/%3E%3C/pattern%3E%3C/defs%3E%3Crect width='100%25' height='100%25' fill='url(%23grid)'/%3E%3C/svg%3E")`,
           backgroundRepeat: "repeat"
         }}
       />
 
-      {/* 🎯 Main Content */}
+      {/* Main Content */}
       <motion.div
         initial="hidden"
         animate="visible"
         variants={containerVariants}
         className="relative z-10 px-4"
       >
-        <Card className={`bg-white/5 backdrop-blur-xl border border-white/10 shadow-2xl rounded-2xl w-full max-w-md mx-auto ${sizeConfig.card}`}>
+        <Card className={`bg-white/80 dark:bg-white/5 backdrop-blur-xl border border-zinc-200/50 dark:border-white/10 shadow-2xl rounded-2xl w-full max-w-md mx-auto ${sizeConfig.card}`}>
           
           {/* Logo/Icon Container */}
           <motion.div
@@ -250,7 +245,7 @@ const LoadingPage = ({
               />
               
               {/* Center Icon */}
-              <div className={`${sizeConfig.icon} bg-gradient-to-br from-cyan-500/20 to-purple-500/20 rounded-full flex items-center justify-center backdrop-blur-sm`}>
+              <div className={`${sizeConfig.icon} bg-gradient-to-br from-cyan-300/20 to-purple-300/20 dark:from-cyan-500/20 dark:to-purple-500/20 rounded-full flex items-center justify-center backdrop-blur-sm`}>
                 {customIcon ? (
                   <customIcon className={`${sizeConfig.loader} text-transparent bg-gradient-to-r ${customColor} bg-clip-text`} />
                 ) : (
@@ -271,17 +266,17 @@ const LoadingPage = ({
             {/* Bouncing Dots */}
             <div className="flex justify-center gap-1 mt-2">
               <motion.div
-                className="w-2 h-2 bg-cyan-400 rounded-full"
+                className="w-2 h-2 bg-cyan-500 dark:bg-cyan-400 rounded-full"
                 animate={{ y: [0, -8, 0] }}
                 transition={{ duration: 0.6, repeat: Infinity, ease: "easeInOut", delay: 0 }}
               />
               <motion.div
-                className="w-2 h-2 bg-blue-400 rounded-full"
+                className="w-2 h-2 bg-blue-500 dark:bg-blue-400 rounded-full"
                 animate={{ y: [0, -8, 0] }}
                 transition={{ duration: 0.6, repeat: Infinity, ease: "easeInOut", delay: 0.15 }}
               />
               <motion.div
-                className="w-2 h-2 bg-purple-400 rounded-full"
+                className="w-2 h-2 bg-purple-500 dark:bg-purple-400 rounded-full"
                 animate={{ y: [0, -8, 0] }}
                 transition={{ duration: 0.6, repeat: Infinity, ease: "easeInOut", delay: 0.3 }}
               />
@@ -289,13 +284,13 @@ const LoadingPage = ({
           </motion.div>
 
           {/* Loading Message */}
-          <motion.p variants={itemVariants} className={`text-gray-400 text-center mb-6 ${sizeConfig.message}`}>
+          <motion.p variants={itemVariants} className={`text-zinc-600 dark:text-gray-400 text-center mb-6 ${sizeConfig.message}`}>
             {message}
           </motion.p>
 
           {/* Estimated Time */}
           {estimatedTime && (
-            <motion.p variants={itemVariants} className="text-center text-xs text-gray-500 mb-4">
+            <motion.p variants={itemVariants} className="text-center text-xs text-zinc-500 dark:text-gray-500 mb-4">
               ⏱️ Estimated time: {estimatedTime}
             </motion.p>
           )}
@@ -303,7 +298,7 @@ const LoadingPage = ({
           {/* Progress Bar */}
           {showProgress && (
             <motion.div variants={itemVariants} className={`${sizeConfig.progress} mx-auto mb-6`}>
-              <div className="h-1 bg-white/10 rounded-full overflow-hidden">
+              <div className="h-1 bg-zinc-200 dark:bg-white/10 rounded-full overflow-hidden">
                 <motion.div
                   className="h-full bg-gradient-to-r from-cyan-400 via-blue-400 to-purple-400 rounded-full"
                   initial={{ width: "0%" }}
@@ -323,7 +318,7 @@ const LoadingPage = ({
                 />
               </div>
               {progressValue !== null && (
-                <div className="text-right text-xs text-gray-500 mt-1">
+                <div className="text-right text-xs text-zinc-500 dark:text-gray-500 mt-1">
                   {Math.round(progressValue)}%
                 </div>
               )}
@@ -334,7 +329,7 @@ const LoadingPage = ({
           {showStats && (
             <motion.div
               variants={containerVariants}
-              className="flex flex-wrap justify-center gap-6 text-xs text-gray-500"
+              className="flex flex-wrap justify-center gap-6 text-xs text-zinc-500 dark:text-gray-500"
             >
               {stats.map((stat, index) => {
                 const StatIcon = stat.icon;
@@ -364,12 +359,12 @@ const LoadingPage = ({
           {showTips && (
             <motion.div
               variants={itemVariants}
-              className="mt-8 pt-6 border-t border-white/10"
+              className="mt-8 pt-6 border-t border-zinc-200/50 dark:border-white/10"
             >
-              <div className="flex flex-wrap items-center justify-center gap-3 text-xs text-gray-500">
+              <div className="flex flex-wrap items-center justify-center gap-3 text-xs text-zinc-500 dark:text-gray-500">
                 {tips.slice(0, 3).map((tip, index) => (
                   <span key={index} className="flex items-center gap-1">
-                    <Sparkles className="w-3 h-3 text-cyan-400" />
+                    <Sparkles className="w-3 h-3 text-cyan-500 dark:text-cyan-400" />
                     {tip}
                   </span>
                 ))}
@@ -384,29 +379,16 @@ const LoadingPage = ({
 
 // Export with different presets for easy use
 export const LoadingPresets = {
-  // For page loads
   page: (props) => <LoadingPage title="Loading Page" {...props} />,
-  
-  // For data fetching
   data: (props) => <LoadingPage title="Fetching Data" message="Loading your data..." step="loading" {...props} />,
-  
-  // For dashboard
   dashboard: (props) => <LoadingPage title="Dashboard" message="Loading your dashboard..." step="preparing" customStats={[
     { icon: TrendingUp, label: "Loading analytics", animate: "spin" },
     { icon: Users, label: "Fetching users", animate: "pulse" },
     { icon: Briefcase, label: "Loading jobs", animate: "bounce" },
   ]} {...props} />,
-  
-  // For authentication
   auth: (props) => <LoadingPage title="Signing In" message="Please wait while we verify your credentials..." step="almost" customColor="from-purple-400 via-pink-400 to-rose-400" {...props} />,
-  
-  // For file uploads
   upload: (props) => <LoadingPage title="Uploading" message="Your file is being uploaded..." step="loading" showProgress={true} progress={45} customColor="from-orange-400 via-red-400 to-pink-400" {...props} />,
-  
-  // Minimal
   minimal: (props) => <LoadingPage variant="minimal" showStats={false} showTips={false} size="sm" {...props} />,
-  
-  // Full
   full: (props) => <LoadingPage variant="full" size="lg" showStats={true} showTips={true} {...props} />,
 };
 

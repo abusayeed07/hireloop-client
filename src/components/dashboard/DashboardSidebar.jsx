@@ -288,7 +288,7 @@ export function DashboardSidebar() {
     }
   };
 
-  // Desktop Navigation Renderer
+  // Desktop Navigation Renderer - Updated for theme
   const renderNavContent = () => (
     <motion.nav
       variants={containerVariants}
@@ -303,7 +303,7 @@ export function DashboardSidebar() {
             {getDashboardIcon()}
           </div>
           <div>
-            <h2 className="text-sm font-semibold text-white">
+            <h2 className="text-sm font-semibold text-zinc-900 dark:text-white">
               {getDashboardName()}
             </h2>
             <p className="text-[10px] text-zinc-500 uppercase tracking-wider">
@@ -315,21 +315,21 @@ export function DashboardSidebar() {
 
       <motion.div
         variants={itemVariants}
-        className="border-b border-white/5 my-1 mx-3"
+        className="border-b border-zinc-200/50 dark:border-white/5 my-1 mx-3"
       />
 
       {/* Public Site Link */}
       <motion.div variants={itemVariants}>
         <Link
           href="/"
-          className={`flex items-center gap-3 rounded-xl px-4 py-3 text-sm transition-all duration-300 hover:bg-white/5 hover:text-white group relative overflow-hidden ${
+          className={`flex items-center gap-3 rounded-xl px-4 py-3 text-sm transition-all duration-300 hover:bg-zinc-100 dark:hover:bg-white/5 hover:text-zinc-900 dark:hover:text-white group relative overflow-hidden ${
             pathname === "/"
-              ? "bg-white/5 text-white shadow-sm border-l-2 border-cyan-400"
-              : "text-zinc-400 hover:border-l-2 hover:border-cyan-400/30"
+              ? "bg-zinc-100 dark:bg-white/5 text-zinc-900 dark:text-white shadow-sm border-l-2 border-cyan-400"
+              : "text-zinc-500 dark:text-zinc-400 hover:border-l-2 hover:border-cyan-400/30"
           }`}
         >
           <Globe
-            className={`w-5 h-5 transition-colors duration-300 ${pathname === "/" ? "text-cyan-400" : "text-zinc-500 group-hover:text-cyan-400"}`}
+            className={`w-5 h-5 transition-colors duration-300 ${pathname === "/" ? "text-cyan-400" : "text-zinc-400 dark:text-zinc-500 group-hover:text-cyan-400"}`}
           />
           <span>Public Site</span>
         </Link>
@@ -337,7 +337,7 @@ export function DashboardSidebar() {
 
       <motion.div
         variants={itemVariants}
-        className="border-b border-white/5 my-1 mx-3"
+        className="border-b border-zinc-200/50 dark:border-white/5 my-1 mx-3"
       />
 
       {/* Role-Specific Links */}
@@ -347,14 +347,14 @@ export function DashboardSidebar() {
           <motion.div key={item.label} variants={itemVariants}>
             <Link
               href={item.href}
-              className={`flex items-center gap-3 rounded-xl px-4 py-3 text-sm transition-all duration-300 hover:bg-white/5 hover:text-white group relative overflow-hidden ${
+              className={`flex items-center gap-3 rounded-xl px-4 py-3 text-sm transition-all duration-300 hover:bg-zinc-100 dark:hover:bg-white/5 hover:text-zinc-900 dark:hover:text-white group relative overflow-hidden ${
                 active
-                  ? "bg-white/5 text-white shadow-sm border-l-2 border-cyan-400"
-                  : "text-zinc-400"
+                  ? "bg-zinc-100 dark:bg-white/5 text-zinc-900 dark:text-white shadow-sm border-l-2 border-cyan-400"
+                  : "text-zinc-500 dark:text-zinc-400"
               }`}
             >
               <item.icon
-                className={`w-5 h-5 transition-colors duration-300 ${active ? "text-cyan-400" : "text-zinc-500 group-hover:text-cyan-400"}`}
+                className={`w-5 h-5 transition-colors duration-300 ${active ? "text-cyan-400" : "text-zinc-400 dark:text-zinc-500 group-hover:text-cyan-400"}`}
               />
               <span>{item.label}</span>
               {active && (
@@ -381,15 +381,15 @@ export function DashboardSidebar() {
   return (
     <>
       {/* =============================== */}
-      {/* 💻 DESKTOP SIDEBAR */}
+      {/* 💻 DESKTOP SIDEBAR - Updated for theme */}
       {/* =============================== */}
       <motion.aside
         initial={{ opacity: 0, x: -20 }}
         animate={{ opacity: 1, x: 0 }}
         transition={{ duration: 0.5, ease: "easeOut" }}
-        className="hidden lg:flex flex-col w-64 h-screen sticky top-0 bg-[#090a0f] border-r border-white/5 p-4 shadow-2xl shadow-black/50"
+        className="hidden lg:flex flex-col w-64 h-screen sticky top-0 bg-white dark:bg-[#090a0f] border-r border-zinc-200/50 dark:border-white/5 p-4 shadow-2xl shadow-black/5 dark:shadow-black/50"
       >
-        <div className="flex items-center gap-2 px-3 py-4 mb-2 border-b border-white/5">
+        <div className="flex items-center gap-2 px-3 py-4 mb-2 border-b border-zinc-200/50 dark:border-white/5">
           <div className="relative w-[150px] h-[40px]">
             <Image
               src={logoImg}
@@ -410,9 +410,9 @@ export function DashboardSidebar() {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.3 }}
-          className="pt-4 border-t border-white/5"
+          className="pt-4 border-t border-zinc-200/50 dark:border-white/5"
         >
-          <div className="flex items-center gap-3 px-3 py-2 bg-white/5 rounded-xl border border-white/5 hover:border-white/10 transition-all duration-300 relative overflow-hidden group">
+          <div className="flex items-center gap-3 px-3 py-2 bg-zinc-100/50 dark:bg-white/5 rounded-xl border border-zinc-200/50 dark:border-white/5 hover:border-zinc-300 dark:hover:border-white/10 transition-all duration-300 relative overflow-hidden group">
             <div className="absolute inset-0 bg-gradient-to-r from-cyan-500/0 via-purple-500/0 to-cyan-500/0 opacity-0 group-hover:opacity-100 blur-xl transition-opacity duration-500 pointer-events-none" />
 
             <div className={`relative w-10 h-10 rounded-full bg-gradient-to-br ${getRoleBadgeColor()} flex items-center justify-center text-white text-sm font-bold overflow-hidden shrink-0 shadow-lg shadow-purple-500/20`}>
@@ -429,13 +429,13 @@ export function DashboardSidebar() {
                   {getUserInitials()}
                 </span>
               )}
-              <div className="absolute bottom-0 right-0 w-3 h-3 rounded-full bg-emerald-500 border-2 border-zinc-950" />
+              <div className="absolute bottom-0 right-0 w-3 h-3 rounded-full bg-emerald-500 border-2 border-white dark:border-zinc-950" />
             </div>
             <div className="flex-1 min-w-0 relative z-10">
-              <p className="text-sm text-white font-medium truncate">
+              <p className="text-sm text-zinc-900 dark:text-white font-medium truncate">
                 {user?.name || "User"}
               </p>
-              <p className="text-xs text-zinc-500 truncate">
+              <p className="text-xs text-zinc-500 dark:text-zinc-500 truncate">
                 {user?.email || ""}
               </p>
               <span className={`text-[8px] uppercase font-bold tracking-wider bg-gradient-to-r ${getRoleBadgeColor()} bg-clip-text text-transparent`}>
@@ -449,24 +449,23 @@ export function DashboardSidebar() {
               className="relative z-10 p-2 rounded-lg hover:bg-red-500/10 transition-colors group"
               title="Logout"
             >
-              <LogOut className="w-4 h-4 text-zinc-500 group-hover:text-red-400 transition-colors duration-300" />
+              <LogOut className="w-4 h-4 text-zinc-500 dark:text-zinc-500 group-hover:text-red-400 transition-colors duration-300" />
             </motion.button>
           </div>
         </motion.div>
       </motion.aside>
 
       {/* =============================== */}
-      {/* 📱 MOBILE HEADER - USING REGULAR IMG TAG FOR RELIABILITY */}
+      {/* 📱 MOBILE HEADER - Updated for theme */}
       {/* =============================== */}
-      <div className="lg:hidden fixed top-0 left-0 right-0 z-50 bg-zinc-950/80 backdrop-blur-md border-b border-white/5 px-4 py-3 flex items-center justify-between">
-        {/* Logo - Using regular img tag for mobile reliability */}
+      <div className="lg:hidden fixed top-0 left-0 right-0 z-50 bg-white/80 dark:bg-zinc-950/80 backdrop-blur-md border-b border-zinc-200/50 dark:border-white/5 px-4 py-3 flex items-center justify-between">
+        {/* Logo */}
         <Link href="/dashboard" className="flex items-center shrink-0">
           <img
             src="/logo.png"
             alt="HireLoop Logo"
             className="h-[32px] w-auto object-contain sm:h-[36px]"
             onError={(e) => {
-              // Fallback if image fails to load
               e.target.style.display = 'none';
               const parent = e.target.parentElement;
               if (parent) {
@@ -488,7 +487,7 @@ export function DashboardSidebar() {
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
             onClick={() => setIsOpen(!isOpen)}
-            className="p-2 rounded-xl hover:bg-white/5 transition-colors text-zinc-400 hover:text-white shrink-0"
+            className="p-2 rounded-xl hover:bg-zinc-100 dark:hover:bg-white/5 transition-colors text-zinc-500 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white shrink-0"
           >
             <AnimatePresence mode="wait" initial={false}>
               {isOpen ? (
@@ -535,7 +534,7 @@ export function DashboardSidebar() {
       </AnimatePresence>
 
       {/* =============================== */}
-      {/* 📱 MOBILE SIDEBAR DRAWER - USING REGULAR IMG TAG */}
+      {/* 📱 MOBILE SIDEBAR DRAWER - Updated for theme */}
       {/* =============================== */}
       <AnimatePresence>
         {isOpen && (
@@ -544,10 +543,10 @@ export function DashboardSidebar() {
             initial="hidden"
             animate="visible"
             exit="exit"
-            className="lg:hidden fixed top-0 left-0 bottom-0 w-[85%] max-w-[320px] bg-zinc-950/90 backdrop-blur-xl border-r border-white/5 p-6 z-50 flex flex-col shadow-2xl shadow-black/70 pt-20"
+            className="lg:hidden fixed top-0 left-0 bottom-0 w-[85%] max-w-[320px] bg-white dark:bg-zinc-950/90 backdrop-blur-xl border-r border-zinc-200/50 dark:border-white/5 p-6 z-50 flex flex-col shadow-2xl shadow-black/10 dark:shadow-black/70 pt-20"
           >
-            {/* Logo - Using regular img tag for mobile reliability */}
-            <div className="flex items-center px-3 py-4 mb-2 border-b border-white/5">
+            {/* Logo */}
+            <div className="flex items-center px-3 py-4 mb-2 border-b border-zinc-200/50 dark:border-white/5">
               <img
                 src="/logo.png"
                 alt="HireLoop Logo"
@@ -575,9 +574,9 @@ export function DashboardSidebar() {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.2 }}
-              className="pt-4 border-t border-white/5 flex flex-col gap-3"
+              className="pt-4 border-t border-zinc-200/50 dark:border-white/5 flex flex-col gap-3"
             >
-              <div className="flex items-center gap-3 px-3 py-2 bg-white/5 rounded-xl border border-white/5">
+              <div className="flex items-center gap-3 px-3 py-2 bg-zinc-100/50 dark:bg-white/5 rounded-xl border border-zinc-200/50 dark:border-white/5">
                 <div className={`relative w-10 h-10 rounded-full bg-gradient-to-br ${getRoleBadgeColor()} flex items-center justify-center text-white text-sm font-bold overflow-hidden shrink-0 shadow-lg shadow-purple-500/20`}>
                   {getAvatarImage() ? (
                     <Image
@@ -592,13 +591,13 @@ export function DashboardSidebar() {
                       {getUserInitials()}
                     </span>
                   )}
-                  <div className="absolute bottom-0 right-0 w-3 h-3 rounded-full bg-emerald-500 border-2 border-zinc-950" />
+                  <div className="absolute bottom-0 right-0 w-3 h-3 rounded-full bg-emerald-500 border-2 border-white dark:border-zinc-950" />
                 </div>
                 <div className="flex-1 min-w-0">
-                  <p className="text-sm text-white font-medium truncate">
+                  <p className="text-sm text-zinc-900 dark:text-white font-medium truncate">
                     {user?.name || "User"}
                   </p>
-                  <p className="text-xs text-zinc-500 truncate">
+                  <p className="text-xs text-zinc-500 dark:text-zinc-500 truncate">
                     {user?.email || ""}
                   </p>
                   <span className={`text-[8px] uppercase font-bold tracking-wider bg-gradient-to-r ${getRoleBadgeColor()} bg-clip-text text-transparent`}>
@@ -614,7 +613,7 @@ export function DashboardSidebar() {
                   handleSignOut();
                   setIsOpen(false);
                 }}
-                className="flex items-center gap-3 rounded-xl px-4 py-3 text-sm text-red-400 hover:bg-red-500/10 transition-all w-full font-medium"
+                className="flex items-center gap-3 rounded-xl px-4 py-3 text-sm text-red-500 dark:text-red-400 hover:bg-red-100/50 dark:hover:bg-red-500/10 transition-all w-full font-medium"
               >
                 <LogOut className="w-5 h-5" />
                 <span>Logout</span>
@@ -624,7 +623,7 @@ export function DashboardSidebar() {
         )}
       </AnimatePresence>
 
-      {/* Global styles for scrollbar */}
+      {/* Global styles for scrollbar - Updated for theme */}
       <style>{`
         .custom-scrollbar::-webkit-scrollbar {
           width: 4px;
@@ -633,10 +632,16 @@ export function DashboardSidebar() {
           background: transparent;
         }
         .custom-scrollbar::-webkit-scrollbar-thumb {
-          background: rgba(255, 255, 255, 0.1);
+          background: rgba(0, 0, 0, 0.1);
           border-radius: 10px;
         }
+        .dark .custom-scrollbar::-webkit-scrollbar-thumb {
+          background: rgba(255, 255, 255, 0.1);
+        }
         .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+          background: rgba(0, 0, 0, 0.2);
+        }
+        .dark .custom-scrollbar::-webkit-scrollbar-thumb:hover {
           background: rgba(255, 255, 255, 0.2);
         }
       `}</style>

@@ -73,7 +73,6 @@ export default function ProfilePage() {
   const { data: session, isPending } = authClient.useSession();
   const user = session?.user;
 
-  // Image Upload State
   const [isUploadingAvatar, setIsUploadingAvatar] = useState(false);
   const fileInputRef = useRef(null);
 
@@ -109,7 +108,6 @@ export default function ProfilePage() {
     }
   }, [user]);
 
-  // ✅ IMG BB IMAGE UPLOAD HANDLER
   const handleImageUpload = async (e) => {
     const file = e.target.files[0];
     if (!file) return;
@@ -161,7 +159,6 @@ export default function ProfilePage() {
     setSaving(true);
 
     try {
-      // ✅ Step 1: Update Profile Information
       const updateData = {
         name: formData.name,
       };
@@ -178,14 +175,11 @@ export default function ProfilePage() {
         return;
       }
 
-      // ✅ Step 2: Handle Password Change (if passwords are provided)
       const hasNewPassword = passwordData.newPassword?.trim() !== "";
       const hasConfirmPassword = passwordData.confirmPassword?.trim() !== "";
       const hasCurrentPassword = passwordData.currentPassword?.trim() !== "";
 
-      // ✅ Check if user wants to change password
       if (hasNewPassword || hasConfirmPassword || hasCurrentPassword) {
-        // ✅ Validate all password fields are filled
         if (!hasCurrentPassword) {
           toast.error("Please enter your Current Password to change it.");
           setSaving(false);
@@ -204,21 +198,18 @@ export default function ProfilePage() {
           return;
         }
 
-        // ✅ Validate password length
         if (passwordData.newPassword.length < 8) {
           toast.error("Password must be at least 8 characters long.");
           setSaving(false);
           return;
         }
 
-        // ✅ Validate passwords match
         if (passwordData.newPassword !== passwordData.confirmPassword) {
           toast.error("The provided new passwords do not match.");
           setSaving(false);
           return;
         }
 
-        // ✅ Change password - Let the backend handle validation
         const passwordRes = await authClient.changePassword({
           currentPassword: passwordData.currentPassword,
           newPassword: passwordData.newPassword,
@@ -232,7 +223,6 @@ export default function ProfilePage() {
           return;
         }
 
-        // ✅ Clear password fields after successful change
         setPasswordData({
           currentPassword: "",
           newPassword: "",
@@ -242,17 +232,14 @@ export default function ProfilePage() {
         toast.success("Password updated successfully!");
       }
 
-      // ✅ Show success for profile update
       toast.success("Profile updated successfully!");
       setStatusMessage({
         type: "success",
         text: "Profile updated successfully.",
       });
 
-      // ✅ Refresh session to get updated user data
       await authClient.getSession();
 
-      // ✅ Redirect to home page after a short delay
       setTimeout(() => {
         router.push("/");
       }, 1500);
@@ -270,7 +257,6 @@ export default function ProfilePage() {
     }
   };
 
-  // ✅ USE DYNAMIC LOADING PAGE INSTEAD OF SKELETON
   if (isPending || !session) {
     return (
       <LoadingPage 
@@ -294,22 +280,22 @@ export default function ProfilePage() {
         initial="hidden"
         animate="visible"
         variants={containerVariants}
-        className="min-h-screen bg-[#090a0f] text-zinc-200 py-12 px-4 sm:px-6 lg:px-8 font-sans antialiased relative overflow-hidden"
+        className="min-h-screen bg-zinc-50 dark:bg-[#090a0f] text-zinc-900 dark:text-zinc-200 py-12 px-4 sm:px-6 lg:px-8 font-sans antialiased relative overflow-hidden"
       >
-        {/* Ambient Background Glow */}
-        <div className="absolute top-0 right-0 w-[600px] h-[600px] bg-blue-500/5 blur-[120px] pointer-events-none -z-10" />
-        <div className="absolute bottom-0 left-0 w-[600px] h-[600px] bg-purple-500/5 blur-[120px] pointer-events-none -z-10" />
+        {/* Ambient Background Glow - lighter in light mode */}
+        <div className="absolute top-0 right-0 w-[600px] h-[600px] bg-blue-400/5 dark:bg-blue-500/5 blur-[120px] pointer-events-none -z-10" />
+        <div className="absolute bottom-0 left-0 w-[600px] h-[600px] bg-purple-400/5 dark:bg-purple-500/5 blur-[120px] pointer-events-none -z-10" />
 
         <div className="max-w-3xl mx-auto space-y-8 mt-15 relative z-10">
           {/* Header Section */}
           <motion.div
             variants={itemVariants}
-            className="border-b border-zinc-800/60 pb-5"
+            className="border-b border-zinc-200/50 dark:border-zinc-800/60 pb-5"
           >
-            <h1 className="text-2xl font-bold tracking-tight text-white bg-clip-text bg-gradient-to-r from-white to-zinc-400">
+            <h1 className="text-2xl font-bold tracking-tight text-zinc-900 dark:text-white">
               My Profile
             </h1>
-            <p className="text-zinc-500 text-xs mt-1">
+            <p className="text-zinc-500 dark:text-zinc-500 text-xs mt-1">
               Manage your account identity, telemetry details, and security
               configuration.
             </p>
@@ -317,24 +303,24 @@ export default function ProfilePage() {
 
           <form onSubmit={handleSaveChanges} className="space-y-6">
             <motion.div variants={itemVariants}>
-              <Card className="bg-zinc-900/20 backdrop-blur-sm border border-zinc-800/80 rounded-2xl p-6 shadow-xl shadow-black/40 space-y-8 hover:border-zinc-700/60 transition-all duration-300">
+              <Card className="bg-white/80 dark:bg-zinc-900/20 backdrop-blur-sm border border-zinc-200/50 dark:border-zinc-800/80 rounded-2xl p-6 shadow-sm dark:shadow-xl shadow-black/5 dark:shadow-black/40 space-y-8 hover:border-zinc-300 dark:hover:border-zinc-700/60 transition-all duration-300">
                 
                 {/* Section 1: Profile Information */}
                 <motion.div variants={itemVariants} className="space-y-6">
-                  <div className="flex items-center gap-3 text-zinc-200 font-medium text-sm border-b border-zinc-800/40 pb-3">
-                    <User className="w-4 h-4 text-zinc-400" />
+                  <div className="flex items-center gap-3 text-zinc-700 dark:text-zinc-200 font-medium text-sm border-b border-zinc-200/50 dark:border-zinc-800/40 pb-3">
+                    <User className="w-4 h-4 text-zinc-400 dark:text-zinc-500" />
                     <h2>Profile Information</h2>
                   </div>
 
-                  {/* PROFESSIONAL AVATAR UPLOAD SECTION */}
+                  {/* Avatar Upload Section */}
                   <motion.div 
                     variants={avatarVariants}
-                    className="flex flex-col sm:flex-row items-center gap-5 pb-6 border-b border-zinc-800/60"
+                    className="flex flex-col sm:flex-row items-center gap-5 pb-6 border-b border-zinc-200/50 dark:border-zinc-800/60"
                   >
                     <motion.div
-                      whileHover={{ scale: 1.05, boxShadow: "0px 0px 30px rgba(59, 130, 246, 0.2)" }}
+                      whileHover={{ scale: 1.05, boxShadow: "0px 0px 30px rgba(59, 130, 246, 0.15)" }}
                       whileTap={{ scale: 0.95 }}
-                      className="relative w-24 h-24 rounded-2xl bg-gradient-to-br from-zinc-800 to-zinc-700 flex items-center justify-center text-zinc-400 text-2xl font-bold uppercase overflow-hidden group border border-zinc-700 shadow-lg cursor-pointer"
+                      className="relative w-24 h-24 rounded-2xl bg-gradient-to-br from-zinc-200 to-zinc-300 dark:from-zinc-800 dark:to-zinc-700 flex items-center justify-center text-zinc-500 dark:text-zinc-400 text-2xl font-bold uppercase overflow-hidden group border border-zinc-300/50 dark:border-zinc-700 shadow-lg cursor-pointer"
                       onClick={() => fileInputRef.current?.click()}
                     >
                       <input
@@ -353,7 +339,7 @@ export default function ProfilePage() {
                           className="object-cover transition-all duration-300"
                         />
                       ) : (
-                        <span className="text-3xl font-bold text-zinc-300">
+                        <span className="text-3xl font-bold text-zinc-500 dark:text-zinc-300">
                           {formData.name?.charAt(0).toUpperCase() || "U"}
                         </span>
                       )}
@@ -373,15 +359,15 @@ export default function ProfilePage() {
                     </motion.div>
 
                     <div className="text-center sm:text-left space-y-1">
-                      <h3 className="text-sm font-semibold text-zinc-300">
+                      <h3 className="text-sm font-semibold text-zinc-700 dark:text-zinc-300">
                         Profile Photo
                       </h3>
-                      <p className="text-xs text-zinc-500">PNG or JPG up to 2MB.</p>
+                      <p className="text-xs text-zinc-500 dark:text-zinc-500">PNG or JPG up to 2MB.</p>
                       <motion.div whileHover={{ scale: 1.03 }} whileTap={{ scale: 0.97 }}>
                         <Button
                           size="sm"
                           variant="flat"
-                          className="bg-zinc-800/60 hover:bg-zinc-700/80 text-zinc-300 mt-2 text-xs h-8 rounded-lg border border-zinc-700/50 transition-all duration-200"
+                          className="bg-zinc-100 dark:bg-zinc-800/60 hover:bg-zinc-200 dark:hover:bg-zinc-700/80 text-zinc-700 dark:text-zinc-300 mt-2 text-xs h-8 rounded-lg border border-zinc-300/50 dark:border-zinc-700/50 transition-all duration-200"
                           onPress={() => fileInputRef.current?.click()}
                           isLoading={isUploadingAvatar}
                           startContent={
@@ -401,11 +387,11 @@ export default function ProfilePage() {
                   >
                     {/* Full Name */}
                     <div className="space-y-2">
-                      <label className="text-xs font-medium text-zinc-400 tracking-wide">
+                      <label className="text-xs font-medium text-zinc-600 dark:text-zinc-400 tracking-wide">
                         Full Name
                       </label>
                       <div className="relative group">
-                        <User className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-500 transition-colors group-focus-within:text-blue-400" />
+                        <User className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-400 dark:text-zinc-500 transition-colors group-focus-within:text-blue-600 dark:group-focus-within:text-blue-400" />
                         <Input
                           type="text"
                           variant="bordered"
@@ -414,36 +400,36 @@ export default function ProfilePage() {
                             setFormData({ ...formData, name: e.target.value })
                           }
                           placeholder="John Doe"
-                          className="pl-9 bg-zinc-950/60 border-zinc-800 text-zinc-200 placeholder-zinc-600 text-sm w-full focus:border-zinc-500 transition-all"
+                          className="pl-9 bg-white/80 dark:bg-zinc-950/60 border-zinc-300/50 dark:border-zinc-800 text-zinc-900 dark:text-zinc-200 placeholder-zinc-400 dark:placeholder-zinc-600 text-sm w-full focus:border-zinc-400 dark:focus:border-zinc-500 transition-all"
                         />
                       </div>
                     </div>
 
                     {/* Email - Disabled */}
                     <div className="space-y-2">
-                      <label className="text-xs font-medium text-zinc-400 tracking-wide">
+                      <label className="text-xs font-medium text-zinc-600 dark:text-zinc-400 tracking-wide">
                         Email Address
                       </label>
                       <div className="relative">
-                        <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-600" />
+                        <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-400 dark:text-zinc-600" />
                         <Input
                           type="email"
                           variant="bordered"
                           value={user?.email || ""}
                           disabled
                           placeholder="email@example.com"
-                          className="pl-9 opacity-60 bg-zinc-950/20 border-zinc-900 text-zinc-500 cursor-not-allowed text-sm w-full"
+                          className="pl-9 opacity-60 bg-zinc-100/50 dark:bg-zinc-950/20 border-zinc-300/30 dark:border-zinc-900 text-zinc-500 dark:text-zinc-500 cursor-not-allowed text-sm w-full"
                         />
                       </div>
                     </div>
 
                     {/* Phone Number */}
                     <div className="space-y-2">
-                      <label className="text-xs font-medium text-zinc-400 tracking-wide">
+                      <label className="text-xs font-medium text-zinc-600 dark:text-zinc-400 tracking-wide">
                         Phone Number
                       </label>
                       <div className="relative group">
-                        <Phone className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-500 transition-colors group-focus-within:text-blue-400" />
+                        <Phone className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-400 dark:text-zinc-500 transition-colors group-focus-within:text-blue-600 dark:group-focus-within:text-blue-400" />
                         <Input
                           type="tel"
                           variant="bordered"
@@ -452,24 +438,24 @@ export default function ProfilePage() {
                             setFormData({ ...formData, phone: e.target.value })
                           }
                           placeholder="+880 1XXX-XXXXXX"
-                          className="pl-9 bg-zinc-950/60 border-zinc-800 text-zinc-200 placeholder-zinc-600 text-sm w-full focus:border-zinc-500 transition-all"
+                          className="pl-9 bg-white/80 dark:bg-zinc-950/60 border-zinc-300/50 dark:border-zinc-800 text-zinc-900 dark:text-zinc-200 placeholder-zinc-400 dark:placeholder-zinc-600 text-sm w-full focus:border-zinc-400 dark:focus:border-zinc-500 transition-all"
                         />
                       </div>
                     </div>
 
                     {/* Account Role - Disabled */}
                     <div className="space-y-2">
-                      <label className="text-xs font-medium text-zinc-400 tracking-wide">
+                      <label className="text-xs font-medium text-zinc-600 dark:text-zinc-400 tracking-wide">
                         Account Role
                       </label>
                       <div className="relative">
-                        <Shield className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-600" />
+                        <Shield className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-400 dark:text-zinc-600" />
                         <Input
                           type="text"
                           variant="bordered"
                           value={user?.role || "seeker"}
                           disabled
-                          className="pl-9 opacity-60 bg-zinc-950/20 border-zinc-900 text-zinc-500 cursor-not-allowed capitalize text-sm w-full"
+                          className="pl-9 opacity-60 bg-zinc-100/50 dark:bg-zinc-950/20 border-zinc-300/30 dark:border-zinc-900 text-zinc-500 dark:text-zinc-500 cursor-not-allowed capitalize text-sm w-full"
                         />
                       </div>
                     </div>
@@ -479,21 +465,21 @@ export default function ProfilePage() {
                 {/* Section 2: Security Credentials */}
                 <motion.div
                   variants={itemVariants}
-                  className="space-y-6 pt-2 border-t border-zinc-800/60"
+                  className="space-y-6 pt-2 border-t border-zinc-200/50 dark:border-zinc-800/60"
                 >
-                  <div className="flex items-center gap-3 text-zinc-200 font-medium text-sm border-b border-zinc-800/40 pb-3">
-                    <Lock className="w-4 h-4 text-zinc-400" />
+                  <div className="flex items-center gap-3 text-zinc-700 dark:text-zinc-200 font-medium text-sm border-b border-zinc-200/50 dark:border-zinc-800/40 pb-3">
+                    <Lock className="w-4 h-4 text-zinc-400 dark:text-zinc-500" />
                     <h2>Security Credentials</h2>
                   </div>
 
                   <div className="space-y-5">
                     {/* Current Password */}
                     <div className="space-y-2">
-                      <label className="text-xs font-medium text-zinc-400 tracking-wide">
+                      <label className="text-xs font-medium text-zinc-600 dark:text-zinc-400 tracking-wide">
                         Current Account Password
                       </label>
                       <div className="relative">
-                        <KeyRound className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-600 z-10" />
+                        <KeyRound className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-400 dark:text-zinc-600 z-10" />
                         <Input
                           type={showCurrentPassword ? "text" : "password"}
                           placeholder={
@@ -507,7 +493,7 @@ export default function ProfilePage() {
                             })
                           }
                           variant="bordered"
-                          className="w-full h-10 pl-9 pr-12 bg-zinc-950/60 border border-zinc-800 rounded-lg text-zinc-200 placeholder-zinc-600 text-sm hover:border-zinc-700 focus:border-zinc-600 focus:outline-none transition-all"
+                          className="w-full h-10 pl-9 pr-12 bg-white/80 dark:bg-zinc-950/60 border border-zinc-300/50 dark:border-zinc-800 rounded-lg text-zinc-900 dark:text-zinc-200 placeholder-zinc-400 dark:placeholder-zinc-600 text-sm hover:border-zinc-400 dark:hover:border-zinc-700 focus:border-zinc-500 dark:focus:border-zinc-600 focus:outline-none transition-all"
                         />
                         <motion.button
                           type="button"
@@ -516,7 +502,7 @@ export default function ProfilePage() {
                           onClick={() =>
                             setShowCurrentPassword(!showCurrentPassword)
                           }
-                          className="absolute right-3.5 top-1/2 -translate-y-1/2 text-zinc-500 hover:text-zinc-300 transition-colors z-10 focus:outline-none"
+                          className="absolute right-3.5 top-1/2 -translate-y-1/2 text-zinc-500 dark:text-zinc-500 hover:text-zinc-700 dark:hover:text-zinc-300 transition-colors z-10 focus:outline-none"
                         >
                           <AnimatePresence mode="wait">
                             <motion.span
@@ -540,7 +526,7 @@ export default function ProfilePage() {
                     {/* New Password & Confirm Password */}
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                       <div className="space-y-2">
-                        <label className="text-xs font-medium text-zinc-400 tracking-wide">
+                        <label className="text-xs font-medium text-zinc-600 dark:text-zinc-400 tracking-wide">
                           New Secure Password
                         </label>
                         <div className="relative">
@@ -557,14 +543,14 @@ export default function ProfilePage() {
                               })
                             }
                             variant="bordered"
-                            className="w-full h-10 pl-3 pr-12 bg-zinc-950/60 border border-zinc-800 rounded-lg text-zinc-200 placeholder-zinc-600 text-sm hover:border-zinc-700 focus:border-zinc-600 focus:outline-none transition-all"
+                            className="w-full h-10 pl-3 pr-12 bg-white/80 dark:bg-zinc-950/60 border border-zinc-300/50 dark:border-zinc-800 rounded-lg text-zinc-900 dark:text-zinc-200 placeholder-zinc-400 dark:placeholder-zinc-600 text-sm hover:border-zinc-400 dark:hover:border-zinc-700 focus:border-zinc-500 dark:focus:border-zinc-600 focus:outline-none transition-all"
                           />
                           <motion.button
                             type="button"
                             whileHover={{ scale: 1.1, rotate: 10 }}
                             whileTap={{ scale: 0.95 }}
                             onClick={() => setShowNewPassword(!showNewPassword)}
-                            className="absolute right-3.5 top-1/2 -translate-y-1/2 text-zinc-500 hover:text-zinc-300 transition-colors z-10 focus:outline-none"
+                            className="absolute right-3.5 top-1/2 -translate-y-1/2 text-zinc-500 dark:text-zinc-500 hover:text-zinc-700 dark:hover:text-zinc-300 transition-colors z-10 focus:outline-none"
                           >
                             <AnimatePresence mode="wait">
                               <motion.span
@@ -585,7 +571,7 @@ export default function ProfilePage() {
                         </div>
                       </div>
                       <div className="space-y-2">
-                        <label className="text-xs font-medium text-zinc-400 tracking-wide">
+                        <label className="text-xs font-medium text-zinc-600 dark:text-zinc-400 tracking-wide">
                           Confirm New Password
                         </label>
                         
@@ -603,12 +589,12 @@ export default function ProfilePage() {
                               })
                             }
                             variant="bordered"
-                            className={`w-full h-10 pl-3 pr-12 transition-all duration-300 ${
+                            className={`w-full h-10 pl-3 pr-12 transition-all duration-300 bg-white/80 dark:bg-zinc-950/60 ${
                               passwordData.confirmPassword && passwordData.newPassword
                                 ? passwordData.confirmPassword === passwordData.newPassword
-                                  ? "border-green-500/50 ring-1 ring-green-500/50 bg-green-950/10"
-                                  : "border-red-500/50 ring-1 ring-red-500/50 bg-red-950/10"
-                                : "border-zinc-800 text-zinc-200 placeholder-zinc-600"
+                                  ? "border-green-500/50 ring-1 ring-green-500/50 bg-green-50 dark:bg-green-950/10"
+                                  : "border-red-500/50 ring-1 ring-red-500/50 bg-red-50 dark:bg-red-950/10"
+                                : "border-zinc-300/50 dark:border-zinc-800 text-zinc-900 dark:text-zinc-200 placeholder-zinc-400 dark:placeholder-zinc-600"
                             }`}
                           />
                           
@@ -620,9 +606,9 @@ export default function ProfilePage() {
                                 transition={{ type: "spring", stiffness: 400, damping: 20 }}
                               >
                                 {passwordData.confirmPassword === passwordData.newPassword ? (
-                                  <CheckCircle className="w-4 h-4 text-green-400" />
+                                  <CheckCircle className="w-4 h-4 text-green-600 dark:text-green-400" />
                                 ) : (
-                                  <XCircle className="w-4 h-4 text-red-400" />
+                                  <XCircle className="w-4 h-4 text-red-600 dark:text-red-400" />
                                 )}
                               </motion.div>
                             )}
@@ -635,7 +621,7 @@ export default function ProfilePage() {
                             onClick={() =>
                               setShowConfirmPassword(!showConfirmPassword)
                             }
-                            className="absolute right-10 top-1/2 -translate-y-1/2 text-zinc-500 hover:text-zinc-300 transition-colors z-0 focus:outline-none"
+                            className="absolute right-10 top-1/2 -translate-y-1/2 text-zinc-500 dark:text-zinc-500 hover:text-zinc-700 dark:hover:text-zinc-300 transition-colors z-0 focus:outline-none"
                           >
                             <AnimatePresence mode="wait">
                               <motion.span
@@ -662,22 +648,22 @@ export default function ProfilePage() {
                       <motion.div
                         initial={{ opacity: 0, height: 0 }}
                         animate={{ opacity: 1, height: "auto" }}
-                        className="text-xs text-zinc-500 space-y-1 pl-1"
+                        className="text-xs text-zinc-500 dark:text-zinc-500 space-y-1 pl-1"
                       >
                         <div className="flex items-center gap-2">
-                          <span className={`${passwordData.newPassword.length >= 8 ? 'text-green-400' : 'text-zinc-500'}`}>
+                          <span className={`${passwordData.newPassword.length >= 8 ? 'text-green-600 dark:text-green-400' : 'text-zinc-400 dark:text-zinc-500'}`}>
                             {passwordData.newPassword.length >= 8 ? '✅' : '⬜'}
                           </span>
                           At least 8 characters
                         </div>
                         <div className="flex items-center gap-2">
-                          <span className={`${/[A-Z]/.test(passwordData.newPassword) ? 'text-green-400' : 'text-zinc-500'}`}>
+                          <span className={`${/[A-Z]/.test(passwordData.newPassword) ? 'text-green-600 dark:text-green-400' : 'text-zinc-400 dark:text-zinc-500'}`}>
                             {/[A-Z]/.test(passwordData.newPassword) ? '✅' : '⬜'}
                           </span>
                           At least one uppercase letter
                         </div>
                         <div className="flex items-center gap-2">
-                          <span className={`${/[0-9]/.test(passwordData.newPassword) ? 'text-green-400' : 'text-zinc-500'}`}>
+                          <span className={`${/[0-9]/.test(passwordData.newPassword) ? 'text-green-600 dark:text-green-400' : 'text-zinc-400 dark:text-zinc-500'}`}>
                             {/[0-9]/.test(passwordData.newPassword) ? '✅' : '⬜'}
                           </span>
                           At least one number
@@ -687,7 +673,7 @@ export default function ProfilePage() {
                   </div>
                 </motion.div>
 
-                {/* Premium Badge-Style Status Messages */}
+                {/* Status Messages */}
                 <AnimatePresence mode="wait">
                   {statusMessage.text && (
                     <motion.div
@@ -697,8 +683,8 @@ export default function ProfilePage() {
                       exit="exit"
                       className={`flex items-center gap-2 text-xs font-medium px-4 py-2.5 rounded-full shadow-sm border ${
                         statusMessage.type === "success"
-                          ? "bg-emerald-500/10 text-emerald-400 border-emerald-500/20"
-                          : "bg-red-500/10 text-red-400 border-red-500/20"
+                          ? "bg-emerald-50 dark:bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 border-emerald-200/50 dark:border-emerald-500/20"
+                          : "bg-red-50 dark:bg-red-500/10 text-red-700 dark:text-red-400 border-red-200/50 dark:border-red-500/20"
                       }`}
                     >
                       {statusMessage.type === "success" ? (
@@ -714,17 +700,17 @@ export default function ProfilePage() {
                 {/* Footer Actions */}
                 <motion.div
                   variants={itemVariants}
-                  className="flex items-center justify-end border-t border-zinc-800/60 pt-4"
+                  className="flex items-center justify-end border-t border-zinc-200/50 dark:border-zinc-800/60 pt-4"
                 >
                   <motion.div
-                    whileHover={{ scale: 1.02, boxShadow: "0px 0px 20px rgba(255, 255, 255, 0.1)" }}
+                    whileHover={{ scale: 1.02, boxShadow: "0px 0px 20px rgba(0,0,0,0.05)" }}
                     whileTap={{ scale: 0.97 }}
                     transition={{ type: "spring", stiffness: 400, damping: 17 }}
                   >
                     <Button
                       type="submit"
                       isLoading={saving}
-                      className="bg-zinc-200 hover:bg-zinc-100 text-zinc-950 text-xs font-medium rounded-lg px-5 h-9 shadow-sm transition-colors"
+                      className="bg-gradient-to-r from-blue-600 to-purple-600 text-white font-semibold rounded-xl px-8 h-11 shadow-lg shadow-blue-600/20"
                       startContent={!saving && <Save className="w-3.5 h-3.5" />}
                     >
                       Save Account Updates

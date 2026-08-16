@@ -408,7 +408,7 @@ const PricingPage = () => {
   }
 
   return (
-    <div className="mt-16 sm:mt-20 min-h-screen bg-gradient-to-b from-zinc-950 via-zinc-900 to-zinc-950">
+    <div className="mt-16 sm:mt-20 min-h-screen bg-gradient-to-b from-zinc-50 to-white dark:from-zinc-950 dark:via-zinc-900 dark:to-zinc-950">
       <div className="py-8 sm:py-12 px-3 sm:px-4 md:px-8">
         <div className="max-w-7xl mx-auto">
           {/* Header - Mobile Optimized */}
@@ -418,25 +418,25 @@ const PricingPage = () => {
             transition={{ duration: 0.5 }}
             className="text-center mb-8 sm:mb-12"
           >
-            <h1 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold text-white mb-2 sm:mb-4">
-              Choose Your <span className="text-blue-400">Plan</span>
+            <h1 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold text-zinc-900 dark:text-white mb-2 sm:mb-4">
+              Choose Your <span className="text-blue-600 dark:text-blue-400">Plan</span>
             </h1>
-            <p className="text-zinc-400 text-sm sm:text-base md:text-lg max-w-2xl mx-auto px-2">
+            <p className="text-zinc-600 dark:text-zinc-400 text-sm sm:text-base md:text-lg max-w-2xl mx-auto px-2">
               Select the perfect plan for your needs. Upgrade or downgrade anytime.
             </p>
             {session?.user && (
               <div className="mt-2 space-y-1 px-2">
-                <p className="text-zinc-500 text-xs sm:text-sm truncate">
+                <p className="text-zinc-500 dark:text-zinc-500 text-xs sm:text-sm truncate">
                   👋 Signed in as{" "}
-                  <span className="text-blue-400">{session.user.email}</span>
+                  <span className="text-blue-600 dark:text-blue-400">{session.user.email}</span>
                 </p>
-                <p className="text-zinc-500 text-xs">
+                <p className="text-zinc-500 dark:text-zinc-500 text-xs">
                   Role:{" "}
-                  <span className="capitalize text-zinc-300">
+                  <span className="capitalize text-zinc-700 dark:text-zinc-300">
                     {session.user.role}
                   </span>
                   {isAdmin && (
-                    <span className="ml-2 inline-flex items-center gap-1 text-[10px] bg-purple-500/20 text-purple-400 px-2 py-0.5 rounded-full border border-purple-500/30">
+                    <span className="ml-2 inline-flex items-center gap-1 text-[10px] bg-purple-100 dark:bg-purple-500/20 text-purple-700 dark:text-purple-400 px-2 py-0.5 rounded-full border border-purple-200/50 dark:border-purple-500/30">
                       <Shield className="w-3 h-3" />
                       Admin
                     </span>
@@ -454,13 +454,13 @@ const PricingPage = () => {
             className="flex justify-center mb-8 sm:mb-12 px-2"
             id="pricing-toggle"
           >
-            <div className="relative bg-zinc-900/50 border border-zinc-800 rounded-xl sm:rounded-2xl p-1 flex gap-0.5 sm:gap-1 w-full max-w-md">
+            <div className="relative bg-white/80 dark:bg-zinc-900/50 border border-zinc-200/50 dark:border-zinc-800 rounded-xl sm:rounded-2xl p-1 flex gap-0.5 sm:gap-1 w-full max-w-md">
               <button
                 onClick={() => setActiveTab("seeker")}
-                className={`flex-1 px-3 sm:px-6 py-2 sm:py-3 rounded-lg sm:rounded-xl text-[10px] sm:text-sm font-medium transition-all duration-300 flex items-center justify-center gap-1 sm:gap-2 ${
+                className={`cursor-pointer flex-1 px-3 sm:px-6 py-2 sm:py-3 rounded-lg sm:rounded-xl text-[10px] sm:text-sm font-medium transition-all duration-300 flex items-center justify-center gap-1 sm:gap-2 ${
                   activeTab === "seeker"
                     ? "bg-gradient-to-r from-blue-600 to-purple-600 text-white shadow-lg shadow-blue-600/20"
-                    : "text-zinc-400 hover:text-white hover:bg-zinc-800"
+                    : "text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white hover:bg-zinc-100 dark:hover:bg-zinc-800"
                 }`}
               >
                 <Users className="w-3 h-3 sm:w-4 sm:h-4" />
@@ -468,10 +468,10 @@ const PricingPage = () => {
               </button>
               <button
                 onClick={() => setActiveTab("recruiter")}
-                className={`flex-1 px-3 sm:px-6 py-2 sm:py-3 rounded-lg sm:rounded-xl text-[10px] sm:text-sm font-medium transition-all duration-300 flex items-center justify-center gap-1 sm:gap-2 ${
+                className={`cursor-pointer flex-1 px-3 sm:px-6 py-2 sm:py-3 rounded-lg sm:rounded-xl text-[10px] sm:text-sm font-medium transition-all duration-300 flex items-center justify-center gap-1 sm:gap-2 ${
                   activeTab === "recruiter"
                     ? "bg-gradient-to-r from-blue-600 to-purple-600 text-white shadow-lg shadow-blue-600/20"
-                    : "text-zinc-400 hover:text-white hover:bg-zinc-800"
+                    : "text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white hover:bg-zinc-100 dark:hover:bg-zinc-800"
                 }`}
               >
                 <Briefcase className="w-3 h-3 sm:w-4 sm:h-4" />
@@ -487,11 +487,11 @@ const PricingPage = () => {
               animate={{ opacity: 1, y: 0 }}
               className="mb-6 max-w-3xl mx-auto"
             >
-              <div className="bg-purple-500/10 border border-purple-500/30 rounded-xl p-4 flex items-center gap-3">
-                <Shield className="w-8 h-8 text-purple-400 shrink-0" />
+              <div className="bg-purple-50 dark:bg-purple-500/10 border border-purple-200/50 dark:border-purple-500/30 rounded-xl p-4 flex items-center gap-3">
+                <Shield className="w-8 h-8 text-purple-600 dark:text-purple-400 shrink-0" />
                 <div>
-                  <h3 className="text-purple-400 font-semibold text-sm">Admin Account</h3>
-                  <p className="text-zinc-400 text-xs">
+                  <h3 className="text-purple-700 dark:text-purple-400 font-semibold text-sm">Admin Account</h3>
+                  <p className="text-zinc-600 dark:text-zinc-400 text-xs">
                     You are an administrator. You have full access to all features 
                     and don't need to purchase any plan. Your admin privileges override all plan restrictions.
                   </p>
@@ -524,10 +524,10 @@ const PricingPage = () => {
                     transition={{ delay: index * 0.1 }}
                     className={`relative rounded-xl sm:rounded-2xl p-4 sm:p-5 md:p-6 border transition-all duration-300 ${
                       plan.popular
-                        ? "bg-gradient-to-b from-blue-600/10 to-purple-600/10 border-blue-500/30 shadow-2xl shadow-blue-600/10 sm:scale-105"
+                        ? "bg-gradient-to-b from-blue-50 to-purple-50 dark:from-blue-600/10 dark:to-purple-600/10 border-blue-500/50 dark:border-blue-500/30 shadow-2xl shadow-blue-600/10 sm:scale-105"
                         : isDowngrade && !isCurrentPlan && !plan.isFree
-                        ? "bg-gradient-to-b from-red-600/5 to-orange-600/5 border-red-500/20"
-                        : "bg-zinc-900/50 border-zinc-800 hover:border-zinc-700"
+                        ? "bg-gradient-to-b from-red-50 to-orange-50 dark:from-red-600/5 dark:to-orange-600/5 border-red-400/50 dark:border-red-500/20"
+                        : "bg-white/80 dark:bg-zinc-900/50 border-zinc-200/50 dark:border-zinc-800 hover:border-zinc-300 dark:hover:border-zinc-700"
                     } ${plan.popular ? "order-first sm:order-none" : ""}`}
                   >
                     {plan.popular && (
@@ -538,46 +538,46 @@ const PricingPage = () => {
                     )}
 
                     {isCurrentPlan && !isAdmin && (
-                      <div className="absolute top-2 sm:top-3 right-2 sm:right-3 bg-emerald-500/20 text-emerald-400 text-[8px] sm:text-xs font-medium px-1.5 sm:px-2 py-0.5 rounded-full border border-emerald-500/30 flex items-center gap-0.5 sm:gap-1">
+                      <div className="absolute top-2 sm:top-3 right-2 sm:right-3 bg-emerald-100 dark:bg-emerald-500/20 text-emerald-700 dark:text-emerald-400 text-[8px] sm:text-xs font-medium px-1.5 sm:px-2 py-0.5 rounded-full border border-emerald-200/50 dark:border-emerald-500/30 flex items-center gap-0.5 sm:gap-1">
                         <Crown className="w-2.5 h-2.5 sm:w-3 sm:h-3 inline" />
                         <span className="hidden xs:inline">Current</span>
                       </div>
                     )}
 
                     {isAdmin && (
-                      <div className="absolute top-2 sm:top-3 right-2 sm:right-3 bg-purple-500/20 text-purple-400 text-[8px] sm:text-xs font-medium px-1.5 sm:px-2 py-0.5 rounded-full border border-purple-500/30 flex items-center gap-0.5 sm:gap-1">
+                      <div className="absolute top-2 sm:top-3 right-2 sm:right-3 bg-purple-100 dark:bg-purple-500/20 text-purple-700 dark:text-purple-400 text-[8px] sm:text-xs font-medium px-1.5 sm:px-2 py-0.5 rounded-full border border-purple-200/50 dark:border-purple-500/30 flex items-center gap-0.5 sm:gap-1">
                         <Shield className="w-2.5 h-2.5 sm:w-3 sm:h-3 inline" />
                         <span className="hidden xs:inline">Admin</span>
                       </div>
                     )}
 
                     {isDowngrade && !isCurrentPlan && !plan.isFree && !isAdmin && (
-                      <div className="absolute top-2 sm:top-3 right-2 sm:right-3 bg-red-500/20 text-red-400 text-[8px] sm:text-xs font-medium px-1.5 sm:px-2 py-0.5 rounded-full border border-red-500/30">
+                      <div className="absolute top-2 sm:top-3 right-2 sm:right-3 bg-red-100 dark:bg-red-500/20 text-red-700 dark:text-red-400 text-[8px] sm:text-xs font-medium px-1.5 sm:px-2 py-0.5 rounded-full border border-red-200/50 dark:border-red-500/30">
                         Downgrade
                       </div>
                     )}
 
                     <div className="mb-3 sm:mb-4">
-                      <h3 className="text-base sm:text-lg md:text-xl font-bold text-white">{plan.name}</h3>
-                      <p className="text-zinc-400 text-[10px] sm:text-xs md:text-sm">{plan.description}</p>
+                      <h3 className="text-base sm:text-lg md:text-xl font-bold text-zinc-900 dark:text-white">{plan.name}</h3>
+                      <p className="text-zinc-600 dark:text-zinc-400 text-[10px] sm:text-xs md:text-sm">{plan.description}</p>
                     </div>
 
                     <div className="mb-3 sm:mb-4">
-                      <span className="text-2xl sm:text-3xl md:text-4xl font-bold text-white">
+                      <span className="text-2xl sm:text-3xl md:text-4xl font-bold text-zinc-900 dark:text-white">
                         {plan.price}
                       </span>
-                      <span className="text-zinc-400 text-xs sm:text-sm ml-0.5 sm:ml-1">
+                      <span className="text-zinc-500 dark:text-zinc-400 text-xs sm:text-sm ml-0.5 sm:ml-1">
                         {plan.period}
                       </span>
                       {isAdmin && (
-                        <span className="ml-2 text-[8px] sm:text-xs text-purple-400 bg-purple-500/20 px-1.5 sm:px-2 py-0.5 rounded-full border border-purple-500/30">
+                        <span className="ml-2 text-[8px] sm:text-xs text-purple-700 dark:text-purple-400 bg-purple-100 dark:bg-purple-500/20 px-1.5 sm:px-2 py-0.5 rounded-full border border-purple-200/50 dark:border-purple-500/30">
                           Free for Admin
                         </span>
                       )}
                     </div>
 
                     <div className="mb-3 sm:mb-4">
-                      <span className="inline-block bg-zinc-800/50 text-zinc-300 text-[8px] sm:text-xs px-2 sm:px-3 py-0.5 sm:py-1 rounded-full border border-zinc-700">
+                      <span className="inline-block bg-zinc-100 dark:bg-zinc-800/50 text-zinc-700 dark:text-zinc-300 text-[8px] sm:text-xs px-2 sm:px-3 py-0.5 sm:py-1 rounded-full border border-zinc-200/50 dark:border-zinc-700">
                         {plan.maxApplications !== undefined
                           ? `${plan.maxApplications} applications/month`
                           : plan.maxActiveJobs !== undefined
@@ -590,13 +590,13 @@ const PricingPage = () => {
                       {plan.features.slice(0, 5).map((feature, idx) => (
                         <li key={idx} className="flex items-start gap-1.5 sm:gap-2 text-[10px] sm:text-xs md:text-sm">
                           {feature.included ? (
-                            <Check className="w-3 h-3 sm:w-3.5 sm:h-3.5 md:w-4 md:h-4 text-emerald-400 mt-0.5 shrink-0" />
+                            <Check className="w-3 h-3 sm:w-3.5 sm:h-3.5 md:w-4 md:h-4 text-emerald-600 dark:text-emerald-400 mt-0.5 shrink-0" />
                           ) : (
-                            <X className="w-3 h-3 sm:w-3.5 sm:h-3.5 md:w-4 md:h-4 text-zinc-600 mt-0.5 shrink-0" />
+                            <X className="w-3 h-3 sm:w-3.5 sm:h-3.5 md:w-4 md:h-4 text-zinc-400 dark:text-zinc-600 mt-0.5 shrink-0" />
                           )}
                           <span
                             className={
-                              feature.included ? "text-zinc-300" : "text-zinc-600"
+                              feature.included ? "text-zinc-700 dark:text-zinc-300" : "text-zinc-400 dark:text-zinc-600"
                             }
                           >
                             {feature.text}
@@ -604,13 +604,13 @@ const PricingPage = () => {
                         </li>
                       ))}
                       {plan.features.length > 5 && (
-                        <li className="text-[8px] sm:text-[10px] text-zinc-500 pl-4 sm:pl-5">
+                        <li className="text-[8px] sm:text-[10px] text-zinc-500 dark:text-zinc-500 pl-4 sm:pl-5">
                           +{plan.features.length - 5} more features
                         </li>
                       )}
                     </ul>
 
-                    <div className="flex items-center justify-center gap-0.5 sm:gap-1 text-[6px] sm:text-[8px] md:text-[10px] text-emerald-400/80 mb-2 sm:mb-3">
+                    <div className="flex items-center justify-center gap-0.5 sm:gap-1 text-[6px] sm:text-[8px] md:text-[10px] text-emerald-600 dark:text-emerald-400/80 mb-2 sm:mb-3">
                       <ShieldCheck className="w-2.5 h-2.5 sm:w-3 sm:h-3" />
                       <span>14-day money-back guarantee</span>
                     </div>
@@ -625,16 +625,16 @@ const PricingPage = () => {
                       }
                       className={`cursor-pointer block w-full text-center py-2 sm:py-2.5 px-2 rounded-lg sm:rounded-xl font-medium transition-all duration-300 text-[10px] sm:text-xs md:text-sm ${
                         isAdmin
-                          ? "bg-purple-500/20 text-purple-400 border border-purple-500/30 cursor-not-allowed"
+                          ? "bg-purple-100 dark:bg-purple-500/20 text-purple-700 dark:text-purple-400 border border-purple-200/50 dark:border-purple-500/30 cursor-not-allowed"
                           : isCurrentPlan
-                          ? "bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 cursor-not-allowed"
+                          ? "bg-emerald-100 dark:bg-emerald-500/20 text-emerald-700 dark:text-emerald-400 border border-emerald-200/50 dark:border-emerald-500/30 cursor-not-allowed"
                           : plan.popular
                           ? "bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white shadow-lg shadow-blue-600/20"
                           : isDowngrade && !isCurrentPlan && !plan.isFree
-                          ? "bg-red-500/20 hover:bg-red-500/30 text-red-400 border border-red-500/30"
+                          ? "bg-red-100 dark:bg-red-500/20 hover:bg-red-200 dark:hover:bg-red-500/30 text-red-700 dark:text-red-400 border border-red-200/50 dark:border-red-500/30"
                           : plan.isFree
-                          ? "bg-zinc-700 hover:bg-zinc-600 text-white"
-                          : "bg-zinc-800 hover:bg-zinc-700 text-white"
+                          ? "bg-zinc-200 dark:bg-zinc-700 hover:bg-zinc-300 dark:hover:bg-zinc-600 text-zinc-900 dark:text-white"
+                          : "bg-zinc-200 dark:bg-zinc-800 hover:bg-zinc-300 dark:hover:bg-zinc-700 text-zinc-900 dark:text-white"
                       } ${
                         loading && loadingPlanId === plan.id
                           ? "opacity-50 cursor-not-allowed"
@@ -663,12 +663,12 @@ const PricingPage = () => {
                     </button>
 
                     {!plan.isFree && !isAdmin && (
-                      <p className="text-[6px] sm:text-[8px] md:text-[10px] text-zinc-600 text-center mt-1.5 sm:mt-2">
+                      <p className="text-[6px] sm:text-[8px] md:text-[10px] text-zinc-400 dark:text-zinc-600 text-center mt-1.5 sm:mt-2">
                         🔒 Secure checkout powered by Stripe
                       </p>
                     )}
                     {isAdmin && (
-                      <p className="text-[6px] sm:text-[8px] md:text-[10px] text-purple-500/60 text-center mt-1.5 sm:mt-2">
+                      <p className="text-[6px] sm:text-[8px] md:text-[10px] text-purple-500/60 dark:text-purple-400/60 text-center mt-1.5 sm:mt-2">
                         🛡️ Admin privileges included
                       </p>
                     )}
@@ -685,26 +685,26 @@ const PricingPage = () => {
             transition={{ delay: 0.5 }}
             className="mt-12 sm:mt-16 md:mt-20 max-w-3xl mx-auto px-2 sm:px-0"
           >
-            <h2 className="text-xl sm:text-2xl md:text-3xl font-bold text-white text-center mb-6 sm:mb-8">
+            <h2 className="text-xl sm:text-2xl md:text-3xl font-bold text-zinc-900 dark:text-white text-center mb-6 sm:mb-8">
               Frequently Asked Questions
             </h2>
             <div className="space-y-2 sm:space-y-3">
               {faqs.map((faq) => (
                 <div
                   key={faq.id}
-                  className="bg-zinc-900/50 border border-zinc-800 rounded-lg sm:rounded-xl overflow-hidden"
+                  className="bg-white/80 dark:bg-zinc-900/50 border border-zinc-200/50 dark:border-zinc-800 rounded-lg sm:rounded-xl overflow-hidden"
                 >
                   <button
                     onClick={() => toggleFaq(faq.id)}
-                    className="w-full px-3 sm:px-4 md:px-6 py-3 sm:py-4 flex items-center justify-between text-left hover:bg-zinc-800/50 transition-colors gap-2"
+                    className="w-full px-3 sm:px-4 md:px-6 py-3 sm:py-4 flex items-center justify-between text-left hover:bg-zinc-50 dark:hover:bg-zinc-800/50 transition-colors gap-2"
                   >
-                    <span className="text-white font-medium text-xs sm:text-sm md:text-base">
+                    <span className="text-zinc-900 dark:text-white font-medium text-xs sm:text-sm md:text-base">
                       {faq.question}
                     </span>
                     {openFaq === faq.id ? (
-                      <ChevronUp className="w-4 h-4 sm:w-5 sm:h-5 text-zinc-400 shrink-0" />
+                      <ChevronUp className="w-4 h-4 sm:w-5 sm:h-5 text-zinc-400 dark:text-zinc-500 shrink-0" />
                     ) : (
-                      <ChevronDown className="w-4 h-4 sm:w-5 sm:h-5 text-zinc-400 shrink-0" />
+                      <ChevronDown className="w-4 h-4 sm:w-5 sm:h-5 text-zinc-400 dark:text-zinc-500 shrink-0" />
                     )}
                   </button>
                   <AnimatePresence>
@@ -716,7 +716,7 @@ const PricingPage = () => {
                         transition={{ duration: 0.3 }}
                         className="overflow-hidden"
                       >
-                        <div className="px-3 sm:px-4 md:px-6 pb-3 sm:pb-4 text-zinc-400 text-xs sm:text-sm leading-relaxed">
+                        <div className="px-3 sm:px-4 md:px-6 pb-3 sm:pb-4 text-zinc-600 dark:text-zinc-400 text-xs sm:text-sm leading-relaxed">
                           {faq.answer}
                         </div>
                       </motion.div>
@@ -729,7 +729,7 @@ const PricingPage = () => {
         </div>
       </div>
 
-      {/* Admin Modal */}
+      {/* Admin Modal - Keep dark theme */}
       <AnimatePresence mode="wait">
         {isAdminModalOpen && (
           <Modal isOpen={isAdminModalOpen} onOpenChange={setIsAdminModalOpen}>
@@ -743,8 +743,7 @@ const PricingPage = () => {
                 onClick={closeAdminModal}
               />
 
-              <motion.div
-                className="w-full max-w-[420px] sm:max-w-[480px] bg-[#09090b] border border-purple-500/40 rounded-xl sm:rounded-2xl shadow-2xl shadow-purple-950/40 overflow-hidden relative z-10 mx-2"
+              <motion.div                className="w-full max-w-[420px] sm:max-w-[480px] bg-[#09090b] border border-purple-500/40 rounded-xl sm:rounded-2xl shadow-2xl shadow-purple-950/40 overflow-hidden relative z-10 mx-2"
                 initial={{ opacity: 0, scale: 0.85, y: 30 }}
                 animate={{ opacity: 1, scale: 1, y: 0 }}
                 exit={{ opacity: 0, scale: 0.85, y: 30 }}
@@ -863,7 +862,7 @@ const PricingPage = () => {
         )}
       </AnimatePresence>
 
-      {/* ✅ FULLY FIXED: Downgrade Warning Modal */}
+      {/* ✅ FIXED: Downgrade Warning Modal with proper theme control */}
       <AnimatePresence mode="wait">
         {isDowngradeModalOpen && selectedPlan && (
           <Modal isOpen={isDowngradeModalOpen} onOpenChange={setIsDowngradeModalOpen}>
@@ -878,19 +877,19 @@ const PricingPage = () => {
               />
 
               <motion.div
-                className="w-full max-w-[420px] sm:max-w-[480px] bg-[#09090b] border border-yellow-900/60 rounded-xl sm:rounded-2xl shadow-2xl shadow-yellow-950/40 overflow-hidden relative z-10 mx-2"
+                className="w-full max-w-[420px] sm:max-w-[480px] bg-white/95 dark:bg-[#09090b] border border-yellow-400/50 dark:border-yellow-900/60 rounded-xl sm:rounded-2xl shadow-2xl shadow-yellow-500/20 dark:shadow-yellow-950/40 overflow-hidden relative z-10 mx-2"
                 initial={{ opacity: 0, scale: 0.85, y: 30 }}
                 animate={{ opacity: 1, scale: 1, y: 0 }}
                 exit={{ opacity: 0, scale: 0.85, y: 30 }}
                 transition={{ duration: 0.4, type: "spring", bounce: 0.25 }}
               >
-                <div className="absolute inset-0 bg-gradient-to-br from-yellow-600/10 via-transparent to-amber-900/20 blur-3xl pointer-events-none" />
+                <div className="absolute inset-0 bg-gradient-to-br from-yellow-400/10 via-transparent to-amber-400/10 dark:from-yellow-600/10 dark:via-transparent dark:to-amber-900/20 blur-3xl pointer-events-none" />
 
                 <Modal.Dialog className="relative z-10 bg-transparent">
                   <motion.button
                     whileHover={{ rotate: 90, scale: 1.1 }}
                     whileTap={{ scale: 0.9 }}
-                    className="hover:bg-yellow-950/30 text-zinc-500 hover:text-yellow-500 transition-colors rounded-lg top-2 sm:top-3 md:top-4 right-2 sm:right-3 md:right-4 absolute p-1.5 z-20"
+                    className="hover:bg-yellow-100 dark:hover:bg-yellow-950/30 text-zinc-500 hover:text-yellow-600 dark:text-zinc-500 dark:hover:text-yellow-500 transition-colors rounded-lg top-2 sm:top-3 md:top-4 right-2 sm:right-3 md:right-4 absolute p-1.5 z-20"
                     onClick={closeModal}
                   >
                     <X className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
@@ -898,7 +897,7 @@ const PricingPage = () => {
 
                   <div className="pt-6 sm:pt-8 px-4 sm:px-6 flex justify-center">
                     <motion.div
-                      className="mx-auto flex h-16 w-16 sm:h-20 sm:w-20 md:h-24 md:w-24 items-center justify-center rounded-full bg-yellow-500/10 border border-yellow-500/30 shadow-[0_0_30px_rgba(234,179,8,0.15)]"
+                      className="mx-auto flex h-16 w-16 sm:h-20 sm:w-20 md:h-24 md:w-24 items-center justify-center rounded-full bg-yellow-400/20 dark:bg-yellow-500/10 border border-yellow-400/40 dark:border-yellow-500/30 shadow-[0_0_30px_rgba(234,179,8,0.15)]"
                       initial={{ scale: 0, rotate: -180 }}
                       animate={{ scale: 1, rotate: 0 }}
                       transition={{
@@ -907,48 +906,48 @@ const PricingPage = () => {
                         bounce: 0.4,
                       }}
                     >
-                      <AlertTriangle className="h-8 w-8 sm:h-10 sm:w-10 md:h-12 md:w-12 text-yellow-500" />
+                      <AlertTriangle className="h-8 w-8 sm:h-10 sm:w-10 md:h-12 md:w-12 text-yellow-500 dark:text-yellow-500" />
                     </motion.div>
                   </div>
 
                   <Modal.Header className="pt-3 sm:pt-4 px-4 sm:px-6 pb-1 sm:pb-2 text-center">
-                    <Modal.Heading className="text-base sm:text-lg font-bold text-zinc-200 tracking-tight">
+                    <Modal.Heading className="text-base sm:text-lg font-bold text-zinc-900 dark:text-zinc-200 tracking-tight">
                       Downgrade Warning
                     </Modal.Heading>
                   </Modal.Header>
 
-                  <Modal.Body className="py-3 sm:py-4 px-4 sm:px-6 text-zinc-400">
+                  <Modal.Body className="py-3 sm:py-4 px-4 sm:px-6 text-zinc-600 dark:text-zinc-400">
                     <motion.div
                       className="space-y-3 sm:space-y-4"
                       initial={{ opacity: 0 }}
                       animate={{ opacity: 1 }}
                       transition={{ delay: 0.15 }}
                     >
-                      <div className="text-zinc-300 text-xs sm:text-sm leading-relaxed text-center">
-                        You are about to downgrade to the <strong className="text-yellow-400">{selectedPlan.name}</strong> plan.
+                      <div className="text-zinc-800 dark:text-zinc-300 text-xs sm:text-sm leading-relaxed text-center">
+                        You are about to downgrade to the <strong className="text-yellow-600 dark:text-yellow-400">{selectedPlan.name}</strong> plan.
                       </div>
 
                       <motion.div
-                        className="bg-yellow-950/20 border border-yellow-500/30 rounded-lg sm:rounded-xl p-4"
+                        className="bg-yellow-100/80 dark:bg-yellow-950/20 border border-yellow-400/50 dark:border-yellow-500/30 rounded-lg sm:rounded-xl p-4"
                         initial={{ x: -10, opacity: 0 }}
                         animate={{ x: 0, opacity: 1 }}
                         transition={{ delay: 0.2 }}
                       >
                         <div className="flex items-start gap-3">
-                          <AlertCircle className="w-5 h-5 text-yellow-400 mt-0.5 shrink-0" />
-                          <div className="text-yellow-300 text-[10px] sm:text-xs leading-relaxed">
-                            <p className="font-semibold text-yellow-400 mb-1">
+                          <AlertCircle className="w-5 h-5 text-yellow-600 dark:text-yellow-400 mt-0.5 shrink-0" />
+                          <div className="text-yellow-800 dark:text-yellow-300 text-[10px] sm:text-xs leading-relaxed">
+                            <p className="font-semibold text-yellow-700 dark:text-yellow-400 mb-1">
                               ⚠️ You will lose access to the following features:
                             </p>
                             <ul className="space-y-1">
                               {getLostFeatures().map((feature, idx) => (
                                 <li key={idx} className="flex items-center gap-2">
-                                  <X className="w-3 h-3 text-red-400" />
-                                  <span>{feature.text}</span>
+                                  <X className="w-3 h-3 text-red-500 dark:text-red-400" />
+                                  <span className="text-zinc-700 dark:text-zinc-300">{feature.text}</span>
                                 </li>
                               ))}
                               {getLostFeatures().length === 0 && (
-                                <li className="text-zinc-500 text-xs">No features will be lost.</li>
+                                <li className="text-zinc-500 dark:text-zinc-500 text-xs">No features will be lost.</li>
                               )}
                             </ul>
                           </div>
@@ -956,12 +955,12 @@ const PricingPage = () => {
                       </motion.div>
 
                       <motion.div
-                        className="bg-blue-950/20 border border-blue-900/30 rounded-lg sm:rounded-xl p-3"
+                        className="bg-blue-100/80 dark:bg-blue-950/20 border border-blue-400/50 dark:border-blue-900/30 rounded-lg sm:rounded-xl p-3"
                         initial={{ opacity: 0 }}
                         animate={{ opacity: 1 }}
                         transition={{ delay: 0.3 }}
                       >
-                        <p className="text-blue-400/80 text-[9px] sm:text-xs flex items-center gap-2">
+                        <p className="text-blue-700 dark:text-blue-400/80 text-[9px] sm:text-xs flex items-center gap-2">
                           <ShieldCheck className="w-3 h-3 sm:w-4 sm:h-4 shrink-0" />
                           You will still keep access to all your current data and settings.
                         </p>
@@ -969,14 +968,14 @@ const PricingPage = () => {
                     </motion.div>
                   </Modal.Body>
 
-                  <Modal.Footer className="border-t border-yellow-500/30 py-3 sm:py-4 px-4 sm:px-6 flex justify-center gap-3 bg-zinc-950/30">
+                  <Modal.Footer className="border-t border-yellow-400/30 dark:border-yellow-500/30 py-3 sm:py-4 px-4 sm:px-6 flex justify-center gap-3 bg-zinc-50/50 dark:bg-zinc-950/30">
                     <motion.div
                       className="w-full sm:w-auto"
                       whileHover={{ scale: 1.02 }}
                       whileTap={{ scale: 0.98 }}
                     >
                       <Button
-                        className="w-full sm:w-auto px-6 py-2.5 bg-zinc-800 hover:bg-zinc-700 text-white font-medium text-xs rounded-lg sm:rounded-xl transition-all duration-300 border border-zinc-700"
+                        className="w-full sm:w-auto px-6 py-2.5 bg-zinc-200 dark:bg-zinc-800 hover:bg-zinc-300 dark:hover:bg-zinc-700 text-zinc-800 dark:text-white font-medium text-xs rounded-lg sm:rounded-xl transition-all duration-300 border border-zinc-300 dark:border-zinc-700"
                         onClick={closeModal}
                       >
                         Cancel
@@ -988,7 +987,7 @@ const PricingPage = () => {
                       whileTap={{ scale: 0.98 }}
                     >
                       <Button
-                        className="w-full sm:w-auto px-6 py-2.5 bg-gradient-to-r from-yellow-600 to-amber-600 hover:from-yellow-700 hover:to-amber-700 text-white font-medium text-xs rounded-lg sm:rounded-xl transition-all duration-300 shadow-lg shadow-yellow-500/20"
+                        className="w-full sm:w-auto px-6 py-2.5 bg-gradient-to-r from-yellow-500 to-amber-500 dark:from-yellow-600 dark:to-amber-600 hover:from-yellow-600 hover:to-amber-600 dark:hover:from-yellow-700 dark:hover:to-amber-700 text-white font-medium text-xs rounded-lg sm:rounded-xl transition-all duration-300 shadow-lg shadow-yellow-500/20 dark:shadow-yellow-500/20"
                         onClick={() => handlePurchase(selectedPlan)}
                       >
                         Confirm Downgrade

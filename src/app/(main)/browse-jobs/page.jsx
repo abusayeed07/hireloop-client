@@ -31,20 +31,20 @@ const FilterSidebar = ({ filters, setFilters, categories, categoryCounts, onClos
 
   return (
     <div className="lg:w-72 flex-shrink-0">
-      <div className="bg-[#111214] border border-white/5 rounded-2xl p-5 sticky top-24">
+      <div className="bg-white/80 dark:bg-zinc-900/80 backdrop-blur-sm border border-zinc-200/50 dark:border-zinc-800/50 rounded-2xl p-5 sticky top-24 shadow-sm dark:shadow-none">
         <div className="flex items-center justify-between lg:hidden mb-4">
-          <h3 className="text-lg font-semibold text-white">Filters</h3>
-          <button onClick={onClose} className="text-zinc-400 hover:text-white">
+          <h3 className="text-lg font-semibold text-zinc-900 dark:text-white">Filters</h3>
+          <button onClick={onClose} className="text-zinc-500 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white">
             <X className="w-5 h-5" />
           </button>
         </div>
 
-        <div className="flex items-center gap-2 mb-5 pb-4 border-b border-white/5">
-          <Filter className="w-4 h-4 text-blue-400" />
-          <h3 className="text-sm font-semibold text-white">Filters</h3>
+        <div className="flex items-center gap-2 mb-5 pb-4 border-b border-zinc-200/50 dark:border-zinc-800/50">
+          <Filter className="w-4 h-4 text-blue-600 dark:text-blue-400" />
+          <h3 className="text-sm font-semibold text-zinc-900 dark:text-white">Filters</h3>
           <button
             onClick={() => setFilters({ category: "", jobType: "", remote: "" })}
-            className="ml-auto text-xs text-blue-400 hover:text-blue-300 transition-colors"
+            className="ml-auto text-xs text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 transition-colors"
           >
             Clear All
           </button>
@@ -56,8 +56,8 @@ const FilterSidebar = ({ filters, setFilters, categories, categoryCounts, onClos
             onClick={() => toggleSection("category")}
             className="flex items-center justify-between w-full text-left"
           >
-            <span className="text-sm font-medium text-zinc-300">Category</span>
-            <ChevronDown className={`w-4 h-4 text-zinc-500 transition-transform ${expandedSections.category ? "rotate-180" : ""}`} />
+            <span className="text-sm font-medium text-zinc-600 dark:text-zinc-400">Category</span>
+            <ChevronDown className={`w-4 h-4 text-zinc-500 dark:text-zinc-400 transition-transform ${expandedSections.category ? "rotate-180" : ""}`} />
           </button>
           {expandedSections.category && (
             <motion.div
@@ -73,10 +73,10 @@ const FilterSidebar = ({ filters, setFilters, categories, categoryCounts, onClos
                   value=""
                   checked={filters.category === ""}
                   onChange={() => setFilters((prev) => ({ ...prev, category: "" }))}
-                  className="w-3.5 h-3.5 accent-blue-500"
+                  className="w-3.5 h-3.5 accent-blue-600 dark:accent-blue-400"
                 />
-                <span className="text-sm text-zinc-400 group-hover:text-white transition-colors">All Categories</span>
-                <span className="ml-auto text-xs text-zinc-500">{Object.values(categoryCounts).reduce((a, b) => a + b, 0)}</span>
+                <span className="text-sm text-zinc-600 dark:text-zinc-400 group-hover:text-zinc-900 dark:group-hover:text-white transition-colors">All Categories</span>
+                <span className="ml-auto text-xs text-zinc-500 dark:text-zinc-500">{Object.values(categoryCounts).reduce((a, b) => a + b, 0)}</span>
               </label>
               {categories.map((cat) => (
                 <label key={cat} className="flex items-center gap-2 cursor-pointer group">
@@ -86,17 +86,17 @@ const FilterSidebar = ({ filters, setFilters, categories, categoryCounts, onClos
                     value={cat}
                     checked={filters.category.toLowerCase() === cat.toLowerCase()}
                     onChange={() => setFilters((prev) => ({ ...prev, category: cat }))}
-                    className="w-3.5 h-3.5 accent-blue-500"
+                    className="w-3.5 h-3.5 accent-blue-600 dark:accent-blue-400"
                   />
-                  <span className="text-sm text-zinc-400 group-hover:text-white transition-colors capitalize">{cat}</span>
-                  <span className="ml-auto text-xs text-zinc-500">{categoryCounts[cat] || 0}</span>
+                  <span className="text-sm text-zinc-600 dark:text-zinc-400 group-hover:text-zinc-900 dark:group-hover:text-white transition-colors capitalize">{cat}</span>
+                  <span className="ml-auto text-xs text-zinc-500 dark:text-zinc-500">{categoryCounts[cat] || 0}</span>
                 </label>
               ))}
             </motion.div>
           )}
         </div>
 
-        <div className="border-t border-white/5 my-4" />
+        <div className="border-t border-zinc-200/50 dark:border-zinc-800/50 my-4" />
 
         {/* Job Type Filter */}
         <div className="mb-4">
@@ -104,8 +104,8 @@ const FilterSidebar = ({ filters, setFilters, categories, categoryCounts, onClos
             onClick={() => toggleSection("jobType")}
             className="flex items-center justify-between w-full text-left"
           >
-            <span className="text-sm font-medium text-zinc-300">Job Type</span>
-            <ChevronDown className={`w-4 h-4 text-zinc-500 transition-transform ${expandedSections.jobType ? "rotate-180" : ""}`} />
+            <span className="text-sm font-medium text-zinc-600 dark:text-zinc-400">Job Type</span>
+            <ChevronDown className={`w-4 h-4 text-zinc-500 dark:text-zinc-400 transition-transform ${expandedSections.jobType ? "rotate-180" : ""}`} />
           </button>
           {expandedSections.jobType && (
             <motion.div
@@ -121,9 +121,9 @@ const FilterSidebar = ({ filters, setFilters, categories, categoryCounts, onClos
                   value=""
                   checked={filters.jobType === ""}
                   onChange={() => setFilters((prev) => ({ ...prev, jobType: "" }))}
-                  className="w-3.5 h-3.5 accent-blue-500"
+                  className="w-3.5 h-3.5 accent-blue-600 dark:accent-blue-400"
                 />
-                <span className="text-sm text-zinc-400 group-hover:text-white transition-colors">Any Type</span>
+                <span className="text-sm text-zinc-600 dark:text-zinc-400 group-hover:text-zinc-900 dark:group-hover:text-white transition-colors">Any Type</span>
               </label>
               {jobTypes.map((type) => (
                 <label key={type} className="flex items-center gap-2 cursor-pointer group">
@@ -133,16 +133,16 @@ const FilterSidebar = ({ filters, setFilters, categories, categoryCounts, onClos
                     value={type}
                     checked={filters.jobType === type}
                     onChange={() => setFilters((prev) => ({ ...prev, jobType: type }))}
-                    className="w-3.5 h-3.5 accent-blue-500"
+                    className="w-3.5 h-3.5 accent-blue-600 dark:accent-blue-400"
                   />
-                  <span className="text-sm text-zinc-400 group-hover:text-white transition-colors">{type}</span>
+                  <span className="text-sm text-zinc-600 dark:text-zinc-400 group-hover:text-zinc-900 dark:group-hover:text-white transition-colors">{type}</span>
                 </label>
               ))}
             </motion.div>
           )}
         </div>
 
-        <div className="border-t border-white/5 my-4" />
+        <div className="border-t border-zinc-200/50 dark:border-zinc-800/50 my-4" />
 
         {/* Remote Filter */}
         <div>
@@ -150,8 +150,8 @@ const FilterSidebar = ({ filters, setFilters, categories, categoryCounts, onClos
             onClick={() => toggleSection("remote")}
             className="flex items-center justify-between w-full text-left"
           >
-            <span className="text-sm font-medium text-zinc-300">Remote</span>
-            <ChevronDown className={`w-4 h-4 text-zinc-500 transition-transform ${expandedSections.remote ? "rotate-180" : ""}`} />
+            <span className="text-sm font-medium text-zinc-600 dark:text-zinc-400">Remote</span>
+            <ChevronDown className={`w-4 h-4 text-zinc-500 dark:text-zinc-400 transition-transform ${expandedSections.remote ? "rotate-180" : ""}`} />
           </button>
           {expandedSections.remote && (
             <motion.div
@@ -167,9 +167,9 @@ const FilterSidebar = ({ filters, setFilters, categories, categoryCounts, onClos
                   value=""
                   checked={filters.remote === ""}
                   onChange={() => setFilters((prev) => ({ ...prev, remote: "" }))}
-                  className="w-3.5 h-3.5 accent-blue-500"
+                  className="w-3.5 h-3.5 accent-blue-600 dark:accent-blue-400"
                 />
-                <span className="text-sm text-zinc-400 group-hover:text-white transition-colors">All Jobs</span>
+                <span className="text-sm text-zinc-600 dark:text-zinc-400 group-hover:text-zinc-900 dark:group-hover:text-white transition-colors">All Jobs</span>
               </label>
               <label className="flex items-center gap-2 cursor-pointer group">
                 <input
@@ -178,10 +178,10 @@ const FilterSidebar = ({ filters, setFilters, categories, categoryCounts, onClos
                   value="remote"
                   checked={filters.remote === "remote"}
                   onChange={() => setFilters((prev) => ({ ...prev, remote: "remote" }))}
-                  className="w-3.5 h-3.5 accent-blue-500"
+                  className="w-3.5 h-3.5 accent-blue-600 dark:accent-blue-400"
                 />
-                <span className="text-sm text-zinc-400 group-hover:text-white transition-colors flex items-center gap-1">
-                  <Wifi className="w-3.5 h-3.5 text-emerald-400" />
+                <span className="text-sm text-zinc-600 dark:text-zinc-400 group-hover:text-zinc-900 dark:group-hover:text-white transition-colors flex items-center gap-1">
+                  <Wifi className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400" />
                   Remote Only
                 </span>
               </label>
@@ -192,10 +192,10 @@ const FilterSidebar = ({ filters, setFilters, categories, categoryCounts, onClos
                   value="onsite"
                   checked={filters.remote === "onsite"}
                   onChange={() => setFilters((prev) => ({ ...prev, remote: "onsite" }))}
-                  className="w-3.5 h-3.5 accent-blue-500"
+                  className="w-3.5 h-3.5 accent-blue-600 dark:accent-blue-400"
                 />
-                <span className="text-sm text-zinc-400 group-hover:text-white transition-colors flex items-center gap-1">
-                  <Building2 className="w-3.5 h-3.5 text-zinc-400" />
+                <span className="text-sm text-zinc-600 dark:text-zinc-400 group-hover:text-zinc-900 dark:group-hover:text-white transition-colors flex items-center gap-1">
+                  <Building2 className="w-3.5 h-3.5 text-zinc-500 dark:text-zinc-400" />
                   On-site Only
                 </span>
               </label>
@@ -221,7 +221,6 @@ const containerVariants = {
 export default function BrowseJobsPage() {
   const searchParams = useSearchParams();
 
-  // ✅ Support both 'search' (AI) and 'q' (homepage) parameters
   const initialSearch =
     searchParams.get("search") ||
     searchParams.get("q") ||
@@ -230,9 +229,6 @@ export default function BrowseJobsPage() {
   const initialLocation =
     searchParams.get("location") || "";
 
-  // ✅ FIX: read the 'category' param the AI assistant redirects with
-  // (e.g. /browse-jobs?category=Marketing) — this was previously ignored,
-  // so category-based redirects from the chat assistant showed all jobs.
   const initialCategory =
     searchParams.get("category") || "";
 
@@ -243,7 +239,7 @@ export default function BrowseJobsPage() {
   const [locationQuery, setLocationQuery] = useState(initialLocation);
 
   const [filters, setFilters] = useState({
-    category: initialCategory, // ✅ was ""
+    category: initialCategory,
     jobType: "",
     remote: "",
   });
@@ -253,9 +249,6 @@ export default function BrowseJobsPage() {
   const [showMobileFilters, setShowMobileFilters] = useState(false);
   const itemsPerPage = 6;
 
-  // ✅ Keep filters in sync if the URL changes after mount
-  // (e.g. user sends another chat message that redirects again
-  // while already on /browse-jobs)
   useEffect(() => {
     setSearchQuery(initialSearch);
   }, [initialSearch]);
@@ -268,7 +261,6 @@ export default function BrowseJobsPage() {
     setFilters((prev) => ({ ...prev, category: initialCategory }));
   }, [initialCategory]);
 
-  // Fetch data
   useEffect(() => {
     const fetchJobs = async () => {
       try {
@@ -284,7 +276,6 @@ export default function BrowseJobsPage() {
     fetchJobs();
   }, []);
 
-  // FILTER LOGIC
   const filteredJobs = useMemo(() => {
     let result = [...jobs];
 
@@ -300,7 +291,6 @@ export default function BrowseJobsPage() {
           job.description,
         ].filter(Boolean);
 
-        // Handle skills (string or array)
         let skillsText = "";
         if (job.skills) {
           if (Array.isArray(job.skills)) {
@@ -312,7 +302,7 @@ export default function BrowseJobsPage() {
         searchableFields.push(skillsText);
 
         return searchableFields.some(field =>
-          field.toLowerCase().includes(query)
+          field?.toLowerCase().includes(query)
         );
       });
     }
@@ -326,9 +316,6 @@ export default function BrowseJobsPage() {
     }
 
     if (filters.category) {
-      // ✅ FIX: case-insensitive comparison. The AI assistant sends
-      // display-cased categories like "Marketing" / "Human Resources";
-      // job documents may store jobCategory with different casing.
       const targetCategory = filters.category.toLowerCase();
       result = result.filter(
         (job) =>
@@ -385,21 +372,21 @@ export default function BrowseJobsPage() {
   }
 
   return (
-    <div className="min-h-screen bg-black text-white">
+    <div className="min-h-screen bg-zinc-50 dark:bg-zinc-950 text-zinc-900 dark:text-white">
       
       {/* Hero Section */}
-      <div className="relative bg-gradient-to-b from-zinc-900 to-black border-b border-white/5">
+      <div className="relative bg-gradient-to-b from-zinc-100/50 to-zinc-50/30 dark:from-zinc-900/50 dark:to-zinc-950/30 border-b border-zinc-200/50 dark:border-zinc-800/50">
         <div className="max-w-[1600px] mx-auto px-4 sm:px-8 py-12 md:py-26">
           <div className="flex items-center gap-3 mb-2">
-            <div className="h-8 w-1 bg-blue-500 rounded-full"></div>
-            <p className="text-sm font-medium text-blue-400 uppercase tracking-wider">
+            <div className="h-8 w-1 bg-blue-600 dark:bg-blue-400 rounded-full"></div>
+            <p className="text-sm font-medium text-blue-600 dark:text-blue-400 uppercase tracking-wider">
               Career Opportunities
             </p>
           </div>
-          <h1 className="text-4xl md:text-5xl font-bold tracking-tight bg-gradient-to-r from-white to-zinc-400 bg-clip-text text-transparent">
+          <h1 className="text-4xl md:text-5xl font-bold tracking-tight bg-gradient-to-r from-zinc-900 to-zinc-600 dark:from-white dark:to-zinc-400 bg-clip-text text-transparent">
             Browse Jobs
           </h1>
-          <p className="text-zinc-400 mt-3 text-lg max-w-2xl">
+          <p className="text-zinc-600 dark:text-zinc-400 mt-3 text-lg max-w-2xl">
             Discover your next opportunity from thousands of listings. Find roles that match your skills, location, and career goals.
           </p>
         </div>
@@ -411,36 +398,36 @@ export default function BrowseJobsPage() {
         {/* Search Bar */}
         <form onSubmit={handleSearch} className="flex flex-col md:flex-row gap-3 mb-8">
           <div className="flex-1 relative">
-            <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-500" />
+            <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-400 dark:text-zinc-500" />
             <input
               type="text"
               placeholder="Job title, keyword, company, or category..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full pl-10 pr-4 py-2.5 bg-[#111214]/80 backdrop-blur-sm border border-white/5 rounded-xl text-white placeholder-zinc-500 focus:outline-none focus:border-blue-500/50 transition-colors text-sm"
+              className="w-full pl-10 pr-4 py-2.5 bg-white/80 dark:bg-zinc-900/80 backdrop-blur-sm border border-zinc-200/50 dark:border-zinc-800/50 rounded-xl text-zinc-900 dark:text-white placeholder-zinc-400 dark:placeholder-zinc-500 focus:outline-none focus:border-blue-500/50 transition-colors text-sm"
             />
             {searchQuery && (
               <button
                 onClick={() => setSearchQuery("")}
-                className="absolute right-3 top-1/2 -translate-y-1/2 text-zinc-400 hover:text-white transition-colors"
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-zinc-400 dark:text-zinc-500 hover:text-zinc-900 dark:hover:text-white transition-colors"
               >
                 <X size={16} />
               </button>
             )}
           </div>
           <div className="flex-1 relative">
-            <MapPin className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-500" />
+            <MapPin className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-400 dark:text-zinc-500" />
             <input
               type="text"
               placeholder="Location or type 'remote'"
               value={locationQuery}
               onChange={(e) => setLocationQuery(e.target.value)}
-              className="w-full pl-10 pr-4 py-2.5 bg-[#111214]/80 backdrop-blur-sm border border-white/5 rounded-xl text-white placeholder-zinc-500 focus:outline-none focus:border-blue-500/50 transition-colors text-sm"
+              className="w-full pl-10 pr-4 py-2.5 bg-white/80 dark:bg-zinc-900/80 backdrop-blur-sm border border-zinc-200/50 dark:border-zinc-800/50 rounded-xl text-zinc-900 dark:text-white placeholder-zinc-400 dark:placeholder-zinc-500 focus:outline-none focus:border-blue-500/50 transition-colors text-sm"
             />
             {locationQuery && (
               <button
                 onClick={() => setLocationQuery("")}
-                className="absolute right-3 top-1/2 -translate-y-1/2 text-zinc-400 hover:text-white transition-colors"
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-zinc-400 dark:text-zinc-500 hover:text-zinc-900 dark:hover:text-white transition-colors"
               >
                 <X size={16} />
               </button>
@@ -461,9 +448,9 @@ export default function BrowseJobsPage() {
               initial={{ opacity: 0, scale: 0.8 }}
               animate={{ opacity: 1, scale: 1 }}
             >
-              <span className="inline-flex items-center gap-2 px-3 py-1 bg-blue-500/10 text-blue-400 border border-blue-500/20 rounded-full text-xs">
+              <span className="inline-flex items-center gap-2 px-3 py-1 bg-blue-50 dark:bg-blue-500/10 text-blue-700 dark:text-blue-400 border border-blue-200/50 dark:border-blue-500/20 rounded-full text-xs">
                 Searching: "{searchQuery}"
-                <button onClick={() => setSearchQuery("")} className="hover:text-blue-300 transition-colors">
+                <button onClick={() => setSearchQuery("")} className="hover:text-blue-900 dark:hover:text-blue-300 transition-colors">
                   <X size={12} />
                 </button>
               </span>
@@ -474,25 +461,24 @@ export default function BrowseJobsPage() {
               initial={{ opacity: 0, scale: 0.8 }}
               animate={{ opacity: 1, scale: 1 }}
             >
-              <span className="inline-flex items-center gap-2 px-3 py-1 bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 rounded-full text-xs">
+              <span className="inline-flex items-center gap-2 px-3 py-1 bg-emerald-50 dark:bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 border border-emerald-200/50 dark:border-emerald-500/20 rounded-full text-xs">
                 Location: "{locationQuery}"
-                <button onClick={() => setLocationQuery("")} className="hover:text-emerald-300 transition-colors">
+                <button onClick={() => setLocationQuery("")} className="hover:text-emerald-900 dark:hover:text-emerald-300 transition-colors">
                   <X size={12} />
                 </button>
               </span>
             </motion.div>
           )}
-          {/* ✅ NEW: category chip so it's visible/clearable when arriving via AI redirect */}
           {filters.category && (
             <motion.div
               initial={{ opacity: 0, scale: 0.8 }}
               animate={{ opacity: 1, scale: 1 }}
             >
-              <span className="inline-flex items-center gap-2 px-3 py-1 bg-purple-500/10 text-purple-400 border border-purple-500/20 rounded-full text-xs">
+              <span className="inline-flex items-center gap-2 px-3 py-1 bg-purple-50 dark:bg-purple-500/10 text-purple-700 dark:text-purple-400 border border-purple-200/50 dark:border-purple-500/20 rounded-full text-xs">
                 Category: {filters.category}
                 <button
                   onClick={() => setFilters((prev) => ({ ...prev, category: "" }))}
-                  className="hover:text-purple-300 transition-colors"
+                  className="hover:text-purple-900 dark:hover:text-purple-300 transition-colors"
                 >
                   <X size={12} />
                 </button>
@@ -522,7 +508,7 @@ export default function BrowseJobsPage() {
             {/* Mobile Filter Button */}
             <button
               onClick={() => setShowMobileFilters(true)}
-              className="lg:hidden flex items-center gap-2 px-4 py-2 bg-[#111214] border border-white/5 rounded-lg text-sm text-zinc-400 hover:text-white transition-colors mb-4"
+              className="lg:hidden flex items-center gap-2 px-4 py-2 bg-white/80 dark:bg-zinc-900/80 border border-zinc-200/50 dark:border-zinc-800/50 rounded-lg text-sm text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white transition-colors mb-4"
             >
               <Filter className="w-4 h-4" />
               Filters
@@ -536,7 +522,7 @@ export default function BrowseJobsPage() {
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 exit={{ opacity: 0 }}
-                className="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm lg:hidden"
+                className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm lg:hidden"
                 onClick={() => setShowMobileFilters(false)}
               >
                 <motion.div
@@ -544,7 +530,7 @@ export default function BrowseJobsPage() {
                   animate={{ x: 0 }}
                   exit={{ x: -300 }}
                   transition={{ type: "spring", damping: 25 }}
-                  className="absolute top-0 left-0 h-full w-72 bg-black p-4 overflow-y-auto"
+                  className="absolute top-0 left-0 h-full w-72 bg-white dark:bg-zinc-950 p-4 overflow-y-auto"
                   onClick={(e) => e.stopPropagation()}
                 >
                   <FilterSidebar
@@ -566,15 +552,15 @@ export default function BrowseJobsPage() {
           {/* Right Job Grid */}
           <div className="flex-1">
             <div className="flex items-center justify-between mb-6">
-              <p className="text-sm text-zinc-400">
-                Showing <span className="text-white font-medium">{filteredJobs.length}</span> jobs
+              <p className="text-sm text-zinc-600 dark:text-zinc-400">
+                Showing <span className="text-zinc-900 dark:text-white font-medium">{filteredJobs.length}</span> jobs
               </p>
               <div className="flex items-center gap-2">
-                <span className="text-sm text-zinc-500">Sort by:</span>
+                <span className="text-sm text-zinc-600 dark:text-zinc-400">Sort by:</span>
                 <select
                   value={sortBy}
                   onChange={(e) => setSortBy(e.target.value)}
-                  className="px-3 py-1.5 bg-[#111214] border border-white/5 rounded-lg text-sm text-white focus:outline-none focus:border-blue-500/50"
+                  className="px-3 py-1.5 bg-white/80 dark:bg-zinc-900/80 border border-zinc-200/50 dark:border-zinc-800/50 rounded-lg text-sm text-zinc-900 dark:text-white focus:outline-none focus:border-blue-500/50"
                 >
                   <option value="newest">Newest first</option>
                   <option value="oldest">Oldest first</option>
@@ -589,18 +575,18 @@ export default function BrowseJobsPage() {
               <motion.div 
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
-                className="text-center py-20 bg-zinc-900/30 border border-white/5 rounded-2xl"
+                className="text-center py-20 bg-white/50 dark:bg-zinc-900/50 border border-zinc-200/50 dark:border-zinc-800/50 rounded-2xl"
               >
                 <div className="text-6xl mb-4">🔍</div>
-                <h3 className="text-xl font-semibold text-white">No jobs found</h3>
-                <p className="text-zinc-400 mt-2">Try adjusting your filters or search terms</p>
+                <h3 className="text-xl font-semibold text-zinc-900 dark:text-white">No jobs found</h3>
+                <p className="text-zinc-600 dark:text-zinc-400 mt-2">Try adjusting your filters or search terms</p>
                 <button
                   onClick={() => {
                     setSearchQuery("");
                     setLocationQuery("");
                     setFilters({ category: "", jobType: "", remote: "" });
                   }}
-                  className="mt-4 px-6 py-2 text-sm bg-zinc-800 text-white hover:bg-zinc-700 rounded-lg transition-colors"
+                  className="mt-4 px-6 py-2 text-sm bg-white dark:bg-zinc-900 text-zinc-900 dark:text-white hover:bg-zinc-50 dark:hover:bg-zinc-800 rounded-lg transition-colors border border-zinc-200/50 dark:border-zinc-800/50"
                 >
                   Clear all filters
                 </button>

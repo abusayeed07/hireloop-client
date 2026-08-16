@@ -43,7 +43,6 @@ export default function PostJobForm({
   const [errors, setErrors] = useState({});
   const [focusedField, setFocusedField] = useState(null);
 
-  // 🎨 Animation variants
   const containerVariants = {
     hidden: { opacity: 0 },
     visible: {
@@ -125,33 +124,32 @@ export default function PostJobForm({
     },
   };
 
-  // Check if user is logged in
   if (!user) {
     return (
       <motion.div
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         exit={{ opacity: 0 }}
-        className="min-h-screen bg-gradient-to-br from-[#0d0d0e] via-[#0f0f11] to-[#0d0d0e] flex items-center justify-center p-8"
+        className="min-h-screen bg-zinc-50 dark:bg-[#0d0d0e] flex items-center justify-center p-8"
       >
         <motion.div
           initial={{ scale: 0.9, opacity: 0 }}
           animate={{ scale: 1, opacity: 1 }}
           transition={{ type: "spring", damping: 15 }}
-          className="bg-[#121214]/80 backdrop-blur-sm border border-zinc-800/50 rounded-2xl p-8 text-center max-w-md"
+          className="bg-white/80 dark:bg-[#121214]/80 backdrop-blur-sm border border-zinc-200/50 dark:border-zinc-800/50 rounded-2xl p-8 text-center max-w-md"
         >
           <motion.div
             initial={{ scale: 0 }}
             animate={{ scale: 1 }}
             transition={{ type: "spring", damping: 10, delay: 0.2 }}
-            className="w-16 h-16 bg-red-500/10 rounded-full flex items-center justify-center mx-auto mb-4"
+            className="w-16 h-16 bg-red-100 dark:bg-red-500/10 rounded-full flex items-center justify-center mx-auto mb-4"
           >
             <span className="text-3xl">👤</span>
           </motion.div>
-          <h3 className="text-xl font-semibold text-white mb-2">
+          <h3 className="text-xl font-semibold text-zinc-900 dark:text-white mb-2">
             Not Logged In
           </h3>
-          <p className="text-zinc-400 text-sm mb-6">
+          <p className="text-zinc-600 dark:text-zinc-400 text-sm mb-6">
             Please log in to post a job.
           </p>
           <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
@@ -167,33 +165,32 @@ export default function PostJobForm({
     );
   }
 
-  // Check if company exists
   if (!company) {
     return (
       <motion.div
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         exit={{ opacity: 0 }}
-        className="min-h-screen bg-gradient-to-br from-[#0d0d0e] via-[#0f0f11] to-[#0d0d0e] flex items-center justify-center p-8"
+        className="min-h-screen bg-zinc-50 dark:bg-[#0d0d0e] flex items-center justify-center p-8"
       >
         <motion.div
           initial={{ scale: 0.9, opacity: 0 }}
           animate={{ scale: 1, opacity: 1 }}
           transition={{ type: "spring", damping: 15 }}
-          className="bg-[#121214]/80 backdrop-blur-sm border border-zinc-800/50 rounded-2xl p-8 text-center max-w-md"
+          className="bg-white/80 dark:bg-[#121214]/80 backdrop-blur-sm border border-zinc-200/50 dark:border-zinc-800/50 rounded-2xl p-8 text-center max-w-md"
         >
           <motion.div
             initial={{ scale: 0 }}
             animate={{ scale: 1 }}
             transition={{ type: "spring", damping: 10, delay: 0.2 }}
-            className="w-16 h-16 bg-red-500/10 rounded-full flex items-center justify-center mx-auto mb-4"
+            className="w-16 h-16 bg-red-100 dark:bg-red-500/10 rounded-full flex items-center justify-center mx-auto mb-4"
           >
-            <Briefcase size={32} className="text-red-400" />
+            <Briefcase size={32} className="text-red-600 dark:text-red-400" />
           </motion.div>
-          <h3 className="text-xl font-semibold text-white mb-2">
+          <h3 className="text-xl font-semibold text-zinc-900 dark:text-white mb-2">
             Company Not Found
           </h3>
-          <p className="text-zinc-400 text-sm mb-6">
+          <p className="text-zinc-600 dark:text-zinc-400 text-sm mb-6">
             Please make sure your company profile is set up before posting jobs.
           </p>
           <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
@@ -209,14 +206,13 @@ export default function PostJobForm({
     );
   }
 
-  // ✅ Check company status - PENDING (show only pending message, no form)
   if (company.status === "pending") {
     return (
       <motion.div
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         exit={{ opacity: 0 }}
-        className="min-h-screen bg-gradient-to-br from-[#0d0d0e] via-[#0f0f11] to-[#0d0d0e] flex items-center justify-center p-8 relative overflow-hidden"
+        className="min-h-screen bg-zinc-50 dark:bg-[#0d0d0e] flex items-center justify-center p-8 relative overflow-hidden"
       >
         <motion.div
           animate={{
@@ -228,30 +224,30 @@ export default function PostJobForm({
             repeat: Infinity,
             ease: "easeInOut",
           }}
-          className="absolute top-[-20%] right-[-10%] w-[500px] h-[500px] bg-yellow-500/5 rounded-full blur-3xl"
+          className="absolute top-[-20%] right-[-10%] w-[500px] h-[500px] bg-yellow-500/5 dark:bg-yellow-500/5 rounded-full blur-3xl"
         />
         <motion.div
           initial={{ scale: 0.9, opacity: 0 }}
           animate={{ scale: 1, opacity: 1 }}
           transition={{ type: "spring", damping: 15 }}
-          className="relative z-10 bg-[#121214]/80 backdrop-blur-sm border border-yellow-500/30 rounded-2xl p-8 text-center max-w-md"
+          className="relative z-10 bg-white/80 dark:bg-[#121214]/80 backdrop-blur-sm border border-yellow-400/30 dark:border-yellow-500/30 rounded-2xl p-8 text-center max-w-md"
         >
           <motion.div
             animate={{ rotate: 360 }}
             transition={{ duration: 2, repeat: Infinity, ease: "linear" }}
-            className="w-16 h-16 border-4 border-yellow-500/30 border-t-yellow-500 rounded-full mx-auto mb-4"
+            className="w-16 h-16 border-4 border-yellow-400/30 dark:border-yellow-500/30 border-t-yellow-500 rounded-full mx-auto mb-4"
           />
-          <h3 className="text-xl font-semibold text-white mb-2">
+          <h3 className="text-xl font-semibold text-zinc-900 dark:text-white mb-2">
             Company Pending Approval
           </h3>
-          <p className="text-zinc-400 text-sm mb-4">
+          <p className="text-zinc-600 dark:text-zinc-400 text-sm mb-4">
             Your company profile is currently under review by our admin team.
           </p>
-          <p className="text-zinc-500 text-xs">
+          <p className="text-zinc-500 dark:text-zinc-500 text-xs">
             You will be able to post jobs once your company is approved.
           </p>
-          <div className="mt-6 p-3 bg-yellow-500/5 border border-yellow-500/10 rounded-xl">
-            <p className="text-xs text-yellow-400 flex items-center justify-center gap-2">
+          <div className="mt-6 p-3 bg-yellow-100/50 dark:bg-yellow-500/5 border border-yellow-400/30 dark:border-yellow-500/10 rounded-xl">
+            <p className="text-xs text-yellow-700 dark:text-yellow-400 flex items-center justify-center gap-2">
               <Clock size={14} />
               <span>Estimated review time: 24-48 hours</span>
             </p>
@@ -263,7 +259,7 @@ export default function PostJobForm({
           >
             <Button
               onClick={() => router.push("/dashboard/recruiter/company")}
-              className="bg-zinc-800 hover:bg-zinc-700 text-white border border-zinc-700 rounded-xl px-6 h-11"
+              className="bg-zinc-200 dark:bg-zinc-800 hover:bg-zinc-300 dark:hover:bg-zinc-700 text-zinc-900 dark:text-white border border-zinc-300/50 dark:border-zinc-700 rounded-xl px-6 h-11"
             >
               Check Company Status
             </Button>
@@ -273,14 +269,13 @@ export default function PostJobForm({
     );
   }
 
-  // ✅ Check company status - REJECTED (show rejected message with note from admin)
   if (company.status === "rejected") {
     return (
       <motion.div
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         exit={{ opacity: 0 }}
-        className="min-h-screen bg-gradient-to-br from-[#0d0d0e] via-[#0f0f11] to-[#0d0d0e] flex items-center justify-center p-8 relative overflow-hidden"
+        className="min-h-screen bg-zinc-50 dark:bg-[#0d0d0e] flex items-center justify-center p-8 relative overflow-hidden"
       >
         <motion.div
           animate={{
@@ -292,7 +287,7 @@ export default function PostJobForm({
             repeat: Infinity,
             ease: "easeInOut",
           }}
-          className="absolute top-[-20%] right-[-10%] w-[500px] h-[500px] bg-red-500/5 rounded-full blur-3xl"
+          className="absolute top-[-20%] right-[-10%] w-[500px] h-[500px] bg-red-500/5 dark:bg-red-500/5 rounded-full blur-3xl"
         />
         <motion.div
           animate={{
@@ -305,29 +300,28 @@ export default function PostJobForm({
             ease: "easeInOut",
             delay: 1,
           }}
-          className="absolute bottom-[-20%] left-[-10%] w-[600px] h-[600px] bg-red-600/5 rounded-full blur-3xl"
+          className="absolute bottom-[-20%] left-[-10%] w-[600px] h-[600px] bg-red-600/5 dark:bg-red-600/5 rounded-full blur-3xl"
         />
         <motion.div
           initial={{ scale: 0.9, opacity: 0 }}
           animate={{ scale: 1, opacity: 1 }}
           transition={{ type: "spring", damping: 15 }}
-          className="relative z-10 bg-[#121214]/80 backdrop-blur-sm border border-red-500/30 rounded-2xl p-8 text-center max-w-md"
+          className="relative z-10 bg-white/80 dark:bg-[#121214]/80 backdrop-blur-sm border border-red-400/30 dark:border-red-500/30 rounded-2xl p-8 text-center max-w-md"
         >
           <motion.div
             variants={pulseVariants}
             animate="pulse"
-            className="w-16 h-16 bg-red-500/10 rounded-full flex items-center justify-center mx-auto mb-4"
+            className="w-16 h-16 bg-red-100 dark:bg-red-500/10 rounded-full flex items-center justify-center mx-auto mb-4"
           >
             <span className="text-3xl">❌</span>
           </motion.div>
-          <h3 className="text-xl font-semibold text-white mb-2">
+          <h3 className="text-xl font-semibold text-zinc-900 dark:text-white mb-2">
             Company Rejected
           </h3>
-          <p className="text-zinc-400 text-sm mb-3">
+          <p className="text-zinc-600 dark:text-zinc-400 text-sm mb-3">
             Your company profile has been rejected by the admin.
           </p>
 
-          {/* ✅ Rejection Reason from Admin - Check multiple possible field names */}
           {(company.adminRejectionReason ||
             company.rejectionReason ||
             company.reviewMessage) && (
@@ -335,12 +329,12 @@ export default function PostJobForm({
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.2 }}
-              className="bg-red-500/10 border border-red-500/20 rounded-xl p-4 mb-4 text-left"
+              className="bg-red-100/50 dark:bg-red-500/10 border border-red-400/30 dark:border-red-500/20 rounded-xl p-4 mb-4 text-left"
             >
-              <p className="text-xs text-red-400 font-medium mb-1 flex items-center gap-2">
+              <p className="text-xs text-red-700 dark:text-red-400 font-medium mb-1 flex items-center gap-2">
                 <span>📝</span> Admin Note:
               </p>
-              <p className="text-sm text-zinc-300 leading-relaxed">
+              <p className="text-sm text-zinc-800 dark:text-zinc-300 leading-relaxed">
                 {company.adminRejectionReason ||
                   company.rejectionReason ||
                   company.reviewMessage}
@@ -348,14 +342,14 @@ export default function PostJobForm({
             </motion.div>
           )}
 
-          <p className="text-zinc-500 text-xs mb-4">
+          <p className="text-zinc-500 dark:text-zinc-500 text-xs mb-4">
             Please update your company information and request a re-review.
           </p>
           <div className="flex flex-col sm:flex-row gap-3 justify-center">
             <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
               <Button
                 onClick={() => router.push("/dashboard/recruiter/company")}
-                className="bg-zinc-800 hover:bg-zinc-700 text-white border border-zinc-700 rounded-xl px-6 h-11 inline-flex items-center gap-2"
+                className="bg-zinc-200 dark:bg-zinc-800 hover:bg-zinc-300 dark:hover:bg-zinc-700 text-zinc-900 dark:text-white border border-zinc-300/50 dark:border-zinc-700 rounded-xl px-6 h-11 inline-flex items-center gap-2"
               >
                 <Pencil size={16} />
                 Update Company
@@ -407,14 +401,13 @@ export default function PostJobForm({
       </motion.div>
     );
   }
-  // ✅ Company is approved - show the form
+
   const handleSubmit = async (e) => {
     e.preventDefault();
 
     const formData = new FormData(e.currentTarget);
     const data = Object.fromEntries(formData.entries());
 
-    // Manual validation
     const newErrors = {};
 
     if (!data.jobTitle || data.jobTitle.trim() === "") {
@@ -480,19 +473,15 @@ export default function PostJobForm({
         "Please provide at least 20 characters of requirements";
     }
 
-    // ✅ If there are errors, set them and show toast, but DON'T return early
-    // This allows the user to see all errors at once
     if (Object.keys(newErrors).length > 0) {
       setErrors(newErrors);
       toast.error("Please fill full form before submitting");
-      // ✅ Clear errors after 3 seconds to allow user to fix and retry
       setTimeout(() => {
         setErrors({});
       }, 3000);
       return;
     }
 
-    // ✅ Clear errors before submitting
     setErrors({});
     setIsSubmitting(true);
 
@@ -513,7 +502,6 @@ export default function PostJobForm({
           currency: data.currency || "USD",
         },
         skills: data.skills ? data.skills.split(",").map((s) => s.trim()) : [],
-        // ✅ Default vacancies to 5 if not provided
         vacancies: data.vacancies ? parseInt(data.vacancies) : 5,
       };
 
@@ -552,7 +540,6 @@ export default function PostJobForm({
     }
   };
 
-  // ✅ Helper to get default vacancies value (default to "5" if not provided)
   const getDefaultVacancies = () => {
     if (initialData?.vacancies) {
       return String(initialData.vacancies);
@@ -566,7 +553,7 @@ export default function PostJobForm({
         initial="hidden"
         animate="visible"
         variants={containerVariants}
-        className="min-h-screen bg-gradient-to-br from-[#0d0d0e] via-[#0f0f11] to-[#0d0d0e] text-white py-12 px-4 sm:px-6 lg:px-8"
+        className="min-h-screen bg-zinc-50 dark:bg-[#0d0d0e] text-zinc-900 dark:text-white py-12 px-4 sm:px-6 lg:px-8"
       >
         <div className="max-w-4xl mx-auto">
           {/* Main Form Card */}
@@ -575,12 +562,12 @@ export default function PostJobForm({
             initial="initial"
             animate="animate"
             whileHover="hover"
-            className="relative bg-[#121214]/80 backdrop-blur-sm border border-zinc-800/50 rounded-2xl p-8 shadow-2xl transition-all duration-300 hover:shadow-purple-500/5"
+            className="relative bg-white/80 dark:bg-[#121214]/80 backdrop-blur-sm border border-zinc-200/50 dark:border-zinc-800/50 rounded-2xl p-8 shadow-2xl transition-all duration-300 hover:shadow-purple-500/5 dark:hover:shadow-purple-500/5"
           >
             {/* Form Header */}
             <motion.div
               variants={itemVariants}
-              className="border-b border-zinc-800/80 pb-6 mb-8"
+              className="border-b border-zinc-200/50 dark:border-zinc-800/80 pb-6 mb-8"
             >
               <div className="flex items-start justify-between flex-wrap gap-4">
                 <div>
@@ -588,7 +575,7 @@ export default function PostJobForm({
                     initial={{ opacity: 0, x: -20 }}
                     animate={{ opacity: 1, x: 0 }}
                     transition={{ delay: 0.2, type: "spring", damping: 15 }}
-                    className="text-3xl lg:text-4xl font-bold bg-gradient-to-r from-white to-zinc-400 bg-clip-text text-transparent tracking-tight"
+                    className="text-3xl lg:text-4xl font-bold bg-gradient-to-r from-zinc-900 to-zinc-500 dark:from-white dark:to-zinc-400 bg-clip-text text-transparent tracking-tight"
                   >
                     {isEditing ? "Edit Job Posting" : "Post a New Job"}
                   </motion.h1>
@@ -596,7 +583,7 @@ export default function PostJobForm({
                     initial={{ opacity: 0 }}
                     animate={{ opacity: 1 }}
                     transition={{ delay: 0.3 }}
-                    className="text-zinc-400 text-sm mt-2"
+                    className="text-zinc-600 dark:text-zinc-400 text-sm mt-2"
                   >
                     {isEditing
                       ? "Update the details below to refresh your open position."
@@ -611,32 +598,32 @@ export default function PostJobForm({
                   transition={{ delay: 0.4, type: "spring", damping: 12 }}
                   className="flex flex-col items-end gap-1"
                 >
-                  {/* User Badge */}
-                  <div className="flex items-center gap-2 bg-zinc-900/70 border border-zinc-800 rounded-xl px-4 py-2">
+                  <div className="flex items-center gap-2 bg-zinc-100/80 dark:bg-zinc-900/70 border border-zinc-200/50 dark:border-zinc-800 rounded-xl px-4 py-2">
                     <motion.div
                       animate={{ scale: [1, 1.2, 1] }}
                       transition={{ duration: 2, repeat: Infinity }}
                       className="w-2 h-2 bg-emerald-500 rounded-full"
                     />
                     <span className="text-sm">👤</span>
-                    <span className="text-xs text-zinc-400">Posting as</span>
-                    <span className="text-sm font-semibold text-zinc-200 max-w-[150px] truncate">
+                    <span className="text-xs text-zinc-500 dark:text-zinc-400">
+                      Posting as
+                    </span>
+                    <span className="text-sm font-semibold text-zinc-700 dark:text-zinc-200 max-w-[150px] truncate">
                       {user.name || user.email}
                     </span>
                   </div>
 
-                  {/* Company Badge (below user) */}
-                  <div className="flex items-center gap-2 bg-zinc-900/50 border border-zinc-800/50 rounded-lg px-3 py-1">
+                  <div className="flex items-center gap-2 bg-zinc-100/50 dark:bg-zinc-900/50 border border-zinc-200/50 dark:border-zinc-800/50 rounded-lg px-3 py-1">
                     <Briefcase size={12} className="text-zinc-500" />
-                    <span className="text-[10px] text-zinc-400">Company:</span>
-                    <span className="text-xs font-medium text-zinc-300 max-w-[120px] truncate">
+                    <span className="text-[10px] text-zinc-500">Company:</span>
+                    <span className="text-xs font-medium text-zinc-700 dark:text-zinc-300 max-w-[120px] truncate">
                       {company.name}
                     </span>
                   </div>
                 </motion.div>
               </div>
 
-              {/* ✅ Status panel - Shows actual company status (only for approved) */}
+              {/* Status panel */}
               <motion.div
                 initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
@@ -645,49 +632,48 @@ export default function PostJobForm({
               >
                 <motion.div
                   whileHover={{ scale: 1.02 }}
-                  className="inline-flex items-center gap-2 bg-zinc-900/50 border border-zinc-800 rounded-xl px-3 py-1.5"
+                  className="inline-flex items-center gap-2 bg-zinc-100/50 dark:bg-zinc-900/50 border border-zinc-200/50 dark:border-zinc-800 rounded-xl px-3 py-1.5"
                 >
                   <Briefcase size={14} className="text-zinc-500" />
-                  <span className="text-xs text-zinc-400">Company Status:</span>
-                  <span className="text-xs font-semibold text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded-full">
+                  <span className="text-xs text-zinc-500">Company Status:</span>
+                  <span className="text-xs font-semibold text-emerald-700 dark:text-emerald-400 bg-emerald-100 dark:bg-emerald-500/10 px-2 py-0.5 rounded-full">
                     ✓ Approved
                   </span>
                 </motion.div>
                 <motion.div
                   whileHover={{ scale: 1.02 }}
-                  className="inline-flex items-center gap-2 bg-zinc-900/50 border border-zinc-800 rounded-xl px-3 py-1.5"
+                  className="inline-flex items-center gap-2 bg-zinc-100/50 dark:bg-zinc-900/50 border border-zinc-200/50 dark:border-zinc-800 rounded-xl px-3 py-1.5"
                 >
                   <motion.div
                     animate={{ scale: [1, 1.3, 1] }}
                     transition={{ duration: 1.5, repeat: Infinity }}
                     className="w-1.5 h-1.5 bg-blue-500 rounded-full"
                   />
-                  <span className="text-xs text-zinc-400">
+                  <span className="text-xs text-zinc-500 dark:text-zinc-400">
                     {isEditing
                       ? "Changes will be published immediately"
                       : "Job will be published immediately"}
                   </span>
                 </motion.div>
-                {/* User info badge */}
                 <motion.div
                   whileHover={{ scale: 1.02 }}
-                  className="inline-flex items-center gap-2 bg-zinc-900/50 border border-zinc-800 rounded-xl px-3 py-1.5"
+                  className="inline-flex items-center gap-2 bg-zinc-100/50 dark:bg-zinc-900/50 border border-zinc-200/50 dark:border-zinc-800 rounded-xl px-3 py-1.5"
                 >
                   <span className="text-sm">👤</span>
-                  <span className="text-xs text-zinc-400">Posted by:</span>
-                  <span className="text-xs font-medium text-zinc-300">
+                  <span className="text-xs text-zinc-500">Posted by:</span>
+                  <span className="text-xs font-medium text-zinc-700 dark:text-zinc-300">
                     {user.name || user.email}
                   </span>
                 </motion.div>
               </motion.div>
             </motion.div>
 
-            {/* Form - Only shown when company is approved */}
+            {/* Form */}
             <Form onSubmit={handleSubmit} className="space-y-10">
               {/* SECTION 1: Job Information */}
               <motion.div variants={itemVariants}>
                 <Fieldset className="space-y-6 w-full">
-                  <legend className="text-lg font-semibold text-zinc-300 border-l-3 border-purple-500 pl-3 mb-4">
+                  <legend className="text-lg font-semibold text-zinc-800 dark:text-zinc-300 border-l-3 border-purple-500 pl-3 mb-4">
                     Job Information
                   </legend>
 
@@ -710,7 +696,7 @@ export default function PostJobForm({
                         defaultValue={initialData?.jobTitle || ""}
                       >
                         <Label
-                          className="text-zinc-300 font-medium text-sm flex items-center gap-2"
+                          className="text-zinc-700 dark:text-zinc-300 font-medium text-sm flex items-center gap-2"
                           htmlFor="jobTitle"
                         >
                           <motion.span
@@ -719,16 +705,19 @@ export default function PostJobForm({
                             }}
                             transition={{ duration: 0.5 }}
                           >
-                            <Briefcase size={14} className="text-purple-400" />
+                            <Briefcase
+                              size={14}
+                              className="text-purple-500 dark:text-purple-400"
+                            />
                           </motion.span>
                           Job Title
                         </Label>
                         <Input
                           placeholder="e.g. Senior Frontend Engineer"
-                          className={`w-full text-white bg-[#1c1c1e] border rounded-lg h-12 px-3 text-sm placeholder:text-zinc-600 outline-none transition-all duration-200 ${
+                          className={`w-full text-zinc-900 dark:text-white bg-white dark:bg-[#1c1c1e] border rounded-lg h-12 px-3 text-sm placeholder:text-zinc-400 dark:placeholder:text-zinc-400 outline-none transition-all duration-200 ${
                             errors.jobTitle
                               ? "border-red-500 focus:border-red-500"
-                              : "border-zinc-800 hover:bg-[#242426] focus:border-zinc-600"
+                              : "border-zinc-300/50 dark:border-zinc-800 hover:bg-zinc-100 dark:hover:bg-[#242426] focus:border-zinc-400 dark:focus:border-zinc-600"
                           }`}
                         />
                         <AnimatePresence>
@@ -739,7 +728,7 @@ export default function PostJobForm({
                               animate="visible"
                               exit="exit"
                             >
-                              <FieldError className="text-xs text-red-400" />
+                              <FieldError className="text-xs text-red-500 dark:text-red-400" />
                             </motion.div>
                           )}
                         </AnimatePresence>
@@ -753,10 +742,13 @@ export default function PostJobForm({
                       className="flex flex-col gap-1.5 w-full"
                     >
                       <Label
-                        className="text-zinc-300 font-medium text-sm flex items-center gap-2"
+                        className="text-zinc-700 dark:text-zinc-300 font-medium text-sm flex items-center gap-2"
                         htmlFor="jobCategory"
                       >
-                        <ListCheck size={14} className="text-purple-400" />
+                        <ListCheck
+                          size={14}
+                          className="text-purple-500 dark:text-purple-400"
+                        />
                         Job Category
                       </Label>
                       <Select
@@ -774,21 +766,21 @@ export default function PostJobForm({
                         }
                       >
                         <Select.Trigger
-                          className={`w-full flex items-center justify-between bg-[#1c1c1e] border rounded-lg h-12 px-3 text-white transition-all duration-200 text-sm outline-none ${
+                          className={`w-full flex items-center justify-between gap-2 bg-white dark:bg-[#1c1c1e] border rounded-lg h-12 px-3 text-zinc-900 dark:text-white transition-all duration-200 text-sm outline-none ${
                             errors.jobCategory
                               ? "border-red-500 focus:border-red-500"
-                              : "border-zinc-800 hover:bg-[#242426] focus:border-zinc-600"
+                              : "border-zinc-300/50 dark:border-zinc-800 hover:bg-zinc-100 dark:hover:bg-[#242426] focus:border-zinc-400 dark:focus:border-zinc-600"
                           }`}
                         >
-                          <Select.Value placeholder="Select a category" />
-                          <Select.Indicator />
+                          <Select.Value placeholder="Select a category" className="truncate text-zinc-400" />
+                          <Select.Indicator className="shrink-0 bg-transparent text-zinc-500 dark:text-zinc-400" />
                         </Select.Trigger>
-                        <Select.Popover className="bg-[#1c1c1e] border border-zinc-800 text-white rounded-xl shadow-2xl p-1 backdrop-blur-sm max-h-[300px] overflow-y-auto">
+                        <Select.Popover className="z-50 bg-white dark:bg-[#1c1c1e] border border-zinc-200 dark:border-zinc-800 text-zinc-900 dark:text-white rounded-xl shadow-2xl p-1 max-h-[300px] overflow-y-auto">
                           <ListBox className="outline-none">
                             <ListBox.Item
                               key="technology"
                               id="technology"
-                              className="flex items-center justify-between p-2.5 rounded-lg hover:bg-zinc-800 cursor-pointer text-sm text-zinc-200 outline-none data-[focused=true]:bg-zinc-800 transition-colors duration-150"
+                              className="flex items-center justify-between p-2.5 rounded-lg hover:bg-zinc-100 dark:hover:bg-zinc-800 cursor-pointer text-sm text-zinc-800 dark:text-zinc-200 outline-none data-[focused=true]:bg-zinc-100 dark:data-[focused=true]:bg-zinc-800 transition-colors duration-150"
                               textValue="💻 Technology"
                             >
                               <div className="flex items-center gap-2">
@@ -798,7 +790,7 @@ export default function PostJobForm({
                             <ListBox.Item
                               key="design"
                               id="design"
-                              className="flex items-center justify-between p-2.5 rounded-lg hover:bg-zinc-800 cursor-pointer text-sm text-zinc-200 outline-none data-[focused=true]:bg-zinc-800 transition-colors duration-150"
+                              className="flex items-center justify-between p-2.5 rounded-lg hover:bg-zinc-100 dark:hover:bg-zinc-800 cursor-pointer text-sm text-zinc-800 dark:text-zinc-200 outline-none data-[focused=true]:bg-zinc-100 dark:data-[focused=true]:bg-zinc-800 transition-colors duration-150"
                               textValue="🎨 Design"
                             >
                               <div className="flex items-center gap-2">
@@ -808,7 +800,7 @@ export default function PostJobForm({
                             <ListBox.Item
                               key="marketing"
                               id="marketing"
-                              className="flex items-center justify-between p-2.5 rounded-lg hover:bg-zinc-800 cursor-pointer text-sm text-zinc-200 outline-none data-[focused=true]:bg-zinc-800 transition-colors duration-150"
+                              className="flex items-center justify-between p-2.5 rounded-lg hover:bg-zinc-100 dark:hover:bg-zinc-800 cursor-pointer text-sm text-zinc-800 dark:text-zinc-200 outline-none data-[focused=true]:bg-zinc-100 dark:data-[focused=true]:bg-zinc-800 transition-colors duration-150"
                               textValue="📢 Marketing"
                             >
                               <div className="flex items-center gap-2">
@@ -818,7 +810,7 @@ export default function PostJobForm({
                             <ListBox.Item
                               key="sales"
                               id="sales"
-                              className="flex items-center justify-between p-2.5 rounded-lg hover:bg-zinc-800 cursor-pointer text-sm text-zinc-200 outline-none data-[focused=true]:bg-zinc-800 transition-colors duration-150"
+                              className="flex items-center justify-between p-2.5 rounded-lg hover:bg-zinc-100 dark:hover:bg-zinc-800 cursor-pointer text-sm text-zinc-800 dark:text-zinc-200 outline-none data-[focused=true]:bg-zinc-100 dark:data-[focused=true]:bg-zinc-800 transition-colors duration-150"
                               textValue="💰 Sales"
                             >
                               <div className="flex items-center gap-2">
@@ -828,7 +820,7 @@ export default function PostJobForm({
                             <ListBox.Item
                               key="human resources"
                               id="human resources"
-                              className="flex items-center justify-between p-2.5 rounded-lg hover:bg-zinc-800 cursor-pointer text-sm text-zinc-200 outline-none data-[focused=true]:bg-zinc-800 transition-colors duration-150"
+                              className="flex items-center justify-between p-2.5 rounded-lg hover:bg-zinc-100 dark:hover:bg-zinc-800 cursor-pointer text-sm text-zinc-800 dark:text-zinc-200 outline-none data-[focused=true]:bg-zinc-100 dark:data-[focused=true]:bg-zinc-800 transition-colors duration-150"
                               textValue="👥 Human Resources"
                             >
                               <div className="flex items-center gap-2">
@@ -838,7 +830,7 @@ export default function PostJobForm({
                             <ListBox.Item
                               key="finance"
                               id="finance"
-                              className="flex items-center justify-between p-2.5 rounded-lg hover:bg-zinc-800 cursor-pointer text-sm text-zinc-200 outline-none data-[focused=true]:bg-zinc-800 transition-colors duration-150"
+                              className="flex items-center justify-between p-2.5 rounded-lg hover:bg-zinc-100 dark:hover:bg-zinc-800 cursor-pointer text-sm text-zinc-800 dark:text-zinc-200 outline-none data-[focused=true]:bg-zinc-100 dark:data-[focused=true]:bg-zinc-800 transition-colors duration-150"
                               textValue="💹 Finance"
                             >
                               <div className="flex items-center gap-2">
@@ -848,7 +840,7 @@ export default function PostJobForm({
                             <ListBox.Item
                               key="healthcare"
                               id="healthcare"
-                              className="flex items-center justify-between p-2.5 rounded-lg hover:bg-zinc-800 cursor-pointer text-sm text-zinc-200 outline-none data-[focused=true]:bg-zinc-800 transition-colors duration-150"
+                              className="flex items-center justify-between p-2.5 rounded-lg hover:bg-zinc-100 dark:hover:bg-zinc-800 cursor-pointer text-sm text-zinc-800 dark:text-zinc-200 outline-none data-[focused=true]:bg-zinc-100 dark:data-[focused=true]:bg-zinc-800 transition-colors duration-150"
                               textValue="🏥 Healthcare"
                             >
                               <div className="flex items-center gap-2">
@@ -858,7 +850,7 @@ export default function PostJobForm({
                             <ListBox.Item
                               key="education"
                               id="education"
-                              className="flex items-center justify-between p-2.5 rounded-lg hover:bg-zinc-800 cursor-pointer text-sm text-zinc-200 outline-none data-[focused=true]:bg-zinc-800 transition-colors duration-150"
+                              className="flex items-center justify-between p-2.5 rounded-lg hover:bg-zinc-100 dark:hover:bg-zinc-800 cursor-pointer text-sm text-zinc-800 dark:text-zinc-200 outline-none data-[focused=true]:bg-zinc-100 dark:data-[focused=true]:bg-zinc-800 transition-colors duration-150"
                               textValue="📚 Education"
                             >
                               <div className="flex items-center gap-2">
@@ -868,7 +860,7 @@ export default function PostJobForm({
                             <ListBox.Item
                               key="manufacturing"
                               id="manufacturing"
-                              className="flex items-center justify-between p-2.5 rounded-lg hover:bg-zinc-800 cursor-pointer text-sm text-zinc-200 outline-none data-[focused=true]:bg-zinc-800 transition-colors duration-150"
+                              className="flex items-center justify-between p-2.5 rounded-lg hover:bg-zinc-100 dark:hover:bg-zinc-800 cursor-pointer text-sm text-zinc-800 dark:text-zinc-200 outline-none data-[focused=true]:bg-zinc-100 dark:data-[focused=true]:bg-zinc-800 transition-colors duration-150"
                               textValue="🔧 Manufacturing"
                             >
                               <div className="flex items-center gap-2">
@@ -886,7 +878,7 @@ export default function PostJobForm({
                             animate="visible"
                             exit="exit"
                           >
-                            <FieldError className="text-xs text-red-400" />
+                            <FieldError className="text-xs text-red-500 dark:text-red-400" />
                           </motion.div>
                         )}
                       </AnimatePresence>
@@ -901,10 +893,13 @@ export default function PostJobForm({
                       className="flex flex-col gap-1.5 w-full"
                     >
                       <Label
-                        className="text-zinc-300 font-medium text-sm flex items-center gap-2"
+                        className="text-zinc-700 dark:text-zinc-300 font-medium text-sm flex items-center gap-2"
                         htmlFor="jobType"
                       >
-                        <Clock size={14} className="text-purple-400" />
+                        <Clock
+                          size={14}
+                          className="text-purple-500 dark:text-purple-400"
+                        />
                         Job Type
                       </Label>
                       <Select
@@ -920,21 +915,21 @@ export default function PostJobForm({
                         }
                       >
                         <Select.Trigger
-                          className={`w-full flex items-center justify-between bg-[#1c1c1e] border rounded-lg h-12 px-3 text-white transition-all duration-200 text-sm outline-none ${
+                          className={`w-full flex items-center justify-between gap-2 bg-white dark:bg-[#1c1c1e] border rounded-lg h-12 px-3 text-zinc-900 dark:text-white transition-all duration-200 text-sm outline-none ${
                             errors.jobType
                               ? "border-red-500 focus:border-red-500"
-                              : "border-zinc-800 hover:bg-[#242426] focus:border-zinc-600"
+                              : "border-zinc-300/50 dark:border-zinc-800 hover:bg-zinc-100 dark:hover:bg-[#242426] focus:border-zinc-400 dark:focus:border-zinc-600"
                           }`}
                         >
-                          <Select.Value placeholder="Select job type" />
-                          <Select.Indicator />
+                          <Select.Value placeholder="Select job type" className="truncate text-zinc-400" />
+                          <Select.Indicator className="shrink-0 bg-transparent text-zinc-500 dark:text-zinc-400" />
                         </Select.Trigger>
-                        <Select.Popover className="bg-[#1c1c1e] border border-zinc-800 text-white rounded-xl shadow-2xl p-1 backdrop-blur-sm max-h-[300px] overflow-y-auto">
+                        <Select.Popover className="z-50 bg-white dark:bg-[#1c1c1e] border border-zinc-200 dark:border-zinc-800 text-zinc-900 dark:text-white rounded-xl shadow-2xl p-1 max-h-[300px] overflow-y-auto">
                           <ListBox className="outline-none">
                             <ListBox.Item
                               key="full-time"
                               id="full-time"
-                              className="flex items-center justify-between p-2.5 rounded-lg hover:bg-zinc-800 cursor-pointer text-sm text-zinc-200 outline-none data-[focused=true]:bg-zinc-800 transition-colors duration-150"
+                              className="flex items-center justify-between p-2.5 rounded-lg hover:bg-zinc-100 dark:hover:bg-zinc-800 cursor-pointer text-sm text-zinc-800 dark:text-zinc-200 outline-none data-[focused=true]:bg-zinc-100 dark:data-[focused=true]:bg-zinc-800 transition-colors duration-150"
                               textValue="Full-time"
                             >
                               Full-time
@@ -942,7 +937,7 @@ export default function PostJobForm({
                             <ListBox.Item
                               key="part-time"
                               id="part-time"
-                              className="flex items-center justify-between p-2.5 rounded-lg hover:bg-zinc-800 cursor-pointer text-sm text-zinc-200 outline-none data-[focused=true]:bg-zinc-800 transition-colors duration-150"
+                              className="flex items-center justify-between p-2.5 rounded-lg hover:bg-zinc-100 dark:hover:bg-zinc-800 cursor-pointer text-sm text-zinc-800 dark:text-zinc-200 outline-none data-[focused=true]:bg-zinc-100 dark:data-[focused=true]:bg-zinc-800 transition-colors duration-150"
                               textValue="Part-time"
                             >
                               Part-time
@@ -950,7 +945,7 @@ export default function PostJobForm({
                             <ListBox.Item
                               key="contract"
                               id="contract"
-                              className="flex items-center justify-between p-2.5 rounded-lg hover:bg-zinc-800 cursor-pointer text-sm text-zinc-200 outline-none data-[focused=true]:bg-zinc-800 transition-colors duration-150"
+                              className="flex items-center justify-between p-2.5 rounded-lg hover:bg-zinc-100 dark:hover:bg-zinc-800 cursor-pointer text-sm text-zinc-800 dark:text-zinc-200 outline-none data-[focused=true]:bg-zinc-100 dark:data-[focused=true]:bg-zinc-800 transition-colors duration-150"
                               textValue="Contract"
                             >
                               Contract
@@ -958,7 +953,7 @@ export default function PostJobForm({
                             <ListBox.Item
                               key="internship"
                               id="internship"
-                              className="flex items-center justify-between p-2.5 rounded-lg hover:bg-zinc-800 cursor-pointer text-sm text-zinc-200 outline-none data-[focused=true]:bg-zinc-800 transition-colors duration-150"
+                              className="flex items-center justify-between p-2.5 rounded-lg hover:bg-zinc-100 dark:hover:bg-zinc-800 cursor-pointer text-sm text-zinc-800 dark:text-zinc-200 outline-none data-[focused=true]:bg-zinc-100 dark:data-[focused=true]:bg-zinc-800 transition-colors duration-150"
                               textValue="Internship"
                             >
                               Internship
@@ -966,7 +961,7 @@ export default function PostJobForm({
                             <ListBox.Item
                               key="freelance"
                               id="freelance"
-                              className="flex items-center justify-between p-2.5 rounded-lg hover:bg-zinc-800 cursor-pointer text-sm text-zinc-200 outline-none data-[focused=true]:bg-zinc-800 transition-colors duration-150"
+                              className="flex items-center justify-between p-2.5 rounded-lg hover:bg-zinc-100 dark:hover:bg-zinc-800 cursor-pointer text-sm text-zinc-800 dark:text-zinc-200 outline-none data-[focused=true]:bg-zinc-100 dark:data-[focused=true]:bg-zinc-800 transition-colors duration-150"
                               textValue="Freelance"
                             >
                               Freelance
@@ -982,7 +977,7 @@ export default function PostJobForm({
                             animate="visible"
                             exit="exit"
                           >
-                            <FieldError className="text-xs text-red-400" />
+                            <FieldError className="text-xs text-red-500 dark:text-red-400" />
                           </motion.div>
                         )}
                       </AnimatePresence>
@@ -994,8 +989,10 @@ export default function PostJobForm({
                       transition={{ type: "spring", damping: 15 }}
                       className="space-y-1.5"
                     >
-                      <Label className="text-zinc-300 font-medium text-sm flex items-center gap-2 mb-2">
-                        <span className="text-purple-400">💰</span>
+                      <Label className="text-zinc-700 dark:text-zinc-300 font-medium text-sm flex items-center gap-2 mb-2">
+                        <span className="text-purple-500 dark:text-purple-400">
+                          💰
+                        </span>
                         Salary Range
                       </Label>
                       <div className="flex gap-3">
@@ -1017,10 +1014,10 @@ export default function PostJobForm({
                                 type="number"
                                 min="0"
                                 aria-label="Minimum salary"
-                                className={`w-full text-white bg-[#1c1c1e] border rounded-lg h-12 pl-7 pr-3 text-sm placeholder:text-zinc-600 outline-none transition-all duration-200 appearance-none ${
+                                className={`w-full text-zinc-900 dark:text-white bg-white dark:bg-[#1c1c1e] border rounded-lg h-12 pl-7 pr-3 text-sm placeholder:text-zinc-400 dark:placeholder:text-zinc-600 outline-none transition-all duration-200 appearance-none ${
                                   errors.minSalary
                                     ? "border-red-500 focus:border-red-500"
-                                    : "border-zinc-800 hover:bg-[#242426] focus:border-zinc-600"
+                                    : "border-zinc-300/50 dark:border-zinc-800 hover:bg-zinc-100 dark:hover:bg-[#242426] focus:border-zinc-400 dark:focus:border-zinc-600"
                                 }`}
                               />
                             </div>
@@ -1032,7 +1029,7 @@ export default function PostJobForm({
                                   animate="visible"
                                   exit="exit"
                                 >
-                                  <FieldError className="text-xs text-red-400" />
+                                  <FieldError className="text-xs text-red-500 dark:text-red-400" />
                                 </motion.div>
                               )}
                             </AnimatePresence>
@@ -1057,10 +1054,10 @@ export default function PostJobForm({
                                 type="number"
                                 min="0"
                                 aria-label="Maximum salary"
-                                className={`w-full text-white bg-[#1c1c1e] border rounded-lg h-12 pl-7 pr-3 text-sm placeholder:text-zinc-600 outline-none transition-all duration-200 appearance-none ${
+                                className={`w-full text-zinc-900 dark:text-white bg-white dark:bg-[#1c1c1e] border rounded-lg h-12 pl-7 pr-3 text-sm placeholder:text-zinc-400 dark:placeholder:text-zinc-600 outline-none transition-all duration-200 appearance-none ${
                                   errors.maxSalary
                                     ? "border-red-500 focus:border-red-500"
-                                    : "border-zinc-800 hover:bg-[#242426] focus:border-zinc-600"
+                                    : "border-zinc-300/50 dark:border-zinc-800 hover:bg-zinc-100 dark:hover:bg-[#242426] focus:border-zinc-400 dark:focus:border-zinc-600"
                                 }`}
                               />
                             </div>
@@ -1072,7 +1069,7 @@ export default function PostJobForm({
                                   animate="visible"
                                   exit="exit"
                                 >
-                                  <FieldError className="text-xs text-red-400" />
+                                  <FieldError className="text-xs text-red-500 dark:text-red-400" />
                                 </motion.div>
                               )}
                             </AnimatePresence>
@@ -1088,16 +1085,16 @@ export default function PostJobForm({
                               initialData?.salary?.currency || "USD",
                             ]}
                           >
-                            <Select.Trigger className="w-full flex items-center justify-between bg-[#1c1c1e] border border-zinc-800 hover:bg-[#242426] h-12 rounded-lg px-3 text-white transition-all duration-200 text-sm outline-none data-[focused=true]:border-zinc-600">
-                              <Select.Value />
-                              <Select.Indicator />
+                            <Select.Trigger className="w-full flex items-center justify-between gap-1 bg-white dark:bg-[#1c1c1e] border border-zinc-300/50 dark:border-zinc-800 hover:bg-zinc-100 dark:hover:bg-[#242426] h-12 rounded-lg px-3 text-zinc-900 dark:text-white transition-all duration-200 text-sm outline-none data-[focused=true]:border-zinc-400 dark:data-[focused=true]:border-zinc-600">
+                              <Select.Value className="truncate" />
+                              <Select.Indicator className="shrink-0 bg-transparent text-zinc-500 dark:text-zinc-400" />
                             </Select.Trigger>
-                            <Select.Popover className="bg-[#1c1c1e] border border-zinc-800 text-white rounded-xl shadow-2xl p-1 backdrop-blur-sm">
+                            <Select.Popover className="z-50 bg-white dark:bg-[#1c1c1e] border border-zinc-200 dark:border-zinc-800 text-zinc-900 dark:text-white rounded-xl shadow-2xl p-1">
                               <ListBox className="outline-none">
                                 <ListBox.Item
                                   key="USD"
                                   id="USD"
-                                  className="flex items-center justify-between p-2.5 rounded-lg hover:bg-zinc-800 cursor-pointer text-sm text-zinc-200 outline-none data-[focused=true]:bg-zinc-800 transition-colors duration-150"
+                                  className="flex items-center justify-between p-2.5 rounded-lg hover:bg-zinc-100 dark:hover:bg-zinc-800 cursor-pointer text-sm text-zinc-800 dark:text-zinc-200 outline-none data-[focused=true]:bg-zinc-100 dark:data-[focused=true]:bg-zinc-800 transition-colors duration-150"
                                   textValue="USD ($)"
                                 >
                                   USD ($)
@@ -1105,7 +1102,7 @@ export default function PostJobForm({
                                 <ListBox.Item
                                   key="EUR"
                                   id="EUR"
-                                  className="flex items-center justify-between p-2.5 rounded-lg hover:bg-zinc-800 cursor-pointer text-sm text-zinc-200 outline-none data-[focused=true]:bg-zinc-800 transition-colors duration-150"
+                                  className="flex items-center justify-between p-2.5 rounded-lg hover:bg-zinc-100 dark:hover:bg-zinc-800 cursor-pointer text-sm text-zinc-800 dark:text-zinc-200 outline-none data-[focused=true]:bg-zinc-100 dark:data-[focused=true]:bg-zinc-800 transition-colors duration-150"
                                   textValue="EUR (€)"
                                 >
                                   EUR (€)
@@ -1113,7 +1110,7 @@ export default function PostJobForm({
                                 <ListBox.Item
                                   key="GBP"
                                   id="GBP"
-                                  className="flex items-center justify-between p-2.5 rounded-lg hover:bg-zinc-800 cursor-pointer text-sm text-zinc-200 outline-none data-[focused=true]:bg-zinc-800 transition-colors duration-150"
+                                  className="flex items-center justify-between p-2.5 rounded-lg hover:bg-zinc-100 dark:hover:bg-zinc-800 cursor-pointer text-sm text-zinc-800 dark:text-zinc-200 outline-none data-[focused=true]:bg-zinc-100 dark:data-[focused=true]:bg-zinc-800 transition-colors duration-150"
                                   textValue="GBP (£)"
                                 >
                                   GBP (£)
@@ -1121,7 +1118,7 @@ export default function PostJobForm({
                                 <ListBox.Item
                                   key="BDT"
                                   id="BDT"
-                                  className="flex items-center justify-between p-2.5 rounded-lg hover:bg-zinc-800 cursor-pointer text-sm text-zinc-200 outline-none data-[focused=true]:bg-zinc-800 transition-colors duration-150"
+                                  className="flex items-center justify-between p-2.5 rounded-lg hover:bg-zinc-100 dark:hover:bg-zinc-800 cursor-pointer text-sm text-zinc-800 dark:text-zinc-200 outline-none data-[focused=true]:bg-zinc-100 dark:data-[focused=true]:bg-zinc-800 transition-colors duration-150"
                                   textValue="BDT (৳)"
                                 >
                                   BDT (৳)
@@ -1143,10 +1140,13 @@ export default function PostJobForm({
                     >
                       <div className="flex items-center justify-between mb-1.5">
                         <Label
-                          className="text-zinc-300 font-medium text-sm flex items-center gap-2"
+                          className="text-zinc-700 dark:text-zinc-300 font-medium text-sm flex items-center gap-2"
                           htmlFor="location"
                         >
-                          <MapPin size={14} className="text-purple-400" />
+                          <MapPin
+                            size={14}
+                            className="text-purple-500 dark:text-purple-400"
+                          />
                           Location
                         </Label>
                         <motion.div
@@ -1160,11 +1160,11 @@ export default function PostJobForm({
                             className="scale-90"
                             aria-label="Remote toggle"
                           >
-                            <Switch.Control className="bg-zinc-800 data-[selected=true]:bg-purple-500">
-                              <Switch.Thumb className="bg-zinc-400 data-[selected=true]:bg-white" />
+                            <Switch.Control className="bg-zinc-300 dark:bg-zinc-800 data-[selected=true]:bg-purple-500">
+                              <Switch.Thumb className="bg-white dark:bg-zinc-400 data-[selected=true]:bg-white" />
                             </Switch.Control>
                             <Switch.Content>
-                              <Label className="text-xs text-zinc-400 font-medium ml-1">
+                              <Label className="text-xs text-zinc-600 dark:text-zinc-400 font-medium ml-1">
                                 Remote
                               </Label>
                             </Switch.Content>
@@ -1187,10 +1187,10 @@ export default function PostJobForm({
                           disabled={isRemote}
                           aria-label="Location"
                           defaultValue={initialData?.location || ""}
-                          className={`w-full text-white bg-[#1c1c1e] border rounded-lg h-12 pl-10 pr-3 text-sm placeholder:text-zinc-600 outline-none transition-all duration-200 ${
+                          className={`w-full text-zinc-900 dark:text-white bg-white dark:bg-[#1c1c1e] border rounded-lg h-12 pl-10 pr-3 text-sm placeholder:text-zinc-400 dark:placeholder:text-zinc-600 outline-none transition-all duration-200 ${
                             !isRemote && errors.location
                               ? "border-red-500 focus:border-red-500"
-                              : "border-zinc-800 hover:bg-[#242426] focus:border-zinc-600"
+                              : "border-zinc-300/50 dark:border-zinc-800 hover:bg-zinc-100 dark:hover:bg-[#242426] focus:border-zinc-400 dark:focus:border-zinc-600"
                           } ${isRemote ? "opacity-50 cursor-not-allowed" : ""}`}
                         />
                       </div>
@@ -1201,7 +1201,7 @@ export default function PostJobForm({
                             initial="hidden"
                             animate="visible"
                             exit="exit"
-                            className="text-xs text-red-400 mt-1"
+                            className="text-xs text-red-500 dark:text-red-400 mt-1"
                           >
                             {errors.location}
                           </motion.p>
@@ -1210,7 +1210,7 @@ export default function PostJobForm({
                           <motion.p
                             initial={{ opacity: 0, y: -5 }}
                             animate={{ opacity: 1, y: 0 }}
-                            className="text-xs text-emerald-400 mt-1"
+                            className="text-xs text-emerald-600 dark:text-emerald-400 mt-1"
                           >
                             ✓ Remote position - location not required
                           </motion.p>
@@ -1240,18 +1240,21 @@ export default function PostJobForm({
                         }
                       >
                         <Label
-                          className="text-zinc-300 font-medium text-sm flex items-center gap-2"
+                          className="text-zinc-700 dark:text-zinc-300 font-medium text-sm flex items-center gap-2"
                           htmlFor="deadline"
                         >
-                          <Calendar size={14} className="text-purple-400" />
+                          <Calendar
+                            size={14}
+                            className="text-purple-500 dark:text-purple-400"
+                          />
                           Application Deadline
                         </Label>
                         <Input
                           type="date"
-                          className={`w-full text-white bg-[#1c1c1e] border rounded-lg h-12 px-3 text-sm placeholder:text-zinc-600 outline-none transition-all duration-200 ${
+                          className={`w-full text-zinc-900 dark:text-white bg-white dark:bg-[#1c1c1e] border rounded-lg h-12 px-3 text-sm placeholder:text-zinc-400 dark:placeholder:text-zinc-600 outline-none transition-all duration-200 ${
                             errors.deadline
                               ? "border-red-500 focus:border-red-500"
-                              : "border-zinc-800 hover:bg-[#242426] focus:border-zinc-600"
+                              : "border-zinc-300/50 dark:border-zinc-800 hover:bg-zinc-100 dark:hover:bg-[#242426] focus:border-zinc-400 dark:focus:border-zinc-600"
                           }`}
                           min={new Date().toISOString().split("T")[0]}
                         />
@@ -1263,7 +1266,7 @@ export default function PostJobForm({
                               animate="visible"
                               exit="exit"
                             >
-                              <FieldError className="text-xs text-red-400" />
+                              <FieldError className="text-xs text-red-500 dark:text-red-400" />
                             </motion.div>
                           )}
                         </AnimatePresence>
@@ -1276,7 +1279,7 @@ export default function PostJobForm({
               {/* SECTION 2: Job Description */}
               <motion.div variants={itemVariants}>
                 <Fieldset className="space-y-6 w-full">
-                  <legend className="text-lg font-semibold text-zinc-300 border-l-3 border-purple-500 pl-3 mb-4">
+                  <legend className="text-lg font-semibold text-zinc-800 dark:text-zinc-300 border-l-3 border-purple-500 pl-3 mb-4">
                     Job Details & Description
                   </legend>
 
@@ -1296,19 +1299,22 @@ export default function PostJobForm({
                       defaultValue={initialData?.responsibilities || ""}
                     >
                       <Label
-                        className="text-zinc-300 font-medium text-sm flex items-center gap-2"
+                        className="text-zinc-700 dark:text-zinc-300 font-medium text-sm flex items-center gap-2"
                         htmlFor="responsibilities"
                       >
-                        <ListCheck size={14} className="text-purple-400" />
+                        <ListCheck
+                          size={14}
+                          className="text-purple-500 dark:text-purple-400"
+                        />
                         Key Responsibilities
                       </Label>
                       <TextArea
                         placeholder="• Lead development of new features • Collaborate with cross-functional teams • Write clean, maintainable code • Participate in code reviews"
                         rows={4}
-                        className={`w-full text-white bg-[#1c1c1e] border rounded-lg p-3 text-sm placeholder:text-zinc-600 outline-none transition-all duration-200 resize-none ${
+                        className={`w-full text-zinc-900 dark:text-white bg-white dark:bg-[#1c1c1e] border rounded-lg p-3 text-sm placeholder:text-zinc-400 dark:placeholder:text-zinc-600 outline-none transition-all duration-200 resize-none ${
                           errors.responsibilities
                             ? "border-red-500 focus:border-red-500"
-                            : "border-zinc-800 hover:bg-[#242426] focus:border-zinc-600"
+                            : "border-zinc-300/50 dark:border-zinc-800 hover:bg-zinc-100 dark:hover:bg-[#242426] focus:border-zinc-400 dark:focus:border-zinc-600"
                         }`}
                       />
                       <AnimatePresence>
@@ -1319,7 +1325,7 @@ export default function PostJobForm({
                             animate="visible"
                             exit="exit"
                           >
-                            <FieldError className="text-xs text-red-400" />
+                            <FieldError className="text-xs text-red-500 dark:text-red-400" />
                           </motion.div>
                         )}
                       </AnimatePresence>
@@ -1342,19 +1348,22 @@ export default function PostJobForm({
                       defaultValue={initialData?.requirements || ""}
                     >
                       <Label
-                        className="text-zinc-300 font-medium text-sm flex items-center gap-2"
+                        className="text-zinc-700 dark:text-zinc-300 font-medium text-sm flex items-center gap-2"
                         htmlFor="requirements"
                       >
-                        <GraduationCap size={14} className="text-purple-400" />
+                        <GraduationCap
+                          size={14}
+                          className="text-purple-500 dark:text-purple-400"
+                        />
                         Requirements & Qualifications
                       </Label>
                       <TextArea
                         placeholder="• Bachelor's degree in Computer Science or related field • 5+ years of experience in software development • Proficiency in React and Node.js • Strong problem-solving skills"
                         rows={4}
-                        className={`w-full text-white bg-[#1c1c1e] border rounded-lg p-3 text-sm placeholder:text-zinc-600 outline-none transition-all duration-200 resize-none ${
+                        className={`w-full text-zinc-900 dark:text-white bg-white dark:bg-[#1c1c1e] border rounded-lg p-3 text-sm placeholder:text-zinc-400 dark:placeholder:text-zinc-600 outline-none transition-all duration-200 resize-none ${
                           errors.requirements
                             ? "border-red-500 focus:border-red-500"
-                            : "border-zinc-800 hover:bg-[#242426] focus:border-zinc-600"
+                            : "border-zinc-300/50 dark:border-zinc-800 hover:bg-zinc-100 dark:hover:bg-[#242426] focus:border-zinc-400 dark:focus:border-zinc-600"
                         }`}
                       />
                       <AnimatePresence>
@@ -1365,7 +1374,7 @@ export default function PostJobForm({
                             animate="visible"
                             exit="exit"
                           >
-                            <FieldError className="text-xs text-red-400" />
+                            <FieldError className="text-xs text-red-500 dark:text-red-400" />
                           </motion.div>
                         )}
                       </AnimatePresence>
@@ -1385,10 +1394,13 @@ export default function PostJobForm({
                       defaultValue={initialData?.benefits || ""}
                     >
                       <Label
-                        className="text-zinc-300 font-medium text-sm flex items-center gap-2"
+                        className="text-zinc-700 dark:text-zinc-300 font-medium text-sm flex items-center gap-2"
                         htmlFor="benefits"
                       >
-                        <Gift size={14} className="text-purple-400" />
+                        <Gift
+                          size={14}
+                          className="text-purple-500 dark:text-purple-400"
+                        />
                         Benefits & Perks{" "}
                         <span className="text-zinc-500 text-xs">
                           (Optional)
@@ -1397,7 +1409,7 @@ export default function PostJobForm({
                       <TextArea
                         placeholder="• Competitive salary and equity package • Health, dental, and vision insurance • Remote work stipend • Professional development budget • Flexible working hours"
                         rows={3}
-                        className="w-full text-white bg-[#1c1c1e] border border-zinc-800 hover:bg-[#242426] focus:border-zinc-600 rounded-lg p-3 text-sm placeholder:text-zinc-600 outline-none transition-all duration-200 resize-none"
+                        className="w-full text-zinc-900 dark:text-white bg-white dark:bg-[#1c1c1e] border border-zinc-300/50 dark:border-zinc-800 hover:bg-zinc-100 dark:hover:bg-[#242426] focus:border-zinc-400 dark:focus:border-zinc-600 rounded-lg p-3 text-sm placeholder:text-zinc-400 dark:placeholder:text-zinc-600 outline-none transition-all duration-200 resize-none"
                       />
                     </TextField>
                   </motion.div>
@@ -1407,7 +1419,7 @@ export default function PostJobForm({
               {/* Additional Info Section */}
               <motion.div variants={itemVariants}>
                 <Fieldset className="space-y-4 w-full">
-                  <legend className="text-sm font-medium text-zinc-400 border-b border-zinc-800 w-full pb-2 mb-3">
+                  <legend className="text-sm font-medium text-zinc-500 dark:text-zinc-400 border-b border-zinc-200/50 dark:border-zinc-800 w-full pb-2 mb-3">
                     Additional Information
                   </legend>
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -1418,7 +1430,7 @@ export default function PostJobForm({
                       className="flex flex-col gap-1.5"
                     >
                       <Label
-                        className="text-zinc-400 text-xs"
+                        className="text-zinc-600 dark:text-zinc-400 text-xs"
                         htmlFor="experienceLevel"
                       >
                         Experience Level
@@ -1434,16 +1446,16 @@ export default function PostJobForm({
                             : []
                         }
                       >
-                        <Select.Trigger className="w-full flex items-center justify-between bg-[#1c1c1e] border border-zinc-800 hover:bg-[#242426] h-12 rounded-lg px-3 text-white transition-all duration-200 text-sm outline-none data-[focused=true]:border-zinc-600">
-                          <Select.Value placeholder="Select level" />
-                          <Select.Indicator />
+                        <Select.Trigger className="w-full flex items-center justify-between gap-2 bg-white dark:bg-[#1c1c1e] border border-zinc-300/50 dark:border-zinc-800 hover:bg-zinc-100 dark:hover:bg-[#242426] h-12 rounded-lg px-3 text-zinc-900 dark:text-white transition-all duration-200 text-sm outline-none data-[focused=true]:border-zinc-400 dark:data-[focused=true]:border-zinc-600">
+                          <Select.Value placeholder="Select level" className="truncate text-zinc-400" />
+                          <Select.Indicator className="shrink-0 bg-transparent text-zinc-500 dark:text-zinc-400" />
                         </Select.Trigger>
-                        <Select.Popover className="bg-[#1c1c1e] border border-zinc-800 text-white rounded-xl shadow-2xl p-1 backdrop-blur-sm max-h-[300px] overflow-y-auto">
+                        <Select.Popover className="z-50 bg-white dark:bg-[#1c1c1e] border border-zinc-200 dark:border-zinc-800 text-zinc-900 dark:text-white rounded-xl shadow-2xl p-1 max-h-[300px] overflow-y-auto">
                           <ListBox className="outline-none">
                             <ListBox.Item
                               key="entry level (0-2 years)"
                               id="entry level (0-2 years)"
-                              className="flex items-center justify-between p-2.5 rounded-lg hover:bg-zinc-800 cursor-pointer text-sm text-zinc-200 outline-none data-[focused=true]:bg-zinc-800 transition-colors duration-150"
+                              className="flex items-center justify-between p-2.5 rounded-lg hover:bg-zinc-100 dark:hover:bg-zinc-800 cursor-pointer text-sm text-zinc-800 dark:text-zinc-200 outline-none data-[focused=true]:bg-zinc-100 dark:data-[focused=true]:bg-zinc-800 transition-colors duration-150"
                               textValue="Entry Level (0-2 years)"
                             >
                               Entry Level (0-2 years)
@@ -1451,7 +1463,7 @@ export default function PostJobForm({
                             <ListBox.Item
                               key="mid level (3-5 years)"
                               id="mid level (3-5 years)"
-                              className="flex items-center justify-between p-2.5 rounded-lg hover:bg-zinc-800 cursor-pointer text-sm text-zinc-200 outline-none data-[focused=true]:bg-zinc-800 transition-colors duration-150"
+                              className="flex items-center justify-between p-2.5 rounded-lg hover:bg-zinc-100 dark:hover:bg-zinc-800 cursor-pointer text-sm text-zinc-800 dark:text-zinc-200 outline-none data-[focused=true]:bg-zinc-100 dark:data-[focused=true]:bg-zinc-800 transition-colors duration-150"
                               textValue="Mid Level (3-5 years)"
                             >
                               Mid Level (3-5 years)
@@ -1459,7 +1471,7 @@ export default function PostJobForm({
                             <ListBox.Item
                               key="senior (6-9 years)"
                               id="senior (6-9 years)"
-                              className="flex items-center justify-between p-2.5 rounded-lg hover:bg-zinc-800 cursor-pointer text-sm text-zinc-200 outline-none data-[focused=true]:bg-zinc-800 transition-colors duration-150"
+                              className="flex items-center justify-between p-2.5 rounded-lg hover:bg-zinc-100 dark:hover:bg-zinc-800 cursor-pointer text-sm text-zinc-800 dark:text-zinc-200 outline-none data-[focused=true]:bg-zinc-100 dark:data-[focused=true]:bg-zinc-800 transition-colors duration-150"
                               textValue="Senior (6-9 years)"
                             >
                               Senior (6-9 years)
@@ -1467,7 +1479,7 @@ export default function PostJobForm({
                             <ListBox.Item
                               key="lead/principal (10+ years)"
                               id="lead/principal (10+ years)"
-                              className="flex items-center justify-between p-2.5 rounded-lg hover:bg-zinc-800 cursor-pointer text-sm text-zinc-200 outline-none data-[focused=true]:bg-zinc-800 transition-colors duration-150"
+                              className="flex items-center justify-between p-2.5 rounded-lg hover:bg-zinc-100 dark:hover:bg-zinc-800 cursor-pointer text-sm text-zinc-800 dark:text-zinc-200 outline-none data-[focused=true]:bg-zinc-100 dark:data-[focused=true]:bg-zinc-800 transition-colors duration-150"
                               textValue="Lead/Principal (10+ years)"
                             >
                               Lead/Principal (10+ years)
@@ -1490,7 +1502,7 @@ export default function PostJobForm({
                         defaultValue={getDefaultVacancies()}
                       >
                         <Label
-                          className="text-zinc-400 text-xs"
+                          className="text-zinc-600 dark:text-zinc-400 text-xs"
                           htmlFor="vacancies"
                         >
                           Number of Vacancies
@@ -1499,7 +1511,7 @@ export default function PostJobForm({
                           placeholder="e.g., 3"
                           type="number"
                           min="1"
-                          className="w-full text-white bg-[#1c1c1e] border border-zinc-800 hover:bg-[#242426] focus:border-zinc-600 rounded-lg h-12 px-3 text-sm placeholder:text-zinc-600 outline-none transition-all duration-200"
+                          className="w-full text-zinc-900 dark:text-white bg-white dark:bg-[#1c1c1e] border border-zinc-300/50 dark:border-zinc-800 hover:bg-zinc-100 dark:hover:bg-[#242426] focus:border-zinc-400 dark:focus:border-zinc-600 rounded-lg h-12 px-3 text-sm placeholder:text-zinc-400 dark:placeholder:text-zinc-600 outline-none transition-all duration-200"
                         />
                       </TextField>
                     </motion.div>
@@ -1517,12 +1529,15 @@ export default function PostJobForm({
                       className="flex flex-col gap-1.5"
                       defaultValue={initialData?.skills || ""}
                     >
-                      <Label className="text-zinc-400 text-xs" htmlFor="skills">
+                      <Label
+                        className="text-zinc-600 dark:text-zinc-400 text-xs"
+                        htmlFor="skills"
+                      >
                         Required Skills (Optional)
                       </Label>
                       <Input
                         placeholder="e.g., React, Node.js, Python, AWS (comma separated)"
-                        className="w-full text-white bg-[#1c1c1e] border border-zinc-800 hover:bg-[#242426] focus:border-zinc-600 rounded-lg h-12 px-3 text-sm placeholder:text-zinc-600 outline-none transition-all duration-200"
+                        className="w-full text-zinc-900 dark:text-white bg-white dark:bg-[#1c1c1e] border border-zinc-300/50 dark:border-zinc-800 hover:bg-zinc-100 dark:hover:bg-[#242426] focus:border-zinc-400 dark:focus:border-zinc-600 rounded-lg h-12 px-3 text-sm placeholder:text-zinc-400 dark:placeholder:text-zinc-600 outline-none transition-all duration-200"
                       />
                     </TextField>
                   </motion.div>
@@ -1532,7 +1547,7 @@ export default function PostJobForm({
               {/* Form Actions */}
               <motion.div
                 variants={itemVariants}
-                className="flex justify-end gap-3 pt-6 border-t border-zinc-800 w-full"
+                className="flex justify-end gap-3 pt-6 border-t border-zinc-200/50 dark:border-zinc-800 w-full"
               >
                 <motion.div
                   whileHover={{ scale: 1.02 }}
@@ -1542,7 +1557,7 @@ export default function PostJobForm({
                     type="button"
                     variant="bordered"
                     onClick={() => router.push("/dashboard/recruiter/jobs")}
-                    className="border-zinc-700 text-zinc-300 hover:bg-zinc-900 hover:border-zinc-600 rounded-xl px-6 font-medium h-11 transition-all duration-200"
+                    className="border-zinc-300/50 dark:border-zinc-700 text-zinc-700 dark:text-zinc-300 hover:bg-zinc-100 dark:hover:bg-zinc-900 hover:border-zinc-400 dark:hover:border-zinc-600 rounded-xl px-6 font-medium h-11 transition-all duration-200"
                     aria-label="Cancel and return to jobs"
                   >
                     Cancel
@@ -1555,7 +1570,7 @@ export default function PostJobForm({
                 >
                   <Button
                     type="submit"
-                    className="bg-gradient-to-r from-purple-600 to-purple-700 text-white font-semibold hover:from-purple-700 hover:to-purple-800 rounded-xl px-8 transition-all duration-200 h-11 shadow-lg shadow-purple-500/20 disabled:opacity-50 disabled:cursor-not-allowed"
+                    className="bg-gradient-to-r from-blue-600 to-purple-600 text-white font-semibold rounded-xl px-8 h-11 shadow-lg shadow-blue-600/20 hover:from-blue-700 hover:to-purple-700 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
                     isLoading={isSubmitting}
                     isDisabled={isSubmitting}
                     aria-label="Submit job posting"

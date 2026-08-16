@@ -26,9 +26,7 @@ import { getCompanyJobs } from "@/lib/api/jobs";
 import toast from "react-hot-toast";
 import Pagination from "@/components/Pagination";
 import { FaInstagram, FaLinkedin, FaTwitter, FaYoutube } from "react-icons/fa";
-
-// ✅ IMPORT YOUR DYNAMIC LOADING PAGE
-import LoadingPage from "@/app/loading"; 
+import LoadingPage from "@/app/loading";
 
 // ==========================================
 // HELPERS
@@ -76,17 +74,17 @@ const formatDateShort = (dateString) => {
   });
 };
 
-const SocialLink = ({ icon: Icon, href, label, color = "text-zinc-400" }) => {
+const SocialLink = ({ icon: Icon, href, label, color = "text-zinc-500 dark:text-zinc-400" }) => {
   if (!href) return null;
   return (
     <a
       href={href}
       target="_blank"
       rel="noreferrer"
-      className="w-10 h-10 rounded-xl bg-zinc-800/40 border border-zinc-700/50 hover:border-blue-500/40 flex items-center justify-center transition-all duration-300 hover:bg-zinc-800 hover:scale-105 group"
+      className="w-10 h-10 rounded-xl bg-white/50 dark:bg-zinc-900/50 border border-zinc-200/50 dark:border-zinc-800/50 hover:border-blue-500/40 flex items-center justify-center transition-all duration-300 hover:bg-zinc-50 dark:hover:bg-zinc-800/80 hover:scale-105 group"
     >
       <Icon
-        className={`w-4 h-4 ${color} group-hover:text-blue-400 transition-colors`}
+        className={`w-4 h-4 ${color} group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors`}
       />
       <span className="sr-only">{label}</span>
     </a>
@@ -101,42 +99,42 @@ const JobCard = ({ job, index }) => {
       transition={{ duration: 0.3, delay: index * 0.04 }}
     >
       <Link href={`/browse-jobs/${job._id}`}>
-        <Card className="bg-zinc-950/40 backdrop-blur-md border border-zinc-800/60 rounded-xl p-5 hover:border-blue-500/40 hover:bg-zinc-900/40 transition-all duration-300 shadow-lg shadow-black/10 hover:shadow-blue-500/5 group">
+        <Card className="bg-white/60 dark:bg-zinc-900/60 backdrop-blur-sm border border-zinc-200/50 dark:border-zinc-800/50 rounded-xl p-5 hover:border-blue-500/40 hover:bg-white/80 dark:hover:bg-zinc-900/80 transition-all duration-300 shadow-sm dark:shadow-none hover:shadow-blue-500/5 group">
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
             <div className="flex-1 min-w-0">
-              <h4 className="text-zinc-100 font-semibold text-lg group-hover:text-blue-400 transition-colors line-clamp-1 tracking-tight">
+              <h4 className="text-zinc-900 dark:text-white font-semibold text-lg group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors line-clamp-1 tracking-tight">
                 {job.jobTitle}
               </h4>
 
-              <div className="flex flex-wrap items-center gap-x-3 gap-y-1.5 mt-2 text-sm text-zinc-400">
-                <span className="flex items-center gap-1.5 bg-zinc-800/30 px-2 py-0.5 rounded-md border border-zinc-800">
-                  <MapPin className="w-3.5 h-3.5 text-zinc-500" />
+              <div className="flex flex-wrap items-center gap-x-3 gap-y-1.5 mt-2 text-sm text-zinc-600 dark:text-zinc-400">
+                <span className="flex items-center gap-1.5 bg-white/50 dark:bg-zinc-900/50 px-2 py-0.5 rounded-md border border-zinc-200/50 dark:border-zinc-800/50">
+                  <MapPin className="w-3.5 h-3.5 text-zinc-400 dark:text-zinc-500" />
                   {job.isRemote ? "Remote" : job.location || "N/A"}
                 </span>
-                <span className="capitalize bg-zinc-800/30 px-2 py-0.5 rounded-md border border-zinc-800">
+                <span className="capitalize bg-white/50 dark:bg-zinc-900/50 px-2 py-0.5 rounded-md border border-zinc-200/50 dark:border-zinc-800/50">
                   {job.jobType || "Full-time"}
                 </span>
-                <span className="text-emerald-400 font-medium bg-emerald-500/5 px-2.5 py-0.5 rounded-md border border-emerald-500/10">
+                <span className="text-emerald-700 dark:text-emerald-400 font-medium bg-emerald-50 dark:bg-emerald-500/5 px-2.5 py-0.5 rounded-md border border-emerald-200/50 dark:border-emerald-500/10">
                   {formatSalary(job.minSalary, job.maxSalary, job.currency)}
                 </span>
               </div>
 
               <div className="flex flex-wrap gap-2 mt-3">
                 {job.isRemote && (
-                  <span className="px-2.5 py-0.5 text-[11px] font-medium bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 rounded-md uppercase tracking-wider">
+                  <span className="px-2.5 py-0.5 text-[11px] font-medium bg-emerald-50 dark:bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 border border-emerald-200/50 dark:border-emerald-500/20 rounded-md uppercase tracking-wider">
                     Remote
                   </span>
                 )}
                 {job.jobCategory && (
-                  <span className="px-2.5 py-0.5 text-[11px] font-medium bg-blue-500/10 text-blue-400 border border-blue-500/20 rounded-md uppercase tracking-wider">
+                  <span className="px-2.5 py-0.5 text-[11px] font-medium bg-blue-50 dark:bg-blue-500/10 text-blue-700 dark:text-blue-400 border border-blue-200/50 dark:border-blue-500/20 rounded-md uppercase tracking-wider">
                     {job.jobCategory}
                   </span>
                 )}
               </div>
             </div>
 
-            <div className="flex items-center gap-2 self-end sm:self-center text-xs font-medium text-zinc-500 bg-zinc-900/80 border border-zinc-800/80 px-2.5 py-1 rounded-md shadow-sm">
-              <Clock className="w-3 h-3 text-zinc-600" />
+            <div className="flex items-center gap-2 self-end sm:self-center text-xs font-medium text-zinc-500 dark:text-zinc-400 bg-white/80 dark:bg-zinc-900/80 border border-zinc-200/50 dark:border-zinc-800/50 px-2.5 py-1 rounded-md shadow-sm">
+              <Clock className="w-3 h-3 text-zinc-400 dark:text-zinc-500" />
               {formatDateShort(job.createdAt)}
             </div>
           </div>
@@ -191,7 +189,6 @@ function CompanyDetailContent({ companyId }) {
   const [error, setError] = useState(null);
   const [activeTab, setActiveTab] = useState("about");
 
-  // Pagination Parameters
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 5;
 
@@ -226,26 +223,25 @@ function CompanyDetailContent({ companyId }) {
     setCurrentPage(1);
   }, [activeTab]);
 
-  // ✅ HELPERS DEFINED INSIDE COMPONENT
   const getStatusStyles = (status) => {
     switch (status?.toLowerCase()) {
       case "approved":
-        return "bg-emerald-500/10 text-emerald-400 border-emerald-500/20";
+        return "bg-emerald-50 dark:bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 border-emerald-200/50 dark:border-emerald-500/20";
       case "rejected":
-        return "bg-rose-500/10 text-rose-400 border-rose-500/20";
+        return "bg-rose-50 dark:bg-rose-500/10 text-rose-700 dark:text-rose-400 border-rose-200/50 dark:border-rose-500/20";
       default:
-        return "bg-amber-500/10 text-amber-400 border-amber-500/20";
+        return "bg-amber-50 dark:bg-amber-500/10 text-amber-700 dark:text-amber-400 border-amber-200/50 dark:border-amber-500/20";
     }
   };
 
   const getStatusIcon = (status) => {
     switch (status?.toLowerCase()) {
       case "approved":
-        return <CheckCircle className="w-3.5 h-3.5" />;
+        return <CheckCircle className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400" />;
       case "rejected":
-        return <XCircle className="w-3.5 h-3.5" />;
+        return <XCircle className="w-3.5 h-3.5 text-rose-600 dark:text-rose-400" />;
       default:
-        return <Clock className="w-3.5 h-3.5" />;
+        return <Clock className="w-3.5 h-3.5 text-amber-600 dark:text-amber-400" />;
     }
   };
 
@@ -259,7 +255,6 @@ function CompanyDetailContent({ companyId }) {
 
   const totalPages = Math.ceil(jobs.length / itemsPerPage);
 
-  // ✅ USE YOUR DYNAMIC LOADING PAGE COMPONENT
   if (loading) {
     return (
       <LoadingPage 
@@ -275,17 +270,16 @@ function CompanyDetailContent({ companyId }) {
     );
   }
 
-  // If company is null after loading (not found)
   if (!company) {
     return (
-        <div className="min-h-screen bg-[#090a0f] flex flex-col items-center justify-center text-center px-4">
-            <Building2 className="w-20 h-20 text-zinc-700 mb-4" />
-            <h1 className="text-2xl font-bold text-white mb-2">Company Not Found</h1>
-            <p className="text-zinc-400 mb-6">The company you are looking for does not exist or has been removed.</p>
-            <Link href="/companies" className="inline-flex items-center gap-2 px-6 py-3 bg-blue-600 hover:bg-blue-500 text-white rounded-xl transition-colors">
-                <ArrowLeft className="w-4 h-4" /> Back to Companies
-            </Link>
-        </div>
+      <div className="min-h-screen bg-zinc-50 dark:bg-zinc-950 flex flex-col items-center justify-center text-center px-4">
+        <Building2 className="w-20 h-20 text-zinc-300 dark:text-zinc-700 mb-4" />
+        <h1 className="text-2xl font-bold text-zinc-900 dark:text-white mb-2">Company Not Found</h1>
+        <p className="text-zinc-600 dark:text-zinc-400 mb-6">The company you are looking for does not exist or has been removed.</p>
+        <Link href="/companies" className="inline-flex items-center gap-2 px-6 py-3 bg-blue-600 hover:bg-blue-500 text-white rounded-xl transition-colors">
+          <ArrowLeft className="w-4 h-4" /> Back to Companies
+        </Link>
+      </div>
     );
   }
 
@@ -294,14 +288,14 @@ function CompanyDetailContent({ companyId }) {
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.4 }}
-      className="min-h-screen bg-[#090a0f] text-zinc-100 py-8 px-4 md:px-8 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-blue-950/20 via-[#090a0f] to-[#090a0f]"
+      className="min-h-screen bg-zinc-50 dark:bg-zinc-950 text-zinc-900 dark:text-white py-8 px-4 md:px-8"
     >
       <div className="max-w-5xl mx-auto">
         {/* Back Button */}
         <motion.div initial="hidden" animate="visible" variants={slideInLeft}>
           <Link
             href="/companies"
-            className="inline-flex items-center gap-2 mt-20 px-3.5 py-1.5 text-zinc-400 hover:text-white border border-zinc-800 bg-zinc-900/30 rounded-xl transition-all duration-200 mb-6 text-sm group"
+            className="inline-flex items-center gap-2 mt-20 px-3.5 py-1.5 text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white border border-zinc-200/50 dark:border-zinc-800/50 bg-white/80 dark:bg-zinc-900/80 rounded-xl transition-all duration-200 mb-6 text-sm group"
           >
             <ArrowLeft className="w-4 h-4 group-hover:-translate-x-0.5 transition-transform" />
             Back to Companies
@@ -315,10 +309,10 @@ function CompanyDetailContent({ companyId }) {
         >
           {/* ===== HEADER CARD ===== */}
           <motion.div variants={itemVariants}>
-            <Card className="bg-zinc-900/50 backdrop-blur-md border border-zinc-800/80 rounded-2xl shadow-xl shadow-black/20 p-6 md:p-8 mb-8">
+            <Card className="bg-white/80 dark:bg-zinc-900/80 backdrop-blur-sm border border-zinc-200/50 dark:border-zinc-800/50 rounded-2xl shadow-sm dark:shadow-none p-6 md:p-8 mb-8">
               <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
                 <div className="flex flex-col sm:flex-row items-start sm:items-center gap-5">
-                  <div className="relative h-20 w-20 shrink-0 overflow-hidden rounded-2xl bg-zinc-950 border border-zinc-800/80 flex items-center justify-center p-2 shadow-inner">
+                  <div className="relative h-20 w-20 shrink-0 overflow-hidden rounded-2xl bg-zinc-50 dark:bg-zinc-800/50 border border-zinc-200/50 dark:border-zinc-800/50 flex items-center justify-center p-2 shadow-inner">
                     {company.logo ? (
                       <Image
                         src={company.logo}
@@ -329,13 +323,13 @@ function CompanyDetailContent({ companyId }) {
                         unoptimized
                       />
                     ) : (
-                      <Building2 size={32} className="text-zinc-500" />
+                      <Building2 size={32} className="text-zinc-400 dark:text-zinc-500" />
                     )}
                   </div>
 
                   <div className="space-y-1.5">
                     <div className="flex flex-wrap items-center gap-3">
-                      <h1 className="text-2xl md:text-3xl font-bold tracking-tight text-white">
+                      <h1 className="text-2xl md:text-3xl font-bold tracking-tight text-zinc-900 dark:text-white">
                         {company.name}
                       </h1>
                       <span
@@ -346,18 +340,18 @@ function CompanyDetailContent({ companyId }) {
                       </span>
                     </div>
 
-                    <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-sm text-zinc-400">
-                      <span className="text-zinc-300 font-medium">
+                    <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-sm text-zinc-600 dark:text-zinc-400">
+                      <span className="text-zinc-900 dark:text-zinc-300 font-medium">
                         {company.industry || "General Operations"}
                       </span>
-                      <span className="text-zinc-700">•</span>
+                      <span className="text-zinc-300 dark:text-zinc-700">•</span>
                       <span className="flex items-center gap-1">
-                        <MapPin size={14} className="text-zinc-500" />
+                        <MapPin size={14} className="text-zinc-400 dark:text-zinc-500" />
                         {company.location || "Location not specified"}
                       </span>
-                      <span className="text-zinc-700">•</span>
-                      <span className="flex items-center gap-1 text-blue-400">
-                        <Briefcase size={14} className="text-blue-500/70" />
+                      <span className="text-zinc-300 dark:text-zinc-700">•</span>
+                      <span className="flex items-center gap-1 text-blue-600 dark:text-blue-400">
+                        <Briefcase size={14} className="text-blue-500/70 dark:text-blue-400/70" />
                         {openJobs} Open Positions
                       </span>
                     </div>
@@ -384,13 +378,13 @@ function CompanyDetailContent({ companyId }) {
           </motion.div>
 
           {/* ===== TABS SECTION ===== */}
-          <div className="flex gap-1.5 mb-6 bg-zinc-900/30 p-1 rounded-xl border border-zinc-800/40 max-w-fit">
+          <div className="flex gap-1.5 mb-6 bg-white/50 dark:bg-zinc-900/50 p-1 rounded-xl border border-zinc-200/50 dark:border-zinc-800/50 max-w-fit">
             <button
               onClick={() => setActiveTab("about")}
               className={`px-4 py-1.5 text-xs font-semibold rounded-lg transition-all ${
                 activeTab === "about"
-                  ? "bg-zinc-800 text-white shadow-sm border border-zinc-700/50"
-                  : "text-zinc-400 hover:text-zinc-200"
+                  ? "bg-white dark:bg-zinc-800 text-zinc-900 dark:text-white shadow-sm border border-zinc-200/50 dark:border-zinc-700/50"
+                  : "text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white"
               }`}
             >
               Overview
@@ -399,8 +393,8 @@ function CompanyDetailContent({ companyId }) {
               onClick={() => setActiveTab("jobs")}
               className={`px-4 py-1.5 text-xs font-semibold rounded-lg transition-all ${
                 activeTab === "jobs"
-                  ? "bg-zinc-800 text-white shadow-sm border border-zinc-700/50"
-                  : "text-zinc-400 hover:text-zinc-200"
+                  ? "bg-white dark:bg-zinc-800 text-zinc-900 dark:text-white shadow-sm border border-zinc-200/50 dark:border-zinc-700/50"
+                  : "text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white"
               }`}
             >
               Jobs ({openJobs})
@@ -413,11 +407,11 @@ function CompanyDetailContent({ companyId }) {
               <div className="lg:col-span-2 space-y-6">
                 {company.description && (
                   <motion.div variants={itemVariants}>
-                    <Card className="bg-zinc-900/30 backdrop-blur-md border border-zinc-800/60 rounded-2xl p-6 shadow-sm">
-                      <h3 className="text-base font-bold text-zinc-200 mb-3 tracking-tight">
+                    <Card className="bg-white/60 dark:bg-zinc-900/60 backdrop-blur-sm border border-zinc-200/50 dark:border-zinc-800/50 rounded-2xl p-6 shadow-sm dark:shadow-none">
+                      <h3 className="text-base font-bold text-zinc-900 dark:text-white mb-3 tracking-tight">
                         About the Company
                       </h3>
-                      <p className="text-zinc-400 text-sm leading-relaxed whitespace-pre-line">
+                      <p className="text-zinc-600 dark:text-zinc-400 text-sm leading-relaxed whitespace-pre-line">
                         {company.description}
                       </p>
                     </Card>
@@ -428,31 +422,31 @@ function CompanyDetailContent({ companyId }) {
                   <motion.div variants={itemVariants}>
                     <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
                       {company.mission && (
-                        <Card className="bg-zinc-900/20 border border-zinc-800/60 rounded-xl p-4 shadow-sm">
-                          <h4 className="text-[10px] font-bold text-zinc-500 uppercase tracking-widest mb-1.5">
+                        <Card className="bg-white/60 dark:bg-zinc-900/60 border border-zinc-200/50 dark:border-zinc-800/50 rounded-xl p-4 shadow-sm dark:shadow-none">
+                          <h4 className="text-[10px] font-bold text-zinc-500 dark:text-zinc-500 uppercase tracking-widest mb-1.5">
                             Mission
                           </h4>
-                          <p className="text-zinc-300 text-xs leading-relaxed">
+                          <p className="text-zinc-700 dark:text-zinc-300 text-xs leading-relaxed">
                             {company.mission}
                           </p>
                         </Card>
                       )}
                       {company.vision && (
-                        <Card className="bg-zinc-900/20 border border-zinc-800/60 rounded-xl p-4 shadow-sm">
-                          <h4 className="text-[10px] font-bold text-zinc-500 uppercase tracking-widest mb-1.5">
+                        <Card className="bg-white/60 dark:bg-zinc-900/60 border border-zinc-200/50 dark:border-zinc-800/50 rounded-xl p-4 shadow-sm dark:shadow-none">
+                          <h4 className="text-[10px] font-bold text-zinc-500 dark:text-zinc-500 uppercase tracking-widest mb-1.5">
                             Vision
                           </h4>
-                          <p className="text-zinc-300 text-xs leading-relaxed">
+                          <p className="text-zinc-700 dark:text-zinc-300 text-xs leading-relaxed">
                             {company.vision}
                           </p>
                         </Card>
                       )}
                       {company.values && (
-                        <Card className="bg-zinc-900/20 border border-zinc-800/60 rounded-xl p-4 shadow-sm">
-                          <h4 className="text-[10px] font-bold text-zinc-500 uppercase tracking-widest mb-1.5">
+                        <Card className="bg-white/60 dark:bg-zinc-900/60 border border-zinc-200/50 dark:border-zinc-800/50 rounded-xl p-4 shadow-sm dark:shadow-none">
+                          <h4 className="text-[10px] font-bold text-zinc-500 dark:text-zinc-500 uppercase tracking-widest mb-1.5">
                             Values
                           </h4>
-                          <p className="text-zinc-300 text-xs leading-relaxed">
+                          <p className="text-zinc-700 dark:text-zinc-300 text-xs leading-relaxed">
                             {company.values}
                           </p>
                         </Card>
@@ -464,45 +458,45 @@ function CompanyDetailContent({ companyId }) {
 
               <div className="space-y-6">
                 <motion.div variants={itemVariants}>
-                  <Card className="bg-zinc-900/40 backdrop-blur-md border border-zinc-800/60 rounded-2xl p-5 shadow-sm">
-                    <h3 className="text-xs font-bold text-zinc-500 uppercase tracking-wider mb-4">
+                  <Card className="bg-white/60 dark:bg-zinc-900/60 backdrop-blur-sm border border-zinc-200/50 dark:border-zinc-800/50 rounded-2xl p-5 shadow-sm dark:shadow-none">
+                    <h3 className="text-xs font-bold text-zinc-500 dark:text-zinc-500 uppercase tracking-wider mb-4">
                       Corporate Profiles
                     </h3>
                     <div className="space-y-3.5 text-sm">
                       {company.foundedYear && (
-                        <div className="flex justify-between items-center py-0.5 border-b border-zinc-800/40 pb-2">
-                          <span className="text-zinc-400 text-xs">Founded</span>
-                          <span className="font-medium text-zinc-200">
+                        <div className="flex justify-between items-center py-0.5 border-b border-zinc-200/50 dark:border-zinc-800/50 pb-2">
+                          <span className="text-zinc-600 dark:text-zinc-400 text-xs">Founded</span>
+                          <span className="font-medium text-zinc-900 dark:text-white">
                             {company.foundedYear}
                           </span>
                         </div>
                       )}
                       {company.employeeCount && (
-                        <div className="flex justify-between items-center py-0.5 border-b border-zinc-800/40 pb-2">
-                          <span className="text-zinc-400 text-xs">
+                        <div className="flex justify-between items-center py-0.5 border-b border-zinc-200/50 dark:border-zinc-800/50 pb-2">
+                          <span className="text-zinc-600 dark:text-zinc-400 text-xs">
                             Company Size
                           </span>
-                          <span className="font-medium text-zinc-200">
+                          <span className="font-medium text-zinc-900 dark:text-white">
                             {company.employeeCount} employees
                           </span>
                         </div>
                       )}
                       {company.companyType && (
-                        <div className="flex justify-between items-center py-0.5 border-b border-zinc-800/40 pb-2">
-                          <span className="text-zinc-400 text-xs">
+                        <div className="flex justify-between items-center py-0.5 border-b border-zinc-200/50 dark:border-zinc-800/50 pb-2">
+                          <span className="text-zinc-600 dark:text-zinc-400 text-xs">
                             Firm Classification
                           </span>
-                          <span className="font-medium text-zinc-200">
+                          <span className="font-medium text-zinc-900 dark:text-white">
                             {company.companyType}
                           </span>
                         </div>
                       )}
                       {company.createdAt && (
                         <div className="flex justify-between items-center py-0.5">
-                          <span className="text-zinc-400 text-xs">
+                          <span className="text-zinc-600 dark:text-zinc-400 text-xs">
                             Ecosystem Member Since
                           </span>
-                          <span className="font-medium text-zinc-200">
+                          <span className="font-medium text-zinc-900 dark:text-white">
                             {formatDate(company.createdAt)}
                           </span>
                         </div>
@@ -518,53 +512,53 @@ function CompanyDetailContent({ companyId }) {
                   company.instagram ||
                   company.youtube) && (
                   <motion.div variants={itemVariants}>
-                    <Card className="bg-zinc-900/40 backdrop-blur-md border border-zinc-800/60 rounded-2xl p-5 shadow-sm">
-                      <h3 className="text-xs font-bold text-zinc-500 uppercase tracking-wider mb-4">
+                    <Card className="bg-white/60 dark:bg-zinc-900/60 backdrop-blur-sm border border-zinc-200/50 dark:border-zinc-800/50 rounded-2xl p-5 shadow-sm dark:shadow-none">
+                      <h3 className="text-xs font-bold text-zinc-500 dark:text-zinc-500 uppercase tracking-wider mb-4">
                         Contact Channels
                       </h3>
                       <div className="space-y-3">
                         {company.phone && (
-                          <div className="flex items-center gap-3 text-zinc-300 text-xs">
-                            <Phone className="w-4 h-4 text-zinc-500" />
+                          <div className="flex items-center gap-3 text-zinc-700 dark:text-zinc-300 text-xs">
+                            <Phone className="w-4 h-4 text-zinc-400 dark:text-zinc-500" />
                             <span>{company.phone}</span>
                           </div>
                         )}
                         {company.email && (
-                          <div className="flex items-center gap-3 text-zinc-300 text-xs group">
-                            <Mail className="w-4 h-4 text-zinc-500 group-hover:text-blue-400 transition-colors" />
+                          <div className="flex items-center gap-3 text-zinc-700 dark:text-zinc-300 text-xs group">
+                            <Mail className="w-4 h-4 text-zinc-400 dark:text-zinc-500 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors" />
                             <a
                               href={`mailto:${company.email}`}
-                              className="hover:text-blue-400 hover:underline transition-all"
+                              className="hover:text-blue-600 dark:hover:text-blue-400 hover:underline transition-all"
                             >
                               {company.email}
                             </a>
                           </div>
                         )}
 
-                        <div className="flex flex-wrap gap-2 mt-4 pt-3 border-t border-zinc-800/60">
+                        <div className="flex flex-wrap gap-2 mt-4 pt-3 border-t border-zinc-200/50 dark:border-zinc-800/50">
                           <SocialLink
                             icon={FaTwitter}
                             href={company.twitter}
                             label="Twitter"
-                            color="text-sky-400"
+                            color="text-sky-500 dark:text-sky-400"
                           />
                           <SocialLink
                             icon={FaLinkedin}
                             href={company.linkedin}
                             label="LinkedIn"
-                            color="text-blue-500"
+                            color="text-blue-600 dark:text-blue-400"
                           />
                           <SocialLink
                             icon={FaInstagram}
                             href={company.instagram}
                             label="Instagram"
-                            color="text-pink-400"
+                            color="text-pink-500 dark:text-pink-400"
                           />
                           <SocialLink
                             icon={FaYoutube}
                             href={company.youtube}
                             label="YouTube"
-                            color="text-rose-500"
+                            color="text-rose-600 dark:text-rose-400"
                           />
                         </div>
                       </div>
@@ -578,12 +572,12 @@ function CompanyDetailContent({ companyId }) {
             <motion.div variants={itemVariants}>
               <div className="space-y-3.5">
                 {jobs.length === 0 ? (
-                  <Card className="bg-zinc-900/20 border border-zinc-800/60 rounded-2xl p-12 text-center backdrop-blur-md">
-                    <Briefcase className="w-10 h-10 text-zinc-600 mx-auto mb-3.5" />
-                    <h3 className="text-base font-semibold text-zinc-200">
+                  <Card className="bg-white/60 dark:bg-zinc-900/60 border border-zinc-200/50 dark:border-zinc-800/50 rounded-2xl p-12 text-center backdrop-blur-sm shadow-sm dark:shadow-none">
+                    <Briefcase className="w-10 h-10 text-zinc-300 dark:text-zinc-700 mx-auto mb-3.5" />
+                    <h3 className="text-base font-semibold text-zinc-900 dark:text-white">
                       No vacancies open
                     </h3>
-                    <p className="text-zinc-400 text-xs mt-1.5 max-w-xs mx-auto">
+                    <p className="text-zinc-600 dark:text-zinc-400 text-xs mt-1.5 max-w-xs mx-auto">
                       {company.name} is not evaluating any outside placements at
                       this moment. Check back soon.
                     </p>
@@ -591,9 +585,9 @@ function CompanyDetailContent({ companyId }) {
                 ) : (
                   <>
                     <div className="flex items-center justify-between mb-2 px-1">
-                      <p className="text-xs text-zinc-500">
+                      <p className="text-xs text-zinc-500 dark:text-zinc-500">
                         Aggregated results:{" "}
-                        <span className="text-zinc-300 font-semibold">
+                        <span className="text-zinc-900 dark:text-white font-semibold">
                           {jobs.length} open position
                           {jobs.length > 1 ? "s" : ""}
                         </span>

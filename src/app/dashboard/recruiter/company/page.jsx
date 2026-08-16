@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { authClient } from "@/lib/auth-client";
-import { getRecruiterCompany } from "@/lib/api/companies"; // ✅ Import the correct function
+import { getRecruiterCompany } from "@/lib/api/companies";
 import CompanyProfile from "./CompanyProfile";
 import toast from "react-hot-toast";
 import { Loader2 } from "lucide-react";
@@ -22,10 +22,7 @@ export default function CompanyPage() {
 
       try {
         console.log("🔍 Fetching company for user:", session.user.id);
-        
-        // ✅ Call the clean API function
         const data = await getRecruiterCompany(session.user.id);
-        
         console.log("🏢 Company data:", data);
         setCompany(data);
       } catch (error) {
@@ -56,7 +53,7 @@ export default function CompanyPage() {
           className="text-center"
         >
           <div className="w-16 h-16 border-4 border-cyan-500 border-t-transparent rounded-full animate-spin mx-auto mb-4" />
-          <p className="text-zinc-400 text-sm font-medium tracking-wide">
+          <p className="text-zinc-500 dark:text-zinc-400 text-sm font-medium tracking-wide">
             Loading your workspace...
           </p>
         </motion.div>
@@ -73,12 +70,12 @@ export default function CompanyPage() {
         transition={{ duration: 0.5 }}
         className="min-h-[85vh] flex items-center justify-center"
       >
-        <div className="text-white text-center max-w-md">
-          <div className="w-20 h-20 bg-zinc-900/50 rounded-full flex items-center justify-center mx-auto mb-6 border border-zinc-800">
-            <Loader2 className="w-10 h-10 text-zinc-500 animate-spin" />
+        <div className="text-zinc-900 dark:text-white text-center max-w-md">
+          <div className="w-20 h-20 bg-zinc-100 dark:bg-zinc-900/50 rounded-full flex items-center justify-center mx-auto mb-6 border border-zinc-200/50 dark:border-zinc-800">
+            <Loader2 className="w-10 h-10 text-zinc-400 dark:text-zinc-500 animate-spin" />
           </div>
           <h2 className="text-2xl font-bold mb-2">Waiting for authentication</h2>
-          <p className="text-zinc-400 text-sm">
+          <p className="text-zinc-600 dark:text-zinc-400 text-sm">
             Please sign in to manage your company profile.
           </p>
         </div>

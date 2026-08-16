@@ -32,29 +32,29 @@ const NotFoundPage = () => {
     }
   }, [controls, isInView]);
 
-  const gridPattern = `data:image/svg+xml,%3Csvg width='60' height='60' xmlns='http://www.w3.org/2000/svg'%3E%3Cdefs%3E%3Cpattern id='grid' width='60' height='60' patternUnits='userSpaceOnUse'%3E%3Cpath d='M 60 0 L 0 0 0 60' fill='none' stroke='rgba(255,255,255,0.03)' stroke-width='1'/%3E%3C/pattern%3E%3C/defs%3E%3Crect width='100%25' height='100%25' fill='url(%23grid)'/%3E%3C/svg%3E`;
+  const gridPattern = `data:image/svg+xml,%3Csvg width='60' height='60' xmlns='http://www.w3.org/2000/svg'%3E%3Cdefs%3E%3Cpattern id='grid' width='60' height='60' patternUnits='userSpaceOnUse'%3E%3Cpath d='M 60 0 L 0 0 0 60' fill='none' stroke='rgba(0,0,0,0.05)' stroke-width='1'/%3E%3C/pattern%3E%3C/defs%3E%3Crect width='100%25' height='100%25' fill='url(%23grid)'/%3E%3C/svg%3E`;
 
   if (!mounted) {
     return (
-      <div className="min-h-screen bg-black flex items-center justify-center px-4">
+      <div className="min-h-screen bg-zinc-50 dark:bg-black flex items-center justify-center px-4">
         <div className="text-center">
           <div className="w-12 h-12 border-4 border-purple-500 border-t-transparent rounded-full animate-spin mx-auto" />
-          <p className="text-gray-400 mt-4">Loading...</p>
+          <p className="text-zinc-600 dark:text-gray-400 mt-4">Loading...</p>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="relative min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 overflow-hidden flex items-center justify-center px-4">
+    <div className="relative min-h-screen bg-gradient-to-br from-zinc-50 to-zinc-100 dark:from-slate-900 dark:via-purple-900 dark:to-slate-900 overflow-hidden flex items-center justify-center px-4">
       {/* ============================================= */}
       {/* ANIMATED BACKGROUND */}
       {/* ============================================= */}
       
-      {/* Animated gradient orbs */}
+      {/* Animated gradient orbs - lighter in light mode */}
       <div className="absolute inset-0 overflow-hidden">
         <motion.div
-          className="absolute -top-40 -right-40 w-80 h-80 bg-purple-500 rounded-full mix-blend-multiply filter blur-3xl opacity-30"
+          className="absolute -top-40 -right-40 w-80 h-80 bg-purple-300/30 dark:bg-purple-500 rounded-full mix-blend-multiply filter blur-3xl opacity-30 dark:opacity-30"
           animate={{
             x: [0, 100, -50, 0],
             y: [0, -80, 50, 0],
@@ -67,7 +67,7 @@ const NotFoundPage = () => {
           }}
         />
         <motion.div
-          className="absolute -bottom-40 -left-40 w-80 h-80 bg-blue-500 rounded-full mix-blend-multiply filter blur-3xl opacity-30"
+          className="absolute -bottom-40 -left-40 w-80 h-80 bg-blue-300/30 dark:bg-blue-500 rounded-full mix-blend-multiply filter blur-3xl opacity-30 dark:opacity-30"
           animate={{
             x: [0, -100, 50, 0],
             y: [0, 80, -50, 0],
@@ -80,7 +80,7 @@ const NotFoundPage = () => {
           }}
         />
         <motion.div
-          className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-cyan-500 rounded-full mix-blend-multiply filter blur-3xl opacity-20"
+          className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-cyan-300/30 dark:bg-cyan-500 rounded-full mix-blend-multiply filter blur-3xl opacity-20 dark:opacity-20"
           animate={{
             scale: [1, 1.5, 1],
             opacity: [0.2, 0.3, 0.2],
@@ -99,7 +99,7 @@ const NotFoundPage = () => {
           {particles.map((particle) => (
             <motion.div
               key={particle.id}
-              className="absolute rounded-full bg-white/20"
+              className="absolute rounded-full bg-black/10 dark:bg-white/20"
               style={{
                 width: particle.size,
                 height: particle.size,
@@ -132,7 +132,7 @@ const NotFoundPage = () => {
       />
 
       {/* ============================================= */}
-      {/* MAIN CONTENT - FIXED VISIBILITY */}
+      {/* MAIN CONTENT */}
       {/* ============================================= */}
       <div className="relative z-20 max-w-4xl mx-auto text-center">
         {/* Animated 404 Number */}
@@ -153,7 +153,7 @@ const NotFoundPage = () => {
           </div>
           
           <motion.div
-            className="relative text-8xl md:text-9xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-purple-400 via-pink-400 to-cyan-400"
+            className="relative text-8xl md:text-9xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-purple-500 via-pink-500 to-cyan-500 dark:from-purple-400 dark:via-pink-400 dark:to-cyan-400"
             animate={{
               backgroundPosition: ["0% 50%", "100% 50%", "0% 50%"],
             }}
@@ -182,7 +182,7 @@ const NotFoundPage = () => {
         >
           <div className="relative">
             <motion.div
-              className="absolute inset-0 bg-purple-500/30 rounded-full blur-2xl"
+              className="absolute inset-0 bg-purple-300/30 dark:bg-purple-500/30 rounded-full blur-2xl"
               animate={{
                 scale: [1, 1.2, 1],
               }}
@@ -198,22 +198,22 @@ const NotFoundPage = () => {
           </div>
         </motion.div>
 
-        {/* Title - FIXED: Better visibility */}
+        {/* Title */}
         <motion.h1
           initial={{ opacity: 0, y: 30 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.2 }}
-          className="text-4xl md:text-6xl font-bold text-white mb-4 drop-shadow-[0_2px_10px_rgba(0,0,0,0.8)]"
+          className="text-4xl md:text-6xl font-bold text-zinc-900 dark:text-white mb-4 drop-shadow-[0_2px_10px_rgba(0,0,0,0.1)] dark:drop-shadow-[0_2px_10px_rgba(0,0,0,0.8)]"
         >
           Oops! Lost in Space?
         </motion.h1>
 
-        {/* Description - FIXED: Better visibility */}
+        {/* Description */}
         <motion.p
           initial={{ opacity: 0, y: 30 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.3 }}
-          className="text-lg md:text-xl text-white/90 mb-8 max-w-md mx-auto leading-relaxed drop-shadow-[0_2px_8px_rgba(0,0,0,0.8)]"
+          className="text-lg md:text-xl text-zinc-600 dark:text-white/90 mb-8 max-w-md mx-auto leading-relaxed drop-shadow-[0_2px_8px_rgba(0,0,0,0.1)] dark:drop-shadow-[0_2px_8px_rgba(0,0,0,0.8)]"
         >
           The page you&apos;re looking for has wandered off into the universe. 
           Let&apos;s bring you back to Earth.
@@ -243,7 +243,7 @@ const NotFoundPage = () => {
             whileTap={{ scale: 0.95 }}
           >
             <Link href="/browse-jobs">
-              <Button className="bg-white/20 backdrop-blur-sm border border-white/30 text-white hover:bg-white/30 px-8 py-3 rounded-xl font-medium transition-all duration-300">
+              <Button className="bg-white/80 dark:bg-white/20 backdrop-blur-sm border border-zinc-300/50 dark:border-white/30 text-zinc-700 dark:text-white hover:bg-zinc-100 dark:hover:bg-white/30 px-8 py-3 rounded-xl font-medium transition-all duration-300">
                 <Search className="w-4 h-4 mr-2" />
                 Search Jobs
               </Button>
@@ -251,14 +251,14 @@ const NotFoundPage = () => {
           </motion.div>
         </motion.div>
 
-        {/* Popular Pages - FIXED: Better visibility */}
+        {/* Popular Pages */}
         <motion.div
           initial={{ opacity: 0, y: 30 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.5 }}
           className="mt-12"
         >
-          <p className="text-sm text-white/60 mb-3">Popular pages:</p>
+          <p className="text-sm text-zinc-500 dark:text-white/60 mb-3">Popular pages:</p>
           <div className="flex flex-wrap gap-3 justify-center">
             {[
               { label: "Browse Jobs", href: "/browse-jobs" },
@@ -275,7 +275,7 @@ const NotFoundPage = () => {
               >
                 <Link
                   href={page.href}
-                  className="text-sm text-white/70 hover:text-white px-4 py-2 rounded-lg bg-white/10 hover:bg-white/20 transition-all duration-300 border border-white/10 hover:border-white/30 inline-flex items-center gap-1 backdrop-blur-sm"
+                  className="text-sm text-zinc-600 dark:text-white/70 hover:text-zinc-900 dark:hover:text-white px-4 py-2 rounded-lg bg-white/80 dark:bg-white/10 hover:bg-zinc-100 dark:hover:bg-white/20 transition-all duration-300 border border-zinc-200/50 dark:border-white/10 hover:border-zinc-300 dark:hover:border-white/30 inline-flex items-center gap-1 backdrop-blur-sm"
                 >
                   {page.label}
                   <ArrowRight className="w-3 h-3" />

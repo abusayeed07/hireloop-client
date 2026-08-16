@@ -35,7 +35,6 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 import toast from "react-hot-toast";
-// ✅ Import your LoadingPage component
 import LoadingPage from "@/app/loading";
 
 // 🎨 Animation Variants
@@ -164,7 +163,7 @@ const JobApplyForm = ({ job, applicant }) => {
     return null;
   };
 
-  // Skills validation (optional but with min length if provided)
+  // Skills validation
   const validateSkills = (value) => {
     if (value && value.trim().length > 0 && value.trim().length < 2) {
       return "Please enter at least one skill";
@@ -225,7 +224,6 @@ const JobApplyForm = ({ job, applicant }) => {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    // Validate resume file - REQUIRED
     if (!resumeFile) {
       toast.error("Please upload your resume");
       return;
@@ -263,8 +261,6 @@ const JobApplyForm = ({ job, applicant }) => {
         status: "pending",
       };
 
-      console.log("Submitting Application:", submissionData);
-
       const response = await fetch(`${baseUrl}/api/applications`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -273,7 +269,6 @@ const JobApplyForm = ({ job, applicant }) => {
       });
 
       const result = await response.json();
-      console.log("Application result:", result);
 
       if (result.success || result.insertedId) {
         toast.success("Application submitted successfully! 🎉");
@@ -294,7 +289,6 @@ const JobApplyForm = ({ job, applicant }) => {
         setResumeFile(null);
         setCoverLetterFile(null);
         
-        // Redirect to browse jobs
         window.location.href = `/browse-jobs`;
         
       } else {
@@ -308,7 +302,6 @@ const JobApplyForm = ({ job, applicant }) => {
     }
   };
 
-  // ✅ Show LoadingPage when submitting
   if (isSubmitting) {
     return (
       <LoadingPage 
@@ -337,15 +330,15 @@ const JobApplyForm = ({ job, applicant }) => {
       className="min-h-screen flex items-center justify-center px-4 py-8"
     >
       <div className="w-full max-w-5xl">
-        <Card className="group relative overflow-hidden rounded-2xl border border-white/10 bg-gradient-to-br from-zinc-950 via-zinc-900 to-zinc-950 backdrop-blur-xl shadow-2xl transition-all duration-500 hover:border-blue-500/40 hover:shadow-blue-500/20 p-7">
+        <Card className="group relative overflow-hidden rounded-2xl border border-zinc-200/50 dark:border-white/10 bg-white/80 dark:bg-gradient-to-br dark:from-zinc-950 dark:via-zinc-900 dark:to-zinc-950 backdrop-blur-xl shadow-2xl transition-all duration-500 hover:border-blue-400/50 dark:hover:border-blue-500/40 hover:shadow-blue-500/20 p-7">
           <div className="relative z-10">
             
             {/* Header */}
             <motion.div variants={itemVariants} className="mb-6 text-center">
-              <h2 className="text-3xl font-bold bg-gradient-to-r from-blue-400 via-purple-400 to-pink-400 bg-clip-text text-transparent tracking-tight">
+              <h2 className="text-3xl font-bold bg-gradient-to-r from-blue-500 to-purple-500 dark:from-blue-400 dark:via-purple-400 dark:to-pink-400 bg-clip-text text-transparent tracking-tight">
                 Apply for Position
               </h2>
-              <p className="text-zinc-400 text-sm mt-1">
+              <p className="text-zinc-600 dark:text-zinc-400 text-sm mt-1">
                 {job?.jobTitle || "Position"} at {job?.companyName || "Company"}
               </p>
             </motion.div>
@@ -355,8 +348,8 @@ const JobApplyForm = ({ job, applicant }) => {
               {/* ===== PERSONAL INFORMATION ===== */}
               <motion.div variants={itemVariants}>
                 <div className="flex items-center gap-2 mb-3">
-                  <User className="w-4 h-4 text-blue-400" />
-                  <h3 className="text-xs font-semibold text-zinc-400 uppercase tracking-wider">
+                  <User className="w-4 h-4 text-blue-500 dark:text-blue-400" />
+                  <h3 className="text-xs font-semibold text-zinc-500 dark:text-zinc-400 uppercase tracking-wider">
                     Personal Information
                   </h3>
                 </div>
@@ -365,20 +358,20 @@ const JobApplyForm = ({ job, applicant }) => {
                   {/* Full Name */}
                   <motion.div whileHover={{ y: -2 }} transition={{ type: "spring", damping: 15 }}>
                     <TextField name="fullName">
-                      <Label className="text-zinc-400 text-sm">Full Name</Label>
+                      <Label className="text-zinc-600 dark:text-zinc-400 text-sm">Full Name</Label>
                       <div className="relative">
-                        <User className="absolute left-3 top-1/2 -translate-y-1/2 text-zinc-500" size={16} />
+                        <User className="absolute left-3 top-1/2 -translate-y-1/2 text-zinc-400 dark:text-zinc-500" size={16} />
                         <Input
                           placeholder="John Doe"
                           value={formData.fullName}
                           onChange={(e) =>
                             setFormData((prev) => ({ ...prev, fullName: e.target.value }))
                           }
-                          className="pl-9 bg-transparent text-white placeholder:text-zinc-500 border border-white/10 rounded-lg focus:border-blue-500/50 transition-colors"
+                          className="pl-9 bg-transparent text-zinc-900 dark:text-white placeholder:text-zinc-400 dark:placeholder:text-zinc-500 border border-zinc-300/50 dark:border-white/10 rounded-lg focus:border-blue-500/50 transition-colors"
                           readOnly
                         />
                       </div>
-                      <Description className="text-xs text-zinc-500 mt-1">
+                      <Description className="text-xs text-zinc-500 dark:text-zinc-500 mt-1">
                         Pre-filled from your account
                       </Description>
                     </TextField>
@@ -387,20 +380,20 @@ const JobApplyForm = ({ job, applicant }) => {
                   {/* Email */}
                   <motion.div whileHover={{ y: -2 }} transition={{ type: "spring", damping: 15 }}>
                     <TextField name="email" type="email">
-                      <Label className="text-zinc-400 text-sm">Email Address</Label>
+                      <Label className="text-zinc-600 dark:text-zinc-400 text-sm">Email Address</Label>
                       <div className="relative">
-                        <Mail className="absolute left-3 top-1/2 -translate-y-1/2 text-zinc-500" size={16} />
+                        <Mail className="absolute left-3 top-1/2 -translate-y-1/2 text-zinc-400 dark:text-zinc-500" size={16} />
                         <Input
                           placeholder="john@example.com"
                           value={formData.email}
                           onChange={(e) =>
                             setFormData((prev) => ({ ...prev, email: e.target.value }))
                           }
-                          className="pl-9 bg-transparent text-white placeholder:text-zinc-500 border border-white/10 rounded-lg focus:border-blue-500/50 transition-colors"
+                          className="pl-9 bg-transparent text-zinc-900 dark:text-white placeholder:text-zinc-400 dark:placeholder:text-zinc-500 border border-zinc-300/50 dark:border-white/10 rounded-lg focus:border-blue-500/50 transition-colors"
                           readOnly
                         />
                       </div>
-                      <Description className="text-xs text-zinc-500 mt-1">
+                      <Description className="text-xs text-zinc-500 dark:text-zinc-500 mt-1">
                         Pre-filled from your account
                       </Description>
                     </TextField>
@@ -409,47 +402,47 @@ const JobApplyForm = ({ job, applicant }) => {
                   {/* Phone */}
                   <motion.div whileHover={{ y: -2 }} transition={{ type: "spring", damping: 15 }}>
                     <TextField isRequired name="phone" type="tel" validate={validatePhone}>
-                      <Label className="text-zinc-400 text-sm">
-                        Phone Number <span className="text-zinc-500 text-xs">(11 digits)</span>
+                      <Label className="text-zinc-600 dark:text-zinc-400 text-sm">
+                        Phone Number <span className="text-zinc-500 dark:text-zinc-500 text-xs">(11 digits)</span>
                       </Label>
                       <div className="relative">
-                        <Phone className="absolute left-3 top-1/2 -translate-y-1/2 text-zinc-500" size={16} />
+                        <Phone className="absolute left-3 top-1/2 -translate-y-1/2 text-zinc-400 dark:text-zinc-500" size={16} />
                         <Input
                           placeholder="017xxxxxxxx"
                           value={formData.phone}
                           onChange={(e) =>
                             setFormData((prev) => ({ ...prev, phone: e.target.value }))
                           }
-                          className="pl-9 bg-transparent text-white placeholder:text-zinc-500 border border-white/10 rounded-lg focus:border-blue-500/50 transition-colors"
+                          className="pl-9 bg-transparent text-zinc-900 dark:text-white placeholder:text-zinc-400 dark:placeholder:text-zinc-500 border border-zinc-300/50 dark:border-white/10 rounded-lg focus:border-blue-500/50 transition-colors"
                           maxLength={14}
                           readOnly={formData.phone && formData.phone.length > 0}
                         />
                       </div>
-                      <Description className="text-xs text-zinc-500 mt-1">
+                      <Description className="text-xs text-zinc-500 dark:text-zinc-500 mt-1">
                         {formData.phone && formData.phone.length > 0
                           ? "Pre-filled from your account."
                           : "Enter 11 digit phone number (e.g., 01712345678)"}
                       </Description>
-                      <FieldError className="text-xs text-red-500 mt-1" />
+                      <FieldError className="text-xs text-red-500 dark:text-red-400 mt-1" />
                     </TextField>
                   </motion.div>
 
                   {/* Location */}
                   <motion.div whileHover={{ y: -2 }} transition={{ type: "spring", damping: 15 }}>
                     <TextField isRequired name="location" validate={validateLocation}>
-                      <Label className="text-zinc-400 text-sm">Location</Label>
+                      <Label className="text-zinc-600 dark:text-zinc-400 text-sm">Location</Label>
                       <div className="relative">
-                        <MapPin className="absolute left-3 top-1/2 -translate-y-1/2 text-zinc-500" size={16} />
+                        <MapPin className="absolute left-3 top-1/2 -translate-y-1/2 text-zinc-400 dark:text-zinc-500" size={16} />
                         <Input
                           placeholder="City, Country"
                           value={formData.location}
                           onChange={(e) =>
                             setFormData((prev) => ({ ...prev, location: e.target.value }))
                           }
-                          className="pl-9 bg-transparent text-white placeholder:text-zinc-500 border border-white/10 rounded-lg focus:border-blue-500/50 transition-colors"
+                          className="pl-9 bg-transparent text-zinc-900 dark:text-white placeholder:text-zinc-400 dark:placeholder:text-zinc-500 border border-zinc-300/50 dark:border-white/10 rounded-lg focus:border-blue-500/50 transition-colors"
                         />
                       </div>
-                      <FieldError className="text-xs text-red-500 mt-1" />
+                      <FieldError className="text-xs text-red-500 dark:text-red-400 mt-1" />
                     </TextField>
                   </motion.div>
                 </div>
@@ -458,8 +451,8 @@ const JobApplyForm = ({ job, applicant }) => {
               {/* ===== PROFESSIONAL INFORMATION ===== */}
               <motion.div variants={itemVariants}>
                 <div className="flex items-center gap-2 mb-3">
-                  <Briefcase className="w-4 h-4 text-emerald-400" />
-                  <h3 className="text-xs font-semibold text-zinc-400 uppercase tracking-wider">
+                  <Briefcase className="w-4 h-4 text-emerald-500 dark:text-emerald-400" />
+                  <h3 className="text-xs font-semibold text-zinc-500 dark:text-zinc-400 uppercase tracking-wider">
                     Professional Information
                   </h3>
                 </div>
@@ -468,16 +461,16 @@ const JobApplyForm = ({ job, applicant }) => {
                   {/* Current Company */}
                   <motion.div whileHover={{ y: -2 }} transition={{ type: "spring", damping: 15 }}>
                     <TextField name="currentCompany">
-                      <Label className="text-zinc-400 text-sm">Current Company</Label>
+                      <Label className="text-zinc-600 dark:text-zinc-400 text-sm">Current Company</Label>
                       <div className="relative">
-                        <Building2 className="absolute left-3 top-1/2 -translate-y-1/2 text-zinc-500" size={16} />
+                        <Building2 className="absolute left-3 top-1/2 -translate-y-1/2 text-zinc-400 dark:text-zinc-500" size={16} />
                         <Input
                           placeholder="Current employer"
                           value={formData.currentCompany}
                           onChange={(e) =>
                             setFormData((prev) => ({ ...prev, currentCompany: e.target.value }))
                           }
-                          className="pl-9 bg-transparent text-white placeholder:text-zinc-500 border border-white/10 rounded-lg focus:border-blue-500/50 transition-colors"
+                          className="pl-9 bg-transparent text-zinc-900 dark:text-white placeholder:text-zinc-400 dark:placeholder:text-zinc-500 border border-zinc-300/50 dark:border-white/10 rounded-lg focus:border-blue-500/50 transition-colors"
                         />
                       </div>
                     </TextField>
@@ -486,16 +479,16 @@ const JobApplyForm = ({ job, applicant }) => {
                   {/* Current Role */}
                   <motion.div whileHover={{ y: -2 }} transition={{ type: "spring", damping: 15 }}>
                     <TextField name="currentRole">
-                      <Label className="text-zinc-400 text-sm">Current Role</Label>
+                      <Label className="text-zinc-600 dark:text-zinc-400 text-sm">Current Role</Label>
                       <div className="relative">
-                        <Briefcase className="absolute left-3 top-1/2 -translate-y-1/2 text-zinc-500" size={16} />
+                        <Briefcase className="absolute left-3 top-1/2 -translate-y-1/2 text-zinc-400 dark:text-zinc-500" size={16} />
                         <Input
                           placeholder="Job title"
                           value={formData.currentRole}
                           onChange={(e) =>
                             setFormData((prev) => ({ ...prev, currentRole: e.target.value }))
                           }
-                          className="pl-9 bg-transparent text-white placeholder:text-zinc-500 border border-white/10 rounded-lg focus:border-blue-500/50 transition-colors"
+                          className="pl-9 bg-transparent text-zinc-900 dark:text-white placeholder:text-zinc-400 dark:placeholder:text-zinc-500 border border-zinc-300/50 dark:border-white/10 rounded-lg focus:border-blue-500/50 transition-colors"
                         />
                       </div>
                     </TextField>
@@ -504,38 +497,38 @@ const JobApplyForm = ({ job, applicant }) => {
                   {/* Experience */}
                   <motion.div whileHover={{ y: -2 }} transition={{ type: "spring", damping: 15 }}>
                     <TextField isRequired name="experience" validate={validateExperience}>
-                      <Label className="text-zinc-400 text-sm">Years of Experience</Label>
+                      <Label className="text-zinc-600 dark:text-zinc-400 text-sm">Years of Experience</Label>
                       <div className="relative">
-                        <Award className="absolute left-3 top-1/2 -translate-y-1/2 text-zinc-500" size={16} />
+                        <Award className="absolute left-3 top-1/2 -translate-y-1/2 text-zinc-400 dark:text-zinc-500" size={16} />
                         <Input
                           placeholder="e.g. 5 years"
                           value={formData.experience}
                           onChange={(e) =>
                             setFormData((prev) => ({ ...prev, experience: e.target.value }))
                           }
-                          className="pl-9 bg-transparent text-white placeholder:text-zinc-500 border border-white/10 rounded-lg focus:border-blue-500/50 transition-colors"
+                          className="pl-9 bg-transparent text-zinc-900 dark:text-white placeholder:text-zinc-400 dark:placeholder:text-zinc-500 border border-zinc-300/50 dark:border-white/10 rounded-lg focus:border-blue-500/50 transition-colors"
                         />
                       </div>
-                      <FieldError className="text-xs text-red-500 mt-1" />
+                      <FieldError className="text-xs text-red-500 dark:text-red-400 mt-1" />
                     </TextField>
                   </motion.div>
 
                   {/* Education */}
                   <motion.div whileHover={{ y: -2 }} transition={{ type: "spring", damping: 15 }}>
                     <TextField isRequired name="education" validate={validateEducation}>
-                      <Label className="text-zinc-400 text-sm">Highest Education</Label>
+                      <Label className="text-zinc-600 dark:text-zinc-400 text-sm">Highest Education</Label>
                       <div className="relative">
-                        <GraduationCap className="absolute left-3 top-1/2 -translate-y-1/2 text-zinc-500" size={16} />
+                        <GraduationCap className="absolute left-3 top-1/2 -translate-y-1/2 text-zinc-400 dark:text-zinc-500" size={16} />
                         <Input
                           placeholder="e.g. Bachelor's in CS"
                           value={formData.education}
                           onChange={(e) =>
                             setFormData((prev) => ({ ...prev, education: e.target.value }))
                           }
-                          className="pl-9 bg-transparent text-white placeholder:text-zinc-500 border border-white/10 rounded-lg focus:border-blue-500/50 transition-colors"
+                          className="pl-9 bg-transparent text-zinc-900 dark:text-white placeholder:text-zinc-400 dark:placeholder:text-zinc-500 border border-zinc-300/50 dark:border-white/10 rounded-lg focus:border-blue-500/50 transition-colors"
                         />
                       </div>
-                      <FieldError className="text-xs text-red-500 mt-1" />
+                      <FieldError className="text-xs text-red-500 dark:text-red-400 mt-1" />
                     </TextField>
                   </motion.div>
                 </div>
@@ -544,8 +537,8 @@ const JobApplyForm = ({ job, applicant }) => {
               {/* ===== LINKS & SOCIAL ===== */}
               <motion.div variants={itemVariants}>
                 <div className="flex items-center gap-2 mb-3">
-                  <Link2 className="w-4 h-4 text-purple-400" />
-                  <h3 className="text-xs font-semibold text-zinc-400 uppercase tracking-wider">
+                  <Link2 className="w-4 h-4 text-purple-500 dark:text-purple-400" />
+                  <h3 className="text-xs font-semibold text-zinc-500 dark:text-zinc-400 uppercase tracking-wider">
                     Links & Social Profiles
                   </h3>
                 </div>
@@ -554,16 +547,16 @@ const JobApplyForm = ({ job, applicant }) => {
                   {/* Portfolio */}
                   <motion.div whileHover={{ y: -2 }} transition={{ type: "spring", damping: 15 }}>
                     <TextField name="portfolio">
-                      <Label className="text-zinc-400 text-sm">Portfolio / Website</Label>
+                      <Label className="text-zinc-600 dark:text-zinc-400 text-sm">Portfolio / Website</Label>
                       <div className="relative">
-                        <Globe className="absolute left-3 top-1/2 -translate-y-1/2 text-zinc-500" size={16} />
+                        <Globe className="absolute left-3 top-1/2 -translate-y-1/2 text-zinc-400 dark:text-zinc-500" size={16} />
                         <Input
                           placeholder="https://yourportfolio.com"
                           value={formData.portfolio}
                           onChange={(e) =>
                             setFormData((prev) => ({ ...prev, portfolio: e.target.value }))
                           }
-                          className="pl-9 bg-transparent text-white placeholder:text-zinc-500 border border-white/10 rounded-lg focus:border-blue-500/50 transition-colors"
+                          className="pl-9 bg-transparent text-zinc-900 dark:text-white placeholder:text-zinc-400 dark:placeholder:text-zinc-500 border border-zinc-300/50 dark:border-white/10 rounded-lg focus:border-blue-500/50 transition-colors"
                         />
                       </div>
                     </TextField>
@@ -572,16 +565,16 @@ const JobApplyForm = ({ job, applicant }) => {
                   {/* LinkedIn */}
                   <motion.div whileHover={{ y: -2 }} transition={{ type: "spring", damping: 15 }}>
                     <TextField name="linkedin">
-                      <Label className="text-zinc-400 text-sm">LinkedIn Profile</Label>
+                      <Label className="text-zinc-600 dark:text-zinc-400 text-sm">LinkedIn Profile</Label>
                       <div className="relative">
-                        <Link2 className="absolute left-3 top-1/2 -translate-y-1/2 text-zinc-500" size={16} />
+                        <Link2 className="absolute left-3 top-1/2 -translate-y-1/2 text-zinc-400 dark:text-zinc-500" size={16} />
                         <Input
                           placeholder="https://linkedin.com/in/username"
                           value={formData.linkedin}
                           onChange={(e) =>
                             setFormData((prev) => ({ ...prev, linkedin: e.target.value }))
                           }
-                          className="pl-9 bg-transparent text-white placeholder:text-zinc-500 border border-white/10 rounded-lg focus:border-blue-500/50 transition-colors"
+                          className="pl-9 bg-transparent text-zinc-900 dark:text-white placeholder:text-zinc-400 dark:placeholder:text-zinc-500 border border-zinc-300/50 dark:border-white/10 rounded-lg focus:border-blue-500/50 transition-colors"
                         />
                       </div>
                     </TextField>
@@ -590,19 +583,19 @@ const JobApplyForm = ({ job, applicant }) => {
                   {/* Skills */}
                   <motion.div whileHover={{ y: -2 }} transition={{ type: "spring", damping: 15 }}>
                     <TextField name="skills" className="md:col-span-2" validate={validateSkills}>
-                      <Label className="text-zinc-400 text-sm">Skills</Label>
+                      <Label className="text-zinc-600 dark:text-zinc-400 text-sm">Skills</Label>
                       <div className="relative">
-                        <Code2 className="absolute left-3 top-1/2 -translate-y-1/2 text-zinc-500" size={16} />
+                        <Code2 className="absolute left-3 top-1/2 -translate-y-1/2 text-zinc-400 dark:text-zinc-500" size={16} />
                         <Input
                           placeholder="React, Node.js, Python, MongoDB..."
                           value={formData.skills}
                           onChange={(e) =>
                             setFormData((prev) => ({ ...prev, skills: e.target.value }))
                           }
-                          className="pl-9 bg-transparent text-white placeholder:text-zinc-500 border border-white/10 rounded-lg focus:border-blue-500/50 transition-colors"
+                          className="pl-9 bg-transparent text-zinc-900 dark:text-white placeholder:text-zinc-400 dark:placeholder:text-zinc-500 border border-zinc-300/50 dark:border-white/10 rounded-lg focus:border-blue-500/50 transition-colors"
                         />
                       </div>
-                      <FieldError className="text-xs text-red-500 mt-1" />
+                      <FieldError className="text-xs text-red-500 dark:text-red-400 mt-1" />
                     </TextField>
                   </motion.div>
                 </div>
@@ -611,8 +604,8 @@ const JobApplyForm = ({ job, applicant }) => {
               {/* ===== DOCUMENTS ===== */}
               <motion.div variants={itemVariants}>
                 <div className="flex items-center gap-2 mb-3">
-                  <Upload className="w-4 h-4 text-amber-400" />
-                  <h3 className="text-xs font-semibold text-zinc-400 uppercase tracking-wider">
+                  <Upload className="w-4 h-4 text-amber-500 dark:text-amber-400" />
+                  <h3 className="text-xs font-semibold text-zinc-500 dark:text-zinc-400 uppercase tracking-wider">
                     Documents
                   </h3>
                 </div>
@@ -625,7 +618,7 @@ const JobApplyForm = ({ job, applicant }) => {
                     className={`relative border-2 border-dashed rounded-xl p-6 text-center transition-all cursor-pointer group ${
                       resumeFile
                         ? "border-emerald-500/50 bg-emerald-500/5"
-                        : "border-zinc-700 hover:border-blue-500/50 bg-zinc-800/20"
+                        : "border-zinc-300/50 dark:border-zinc-700 hover:border-blue-500/50 bg-zinc-100/50 dark:bg-zinc-800/20"
                     }`}
                   >
                     <input
@@ -638,8 +631,8 @@ const JobApplyForm = ({ job, applicant }) => {
                     <label htmlFor="resume" className="cursor-pointer block">
                       {resumeFile ? (
                         <div className="flex items-center justify-center gap-3">
-                          <Check className="w-5 h-5 text-emerald-400" />
-                          <span className="text-emerald-400 font-medium text-sm truncate max-w-[150px]">
+                          <Check className="w-5 h-5 text-emerald-500 dark:text-emerald-400" />
+                          <span className="text-emerald-600 dark:text-emerald-400 font-medium text-sm truncate max-w-[150px]">
                             {resumeFile.name}
                           </span>
                           <button
@@ -648,21 +641,21 @@ const JobApplyForm = ({ job, applicant }) => {
                               e.stopPropagation();
                               removeFile("resume");
                             }}
-                            className="text-zinc-500 hover:text-red-400 transition"
+                            className="text-zinc-500 hover:text-red-500 dark:hover:text-red-400 transition"
                           >
                             <X className="w-4 h-4" />
                           </button>
                         </div>
                       ) : (
                         <>
-                          <FileText className="w-8 h-8 text-zinc-500 mx-auto mb-2 group-hover:text-blue-400 transition" />
-                          <p className="text-zinc-400 text-sm group-hover:text-white transition">
-                            Upload Resume <span className="text-red-400">*</span>
+                          <FileText className="w-8 h-8 text-zinc-400 dark:text-zinc-500 mx-auto mb-2 group-hover:text-blue-500 dark:group-hover:text-blue-400 transition" />
+                          <p className="text-zinc-600 dark:text-zinc-400 text-sm group-hover:text-zinc-900 dark:group-hover:text-white transition">
+                            Upload Resume <span className="text-red-500 dark:text-red-400">*</span>
                           </p>
-                          <p className="text-xs text-zinc-600 mt-1">
+                          <p className="text-xs text-zinc-500 dark:text-zinc-600 mt-1">
                             PDF, DOC, DOCX (Max 5MB)
                           </p>
-                          <p className="text-xs text-red-500 mt-2">
+                          <p className="text-xs text-red-500 dark:text-red-400 mt-2">
                             Resume is required
                           </p>
                         </>
@@ -677,7 +670,7 @@ const JobApplyForm = ({ job, applicant }) => {
                     className={`relative border-2 border-dashed rounded-xl p-6 text-center transition-all cursor-pointer group ${
                       coverLetterFile
                         ? "border-emerald-500/50 bg-emerald-500/5"
-                        : "border-zinc-700 hover:border-blue-500/50 bg-zinc-800/20"
+                        : "border-zinc-300/50 dark:border-zinc-700 hover:border-blue-500/50 bg-zinc-100/50 dark:bg-zinc-800/20"
                     }`}
                   >
                     <input
@@ -693,8 +686,8 @@ const JobApplyForm = ({ job, applicant }) => {
                     >
                       {coverLetterFile ? (
                         <div className="flex items-center justify-center gap-3">
-                          <Check className="w-5 h-5 text-emerald-400" />
-                          <span className="text-emerald-400 font-medium text-sm truncate max-w-[150px]">
+                          <Check className="w-5 h-5 text-emerald-500 dark:text-emerald-400" />
+                          <span className="text-emerald-600 dark:text-emerald-400 font-medium text-sm truncate max-w-[150px]">
                             {coverLetterFile.name}
                           </span>
                           <button
@@ -703,18 +696,18 @@ const JobApplyForm = ({ job, applicant }) => {
                               e.stopPropagation();
                               removeFile("coverLetter");
                             }}
-                            className="text-zinc-500 hover:text-red-400 transition"
+                            className="text-zinc-500 hover:text-red-500 dark:hover:text-red-400 transition"
                           >
                             <X className="w-4 h-4" />
                           </button>
                         </div>
                       ) : (
                         <>
-                          <FileText className="w-8 h-8 text-zinc-500 mx-auto mb-2 group-hover:text-blue-400 transition" />
-                          <p className="text-zinc-400 text-sm group-hover:text-white transition">
+                          <FileText className="w-8 h-8 text-zinc-400 dark:text-zinc-500 mx-auto mb-2 group-hover:text-blue-500 dark:group-hover:text-blue-400 transition" />
+                          <p className="text-zinc-600 dark:text-zinc-400 text-sm group-hover:text-zinc-900 dark:group-hover:text-white transition">
                             Upload Cover Letter (Optional)
                           </p>
-                          <p className="text-xs text-zinc-600 mt-1">
+                          <p className="text-xs text-zinc-500 dark:text-zinc-600 mt-1">
                             PDF, DOC, DOCX, TXT (Max 5MB)
                           </p>
                         </>
@@ -727,8 +720,8 @@ const JobApplyForm = ({ job, applicant }) => {
               {/* ===== COVER LETTER TEXT ===== */}
               <motion.div variants={itemVariants}>
                 <div className="flex items-center gap-2 mb-3">
-                  <FileText className="w-4 h-4 text-rose-400" />
-                  <h3 className="text-xs font-semibold text-zinc-400 uppercase tracking-wider">
+                  <FileText className="w-4 h-4 text-rose-500 dark:text-rose-400" />
+                  <h3 className="text-xs font-semibold text-zinc-500 dark:text-zinc-400 uppercase tracking-wider">
                     Cover Letter (Optional)
                   </h3>
                 </div>
@@ -744,9 +737,9 @@ const JobApplyForm = ({ job, applicant }) => {
                     }))
                   }
                   rows={4}
-                  className="w-full bg-transparent text-white placeholder:text-zinc-500 border border-white/10 rounded-lg focus:border-blue-500/50 transition-colors p-3 min-h-[120px]"
+                  className="w-full bg-transparent text-zinc-900 dark:text-white placeholder:text-zinc-400 dark:placeholder:text-zinc-500 border border-zinc-300/50 dark:border-white/10 rounded-lg focus:border-blue-500/50 transition-colors p-3 min-h-[120px]"
                 />
-                <Description className="text-xs text-zinc-500 mt-1">
+                <Description className="text-xs text-zinc-500 dark:text-zinc-500 mt-1">
                   Optional: Share more about why you're interested in this role
                 </Description>
               </motion.div>
@@ -754,15 +747,15 @@ const JobApplyForm = ({ job, applicant }) => {
               {/* ===== SUBMIT ===== */}
               <motion.div
                 variants={itemVariants}
-                className="flex flex-col sm:flex-row gap-4 justify-between items-center pt-4 border-t border-white/5"
+                className="flex flex-col sm:flex-row gap-4 justify-between items-center pt-4 border-t border-zinc-200/50 dark:border-white/5"
               >
-                <p className="text-xs text-zinc-500">
+                <p className="text-xs text-zinc-500 dark:text-zinc-500">
                   By submitting, you agree to our{" "}
-                  <Link href="/terms" className="text-blue-400 hover:text-blue-300">
+                  <Link href="/terms" className="text-blue-500 dark:text-blue-400 hover:text-blue-600 dark:hover:text-blue-300">
                     Terms of Service
                   </Link>{" "}
                   and{" "}
-                  <Link href="/privacy" className="text-blue-400 hover:text-blue-300">
+                  <Link href="/privacy" className="text-blue-500 dark:text-blue-400 hover:text-blue-600 dark:hover:text-blue-300">
                     Privacy Policy
                   </Link>
                 </p>

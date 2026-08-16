@@ -1,4 +1,3 @@
-// frontend/src/app/dashboard/seeker/page.jsx
 "use client";
 
 import { authClient } from "@/lib/auth-client";
@@ -416,8 +415,8 @@ const SeekerDashboardPage = () => {
   }
 
   return (
-    <div className="min-h-screen bg-[#090a0f] text-white p-4 md:p-6 overflow-hidden relative">
-      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[800px] h-[400px] bg-blue-500/5 blur-[100px] pointer-events-none -z-10" />
+    <div className="min-h-screen bg-zinc-50 dark:bg-[#090a0f] text-zinc-900 dark:text-white p-4 md:p-6 overflow-hidden relative">
+      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[800px] h-[400px] bg-blue-500/5 dark:bg-blue-500/5 blur-[100px] pointer-events-none -z-10" />
 
       <div className="max-w-7xl mx-auto relative z-10">
         {/* 🔍 Search Bar */}
@@ -428,11 +427,11 @@ const SeekerDashboardPage = () => {
         >
           <div className="relative group">
             <div className="absolute inset-0 bg-gradient-to-r from-blue-500/20 to-purple-500/20 rounded-2xl blur-xl opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
-            <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-zinc-500 group-hover:text-blue-400 transition-colors" />
+            <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-zinc-500 dark:text-zinc-500 group-hover:text-blue-400 transition-colors" />
             <input
               type="text"
               placeholder="Search for your next career opportunity..."
-              className="w-full pl-12 pr-4 py-4 bg-[#111214] border border-white/5 rounded-2xl text-white placeholder-zinc-500 focus:outline-none focus:border-blue-500/50 focus:ring-1 focus:ring-blue-500/50 transition-all shadow-lg shadow-black/20"
+              className="w-full pl-12 pr-4 py-4 bg-white dark:bg-[#111214] border border-zinc-200/50 dark:border-white/5 rounded-2xl text-zinc-900 dark:text-white placeholder-zinc-400 dark:placeholder-zinc-500 focus:outline-none focus:border-blue-500/50 focus:ring-1 focus:ring-blue-500/50 transition-all shadow-lg shadow-black/5 dark:shadow-black/20"
               onClick={() => router.push("/browse-jobs")}
               readOnly
             />
@@ -456,16 +455,16 @@ const SeekerDashboardPage = () => {
               key={idx}
               variants={statsVariants}
               whileHover={{ y: -4, borderColor: "rgba(255,255,255,0.2)" }}
-              className="bg-[#111214] border border-white/5 rounded-2xl p-5 hover:shadow-lg hover:shadow-black/40 transition-all cursor-default"
+              className="bg-white dark:bg-[#111214] border border-zinc-200/50 dark:border-white/5 rounded-2xl p-5 hover:shadow-lg hover:shadow-black/5 dark:hover:shadow-black/40 transition-all cursor-default"
             >
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-xs text-zinc-500 font-medium uppercase tracking-wider">{stat.label}</p>
+                  <p className="text-xs text-zinc-500 dark:text-zinc-500 font-medium uppercase tracking-wider">{stat.label}</p>
                   <motion.p 
                     key={stat.value}
                     initial={{ scale: 0.8 }}
                     animate={{ scale: 1 }}
-                    className="text-3xl font-bold text-white mt-1"
+                    className="text-3xl font-bold text-zinc-900 dark:text-white mt-1"
                   >
                     {stat.value}
                   </motion.p>
@@ -478,16 +477,16 @@ const SeekerDashboardPage = () => {
           ))}
         </motion.div>
 
-        {/* 📊 Stats Overview Chart - Like Admin Dashboard (Single Chart with 4 bars) */}
+        {/* 📊 Stats Overview Chart */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.3 }}
           className="mb-8"
         >
-          <div className="bg-[#111214] border border-white/5 rounded-2xl p-6">
+          <div className="bg-white dark:bg-[#111214] border border-zinc-200/50 dark:border-white/5 rounded-2xl p-6">
             <div className="flex items-center justify-between mb-6">
-              <h3 className="text-sm font-medium text-zinc-400 uppercase tracking-wider">
+              <h3 className="text-sm font-medium text-zinc-500 dark:text-zinc-400 uppercase tracking-wider">
                 Dashboard Overview
               </h3>
               <span className="text-xs text-zinc-500">
@@ -495,7 +494,6 @@ const SeekerDashboardPage = () => {
               </span>
             </div>
             
-            {/* Single Chart - Like Admin Dashboard Job Posts by Category */}
             <div className="w-full" style={{ height: '220px' }}>
               {hasStatsData ? (
                 <ResponsiveContainer width="100%" height="100%">
@@ -503,7 +501,7 @@ const SeekerDashboardPage = () => {
                     data={statsChartDataWithValues}
                     margin={{ top: 10, right: 10, left: 0, bottom: 5 }}
                   >
-                    <CartesianGrid strokeDasharray="3 3" stroke="#1f2128" vertical={false} />
+                    <CartesianGrid strokeDasharray="3 3" stroke="#e4e4e7 dark:#1f2128" vertical={false} />
                     <XAxis 
                       dataKey="name" 
                       axisLine={false} 
@@ -518,14 +516,14 @@ const SeekerDashboardPage = () => {
                       width={40}
                     />
                     <Tooltip
-                      cursor={{ fill: "rgba(255,255,255,0.03)" }}
+                      cursor={{ fill: "rgba(0,0,0,0.03)" }}
                       contentStyle={{
-                        backgroundColor: "#18181b",
-                        borderColor: "#27272a",
+                        backgroundColor: "#ffffff",
+                        borderColor: "#e4e4e7",
                         borderRadius: 8,
-                        color: "#fff",
+                        color: "#18181b",
                         fontSize: 12,
-                        boxShadow: "0 4px 12px rgba(0,0,0,0.5)",
+                        boxShadow: "0 4px 12px rgba(0,0,0,0.1)",
                       }}
                       formatter={(value) => [`${value}`, "Count"]}
                     />
@@ -556,9 +554,9 @@ const SeekerDashboardPage = () => {
           transition={{ delay: 0.4 }}
           className="mb-8"
         >
-          <div className="bg-[#111214] border border-white/5 rounded-2xl p-6">
+          <div className="bg-white dark:bg-[#111214] border border-zinc-200/50 dark:border-white/5 rounded-2xl p-6">
             <div className="flex items-center justify-between mb-6">
-              <h3 className="text-sm font-medium text-zinc-400 uppercase tracking-wider">
+              <h3 className="text-sm font-medium text-zinc-500 dark:text-zinc-400 uppercase tracking-wider">
                 Application Status
               </h3>
               <span className="text-xs text-zinc-500">
@@ -566,7 +564,6 @@ const SeekerDashboardPage = () => {
               </span>
             </div>
             
-            {/* Application Status Cards */}
             <div className="grid grid-cols-2 md:grid-cols-5 gap-3">
               {[
                 { label: "Applied", value: applicationStatus.applied, color: "blue" },
@@ -610,10 +607,10 @@ const SeekerDashboardPage = () => {
         >
           <div className="flex justify-between items-center mb-3">
             <div className="flex items-center gap-2">
-              <Briefcase className="w-5 h-5 text-zinc-400" />
-              <h2 className="text-lg font-semibold text-white flex items-center gap-2">
+              <Briefcase className="w-5 h-5 text-zinc-500 dark:text-zinc-400" />
+              <h2 className="text-lg font-semibold text-zinc-900 dark:text-white flex items-center gap-2">
                 Recent Applications 
-                <span className="text-sm font-normal text-zinc-400 bg-zinc-800 px-2 py-0.5 rounded-full border border-white/5">
+                <span className="text-sm font-normal text-zinc-500 dark:text-zinc-400 bg-zinc-200 dark:bg-zinc-800 px-2 py-0.5 rounded-full border border-zinc-200/50 dark:border-white/5">
                   {applications.length}
                 </span>
               </h2>
@@ -627,9 +624,9 @@ const SeekerDashboardPage = () => {
           </div>
 
           {applications.length === 0 ? (
-            <div className="p-8 bg-[#111214] border border-white/5 rounded-xl text-center">
-              <FileText className="w-10 h-10 text-zinc-600 mx-auto mb-3" />
-              <p className="text-zinc-400">You haven't applied to any jobs yet.</p>
+            <div className="p-8 bg-white dark:bg-[#111214] border border-zinc-200/50 dark:border-white/5 rounded-xl text-center">
+              <FileText className="w-10 h-10 text-zinc-400 dark:text-zinc-600 mx-auto mb-3" />
+              <p className="text-zinc-500 dark:text-zinc-400">You haven't applied to any jobs yet.</p>
               <button 
                 onClick={() => router.push("/browse-jobs")}
                 className="mt-4 px-4 py-2 bg-blue-600 hover:bg-blue-500 text-white text-sm rounded-xl transition-colors"
@@ -644,11 +641,11 @@ const SeekerDashboardPage = () => {
                   key={app._id || idx}
                   variants={itemVariants}
                   whileHover={{ y: -4 }}
-                  className="p-4 bg-[#111214] border border-white/5 rounded-xl hover:border-white/10 transition-all cursor-pointer"
+                  className="p-4 bg-white dark:bg-[#111214] border border-zinc-200/50 dark:border-white/5 rounded-xl hover:border-zinc-300 dark:hover:border-white/10 transition-all cursor-pointer"
                   onClick={() => router.push("/dashboard/seeker/applications")}
                 >
                   <div className="flex items-start justify-between mb-2">
-                    <h4 className="font-medium text-white truncate">{app.jobTitle || "Job Title"}</h4>
+                    <h4 className="font-medium text-zinc-900 dark:text-white truncate">{app.jobTitle || "Job Title"}</h4>
                     <span className={`px-2 py-0.5 text-[10px] font-medium rounded-full border ${getStatusConfig(app.status).color}`}>
                       {formatStatus(app.status)}
                     </span>
@@ -656,7 +653,7 @@ const SeekerDashboardPage = () => {
                   <p className="text-xs text-zinc-500 flex items-center gap-2">
                     <Building2 className="w-3 h-3" /> {app.companyName || "Company"}
                   </p>
-                  <p className="text-[10px] text-zinc-600 mt-2">
+                  <p className="text-[10px] text-zinc-400 dark:text-zinc-600 mt-2">
                     {app.createdAt ? new Date(app.createdAt).toLocaleDateString() : "Recently"}
                   </p>
                 </motion.div>
@@ -674,21 +671,21 @@ const SeekerDashboardPage = () => {
         >
           {/* Profile Card */}
           <motion.div variants={itemVariants} className="lg:col-span-1">
-            <div className="bg-[#111214] border border-white/5 rounded-2xl p-6 shadow-lg h-full">
-              <div className="flex flex-col items-center text-center border-b border-white/5 pb-6">
+            <div className="bg-white dark:bg-[#111214] border border-zinc-200/50 dark:border-white/5 rounded-2xl p-6 shadow-lg h-full">
+              <div className="flex flex-col items-center text-center border-b border-zinc-200/50 dark:border-white/5 pb-6">
                 <div className="relative w-24 h-24 rounded-full bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center text-3xl font-bold text-white mb-4 overflow-hidden shadow-lg shadow-blue-500/20">
                   {user?.image ? (
                     <Image src={user.image} alt={user.name || "User"} width={96} height={96} className="w-full h-full object-cover" />
                   ) : (
                     <span>{userInitial}</span>
                   )}
-                  <div className="absolute bottom-0 right-0 bg-emerald-500 w-4 h-4 rounded-full border-2 border-[#111214]" />
+                  <div className="absolute bottom-0 right-0 bg-emerald-500 w-4 h-4 rounded-full border-2 border-white dark:border-[#111214]" />
                 </div>
-                <h3 className="text-xl font-semibold text-white">{user?.name || "Welcome back!"}</h3>
-                <p className="text-sm text-zinc-400">{user?.email || "user@example.com"}</p>
+                <h3 className="text-xl font-semibold text-zinc-900 dark:text-white">{user?.name || "Welcome back!"}</h3>
+                <p className="text-sm text-zinc-500 dark:text-zinc-400">{user?.email || "user@example.com"}</p>
                 <button
                   onClick={() => router.push("/profile")}
-                  className="mt-4 px-5 py-2 bg-zinc-800/50 hover:bg-zinc-700 text-white rounded-xl text-sm font-medium transition-colors border border-white/5 hover:border-white/10"
+                  className="mt-4 px-5 py-2 bg-zinc-200 dark:bg-zinc-800/50 hover:bg-zinc-300 dark:hover:bg-zinc-700 text-zinc-900 dark:text-white rounded-xl text-sm font-medium transition-colors border border-zinc-200/50 dark:border-white/5 hover:border-zinc-300 dark:hover:border-white/10"
                 >
                   Edit Profile
                 </button>
@@ -698,12 +695,12 @@ const SeekerDashboardPage = () => {
 
           {/* Activity Feed */}
           <motion.div variants={itemVariants} className="lg:col-span-2">
-            <div className="bg-[#111214] border border-white/5 rounded-2xl p-6 shadow-lg h-full flex flex-col">
-              <div className="flex justify-between items-center mb-6 border-b border-white/5 pb-4">
+            <div className="bg-white dark:bg-[#111214] border border-zinc-200/50 dark:border-white/5 rounded-2xl p-6 shadow-lg h-full flex flex-col">
+              <div className="flex justify-between items-center mb-6 border-b border-zinc-200/50 dark:border-white/5 pb-4">
                 <div className="flex items-center gap-2">
-                  <Bell className="w-5 h-5 text-zinc-400" />
-                  <h3 className="text-lg font-semibold text-white">Recent Activity</h3>
-                  <span className="text-xs text-zinc-500 bg-zinc-800 px-2 py-0.5 rounded-full">
+                  <Bell className="w-5 h-5 text-zinc-500 dark:text-zinc-400" />
+                  <h3 className="text-lg font-semibold text-zinc-900 dark:text-white">Recent Activity</h3>
+                  <span className="text-xs text-zinc-500 dark:text-zinc-500 bg-zinc-200 dark:bg-zinc-800 px-2 py-0.5 rounded-full">
                     {recentActivity.length}
                   </span>
                 </div>
@@ -718,8 +715,8 @@ const SeekerDashboardPage = () => {
               <div className="space-y-3 flex-1">
                 {currentActivities.length === 1 && currentActivities[0].id === "empty-1" ? (
                   <div className="text-center py-12">
-                    <Clock className="w-12 h-12 text-zinc-600 mx-auto mb-3" />
-                    <p className="text-zinc-400 font-medium">No recent activity</p>
+                    <Clock className="w-12 h-12 text-zinc-400 dark:text-zinc-600 mx-auto mb-3" />
+                    <p className="text-zinc-500 dark:text-zinc-400 font-medium">No recent activity</p>
                   </div>
                 ) : (
                   <AnimatePresence>
@@ -729,8 +726,8 @@ const SeekerDashboardPage = () => {
                         initial={{ opacity: 0, x: -20 }}
                         animate={{ opacity: 1, x: 0 }}
                         transition={{ delay: idx * 0.05 }}
-                        whileHover={{ x: 6, backgroundColor: "rgba(255,255,255,0.03)" }}
-                        className="flex items-start gap-3 p-4 bg-zinc-800/10 rounded-xl hover:border-white/5 border border-transparent transition-all cursor-pointer"
+                        whileHover={{ x: 6, backgroundColor: "rgba(0,0,0,0.02)" }}
+                        className="flex items-start gap-3 p-4 bg-zinc-100/50 dark:bg-zinc-800/10 rounded-xl hover:border-zinc-200/50 dark:hover:border-white/5 border border-transparent transition-all cursor-pointer"
                         onClick={() => router.push("/dashboard/seeker/applications")}
                       >
                         <div className={`p-2.5 rounded-lg shrink-0 ${
@@ -743,12 +740,12 @@ const SeekerDashboardPage = () => {
                            <Bell className="w-4 h-4" />}
                         </div>
                         <div className="flex-1 min-w-0">
-                          <p className="text-sm text-white leading-snug">{activity.title}</p>
+                          <p className="text-sm text-zinc-900 dark:text-white leading-snug">{activity.title}</p>
                           <div className="flex items-center gap-2 mt-1 flex-wrap">
                             <span className="text-xs text-zinc-500">{activity.time}</span>
                             {activity.status && (
                               <>
-                                <span className="w-1 h-1 rounded-full bg-zinc-600" />
+                                <span className="w-1 h-1 rounded-full bg-zinc-300 dark:bg-zinc-600" />
                                 <span className={`px-2 py-0.5 rounded-full text-[10px] font-medium border ${getStatusConfig(activity.status).color}`}>
                                   {formatStatus(activity.status)}
                                 </span>
@@ -763,7 +760,7 @@ const SeekerDashboardPage = () => {
               </div>
 
               {totalActivityPages > 1 && (
-                <div className="pt-6 mt-4 border-t border-white/5 flex justify-center">
+                <div className="pt-6 mt-4 border-t border-zinc-200/50 dark:border-white/5 flex justify-center">
                   <Pagination
                     currentPage={activityPage}
                     totalPages={totalActivityPages}

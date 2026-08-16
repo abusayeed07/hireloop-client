@@ -24,9 +24,8 @@ import {
 import { Card, Button } from "@heroui/react";
 import toast from "react-hot-toast";
 import { useSession } from "@/lib/auth-client";
-import LoadingPage from "@/app/loading"; // ✅ Import dynamic loading page
+import LoadingPage from "@/app/loading";
 
-// Helper functions...
 const formatDate = (dateString) => {
   if (!dateString) return "N/A";
   return new Date(dateString).toLocaleDateString("en-US", {
@@ -70,7 +69,6 @@ const getSkillsArray = (skills) => {
 };
 
 export default function JobDetailsPage({ params }) {
-  // ✅ FIX: Unwrap the async params using React.use()
   const unwrappedParams = use(params);
   const jobId = unwrappedParams.id;
   
@@ -101,7 +99,6 @@ function JobDetailsContent({ jobId }) {
         }
         setJob(jobData);
 
-        // ✅ CRITICAL FIX: Pass the userId as the 2nd argument!
         if (session?.user?.id) {
           try {
             const saved = await checkJobSaved(jobId.toString(), session.user.id);
@@ -145,10 +142,8 @@ function JobDetailsContent({ jobId }) {
     setIsSaving(true);
 
     try {
-      // ✅ CORRECT: Passing 2 args (jobId, userId)
       const result = await saveJob(job._id.toString(), session.user.id);
 
-      // ✅ Check result.success === false (handles 401 and 400 errors)
       if (result && result.success === false) {
         if (result.error?.toLowerCase().includes('already saved')) {
           toast.error("You have already saved this job!");
@@ -174,9 +169,8 @@ function JobDetailsContent({ jobId }) {
 
   const containerClasses = isInDashboard
     ? "py-6 px-4 md:px-8"
-    : "min-h-screen bg-[#08090B] py-6 px-4 md:px-8";
+    : "min-h-screen bg-zinc-50 dark:bg-zinc-950 py-6 px-4 md:px-8";
 
-  // ✅ USE DYNAMIC LOADING PAGE INSTEAD OF SKELETON
   if (loading) {
     return (
       <LoadingPage 
@@ -222,7 +216,7 @@ function JobDetailsContent({ jobId }) {
                     ? "/dashboard/seeker/applications"
                     : "/browse-jobs"
                 }
-                className="inline-flex items-center gap-2 px-4 py-2.5 bg-white/5 backdrop-blur-sm border border-white/10 hover:bg-white/10 text-zinc-300 hover:text-white rounded-xl transition-all duration-200 group shadow-lg shadow-black/20"
+                className="inline-flex items-center gap-2 px-4 py-2.5 bg-white/80 dark:bg-zinc-900/80 backdrop-blur-sm border border-zinc-200/50 dark:border-zinc-800/50 hover:bg-zinc-50 dark:hover:bg-zinc-800/80 text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white rounded-xl transition-all duration-200 group shadow-sm dark:shadow-none"
               >
                 <ArrowLeft className="w-4 h-4 group-hover:-translate-x-1 transition-transform" />
                 <span className="text-sm font-medium">
@@ -240,7 +234,7 @@ function JobDetailsContent({ jobId }) {
               >
                 <Link
                   href="/dashboard/seeker"
-                  className="inline-flex items-center gap-2 px-4 py-2.5 bg-cyan-500/10 backdrop-blur-sm border border-cyan-500/20 hover:bg-cyan-500/20 text-cyan-400 hover:text-cyan-300 rounded-xl transition-all duration-200"
+                  className="inline-flex items-center gap-2 px-4 py-2.5 bg-cyan-50 dark:bg-cyan-500/10 backdrop-blur-sm border border-cyan-200/50 dark:border-cyan-500/20 hover:bg-cyan-100 dark:hover:bg-cyan-500/20 text-cyan-700 dark:text-cyan-400 hover:text-cyan-900 dark:hover:text-cyan-300 rounded-xl transition-all duration-200"
                 >
                   <LayoutDashboard className="w-4 h-4" />
                   <span className="text-sm font-medium">Dashboard</span>
@@ -256,10 +250,10 @@ function JobDetailsContent({ jobId }) {
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.1 }}
         >
-          <Card className="bg-[#111214] border border-white/5 rounded-2xl shadow-xl shadow-black/20 p-6 md:p-8 mb-6">
+          <Card className="bg-white/80 dark:bg-zinc-900/80 backdrop-blur-sm border border-zinc-200/50 dark:border-zinc-800/50 rounded-2xl shadow-sm dark:shadow-none p-6 md:p-8 mb-6">
             <div className="flex flex-col md:flex-row md:items-center gap-4 md:gap-6">
               {/* Logo */}
-              <div className="relative h-16 w-16 shrink-0 overflow-hidden rounded-lg bg-zinc-800/50 border border-white/10">
+              <div className="relative h-16 w-16 shrink-0 overflow-hidden rounded-lg bg-zinc-50 dark:bg-zinc-800/50 border border-zinc-200/50 dark:border-zinc-800/50">
                 {job?.jobsLogo ? (
                   <Image
                     src={job.jobsLogo}
@@ -278,7 +272,7 @@ function JobDetailsContent({ jobId }) {
                   />
                 ) : (
                   <div className="flex h-full w-full items-center justify-center">
-                    <House size={28} className="text-zinc-500" />
+                    <House size={28} className="text-zinc-400 dark:text-zinc-500" />
                   </div>
                 )}
               </div>
@@ -286,19 +280,19 @@ function JobDetailsContent({ jobId }) {
               {/* Title & Company */}
               <div className="flex-1 min-w-0">
                 <div className="flex flex-wrap items-center gap-3 mb-1">
-                  <h1 className="text-2xl md:text-3xl font-bold text-white truncate">
+                  <h1 className="text-2xl md:text-3xl font-bold text-zinc-900 dark:text-white truncate">
                     {job?.jobTitle}
                   </h1>
-                  <span className="px-2 py-0.5 bg-emerald-500/10 text-emerald-400 text-[10px] font-medium rounded-full border border-emerald-500/20">
+                  <span className="px-2 py-0.5 bg-emerald-50 dark:bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 text-[10px] font-medium rounded-full border border-emerald-200/50 dark:border-emerald-500/20">
                     Active
                   </span>
                 </div>
-                <div className="flex flex-wrap items-center gap-3 text-zinc-400">
-                  <span className="text-base font-medium text-white">
+                <div className="flex flex-wrap items-center gap-3 text-zinc-600 dark:text-zinc-400">
+                  <span className="text-base font-medium text-zinc-900 dark:text-white">
                     {job?.companyName}
                   </span>
-                  <span className="text-zinc-600">•</span>
-                  <span className="text-sm text-zinc-400 flex items-center gap-1">
+                  <span className="text-zinc-300 dark:text-zinc-700">•</span>
+                  <span className="text-sm text-zinc-600 dark:text-zinc-400 flex items-center gap-1">
                     <Globe size={14} /> Verified Employer
                   </span>
                 </div>
@@ -314,13 +308,13 @@ function JobDetailsContent({ jobId }) {
                     <Button
                       isIconOnly
                       variant="bordered"
-                      className="border-zinc-700 hover:border-zinc-500 bg-zinc-800/30 hover:bg-zinc-800/50 text-zinc-400 hover:text-white transition-all duration-300 rounded-xl w-10 h-10"
+                      className="border-zinc-200/50 dark:border-zinc-800/50 hover:border-zinc-300 dark:hover:border-zinc-700 bg-white/80 dark:bg-zinc-900/80 hover:bg-zinc-50 dark:hover:bg-zinc-800/80 text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white transition-all duration-300 rounded-xl w-10 h-10"
                       onPress={handleSaveToggle}
                       isLoading={isSaving}
                       isDisabled={isSaving || isSaved}
                     >
                       {isSaved ? (
-                        <BookmarkCheck className="w-5 h-5 text-blue-500" />
+                        <BookmarkCheck className="w-5 h-5 text-blue-600 dark:text-blue-400" />
                       ) : (
                         <Bookmark className="w-5 h-5" />
                       )}
@@ -332,7 +326,7 @@ function JobDetailsContent({ jobId }) {
                   hasApplied ? (
                     <Button
                       isDisabled
-                      className="bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 rounded-xl px-6 py-2.5 cursor-not-allowed"
+                      className="bg-emerald-50 dark:bg-emerald-500/20 text-emerald-700 dark:text-emerald-400 border border-emerald-200/50 dark:border-emerald-500/30 rounded-xl px-6 py-2.5 cursor-not-allowed"
                     >
                       <CheckCircle2 className="w-4 h-4 mr-2" />
                       Already Applied
@@ -351,7 +345,7 @@ function JobDetailsContent({ jobId }) {
                     </motion.div>
                   )
                 ) : (
-                  <div className="px-6 py-2.5 bg-zinc-800/30 border border-white/10 rounded-xl text-zinc-500 text-sm font-medium">
+                  <div className="px-6 py-2.5 bg-white/80 dark:bg-zinc-900/80 border border-zinc-200/50 dark:border-zinc-800/50 rounded-xl text-zinc-600 dark:text-zinc-400 text-sm font-medium">
                     {!session
                       ? "Sign in as a Seeker to Apply"
                       : "Only Seekers can apply for jobs"}
@@ -397,14 +391,14 @@ function JobDetailsContent({ jobId }) {
                   return (
                     <Card
                       key={idx}
-                      className="bg-[#111214] border border-white/5 rounded-xl p-4"
+                      className="bg-white/80 dark:bg-zinc-900/80 border border-zinc-200/50 dark:border-zinc-800/50 rounded-xl p-4"
                     >
-                      <p className="text-[10px] text-zinc-500 uppercase tracking-wider flex items-center gap-1 mb-1">
-                        <Icon size={12} className="text-zinc-600" />{" "}
+                      <p className="text-[10px] text-zinc-500 dark:text-zinc-500 uppercase tracking-wider flex items-center gap-1 mb-1">
+                        <Icon size={12} className="text-zinc-400 dark:text-zinc-500" />{" "}
                         {item.label}
                       </p>
-                      <p className="text-sm font-medium text-white truncate">
-                        {item.value}
+                      <p className="text-sm font-medium text-zinc-900 dark:text-white truncate">
+                        {item.value || "N/A"}
                       </p>
                     </Card>
                   );
@@ -417,24 +411,24 @@ function JobDetailsContent({ jobId }) {
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.3 }}
             >
-              <Card className="bg-[#111214] border border-white/5 rounded-2xl p-6 space-y-6">
+              <Card className="bg-white/80 dark:bg-zinc-900/80 border border-zinc-200/50 dark:border-zinc-800/50 rounded-2xl p-6 space-y-6 shadow-sm dark:shadow-none">
                 {job?.description && (
                   <div>
-                    <h3 className="text-xl font-semibold text-white mb-3 flex items-center gap-2">
-                      <Target size={18} className="text-blue-400" /> Job
+                    <h3 className="text-xl font-semibold text-zinc-900 dark:text-white mb-3 flex items-center gap-2">
+                      <Target size={18} className="text-blue-600 dark:text-blue-400" /> Job
                       Description
                     </h3>
-                    <p className="text-zinc-400 leading-relaxed">
+                    <p className="text-zinc-600 dark:text-zinc-400 leading-relaxed">
                       {job.description}
                     </p>
                   </div>
                 )}
                 {job?.responsibilities && (
                   <div>
-                    <h3 className="text-xl font-semibold text-white mb-3">
+                    <h3 className="text-xl font-semibold text-zinc-900 dark:text-white mb-3">
                       Responsibilities
                     </h3>
-                    <ul className="space-y-2 text-zinc-400">
+                    <ul className="space-y-2 text-zinc-600 dark:text-zinc-400">
                       {renderListFromString(job.responsibilities)?.map(
                         (item, index) => (
                           <motion.li
@@ -444,7 +438,7 @@ function JobDetailsContent({ jobId }) {
                             transition={{ delay: 0.3 + index * 0.05 }}
                             className="flex items-start gap-2"
                           >
-                            <span className="text-blue-400 mt-1.5 h-1.5 w-1.5 rounded-full bg-blue-400 shrink-0" />
+                            <span className="text-blue-600 dark:text-blue-400 mt-1.5 h-1.5 w-1.5 rounded-full bg-blue-600 dark:bg-blue-400 shrink-0" />
                             {item}
                           </motion.li>
                         ),
@@ -454,10 +448,10 @@ function JobDetailsContent({ jobId }) {
                 )}
                 {job?.requirements && (
                   <div>
-                    <h3 className="text-xl font-semibold text-white mb-3">
+                    <h3 className="text-xl font-semibold text-zinc-900 dark:text-white mb-3">
                       Requirements
                     </h3>
-                    <ul className="space-y-2 text-zinc-400">
+                    <ul className="space-y-2 text-zinc-600 dark:text-zinc-400">
                       {renderListFromString(job.requirements)?.map(
                         (item, index) => (
                           <motion.li
@@ -467,7 +461,7 @@ function JobDetailsContent({ jobId }) {
                             transition={{ delay: 0.4 + index * 0.05 }}
                             className="flex items-start gap-2"
                           >
-                            <span className="text-amber-400 mt-1.5 h-1.5 w-1.5 rounded-full bg-amber-400 shrink-0" />
+                            <span className="text-amber-600 dark:text-amber-400 mt-1.5 h-1.5 w-1.5 rounded-full bg-amber-600 dark:bg-amber-400 shrink-0" />
                             {item}
                           </motion.li>
                         ),
@@ -477,7 +471,7 @@ function JobDetailsContent({ jobId }) {
                 )}
                 {job?.benefits && (
                   <div>
-                    <h3 className="text-xl font-semibold text-white mb-3">
+                    <h3 className="text-xl font-semibold text-zinc-900 dark:text-white mb-3">
                       Benefits
                     </h3>
                     <div className="flex flex-wrap gap-2">
@@ -488,7 +482,7 @@ function JobDetailsContent({ jobId }) {
                             initial={{ opacity: 0, scale: 0.8 }}
                             animate={{ opacity: 1, scale: 1 }}
                             transition={{ delay: 0.5 + index * 0.05 }}
-                            className="bg-zinc-800/50 text-zinc-300 text-sm px-3 py-1.5 rounded-full border border-zinc-700/50"
+                            className="bg-white/80 dark:bg-zinc-900/80 text-zinc-700 dark:text-zinc-300 text-sm px-3 py-1.5 rounded-full border border-zinc-200/50 dark:border-zinc-800/50"
                           >
                             {item}
                           </motion.span>
@@ -507,11 +501,11 @@ function JobDetailsContent({ jobId }) {
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.4 }}
             >
-              <Card className="bg-[#111214] border border-white/5 rounded-2xl p-6">
-                <h3 className="text-sm font-semibold text-zinc-500 uppercase tracking-wider mb-4 flex items-center gap-2">
+              <Card className="bg-white/80 dark:bg-zinc-900/80 border border-zinc-200/50 dark:border-zinc-800/50 rounded-2xl p-6 shadow-sm dark:shadow-none">
+                <h3 className="text-sm font-semibold text-zinc-500 dark:text-zinc-500 uppercase tracking-wider mb-4 flex items-center gap-2">
                   <Building2 size={14} /> Company Overview
                 </h3>
-                <div className="relative w-full h-32 rounded-lg overflow-hidden bg-zinc-800/30 border border-white/5 mb-4">
+                <div className="relative w-full h-32 rounded-lg overflow-hidden bg-zinc-50 dark:bg-zinc-800/50 border border-zinc-200/50 dark:border-zinc-800/50 mb-4">
                   {job?.companyLogo ? (
                     <Image
                       src={job.companyLogo}
@@ -521,24 +515,24 @@ function JobDetailsContent({ jobId }) {
                     />
                   ) : (
                     <div className="flex h-full w-full items-center justify-center">
-                      <House size={48} className="text-zinc-500" />
+                      <House size={48} className="text-zinc-400 dark:text-zinc-500" />
                     </div>
                   )}
                 </div>
-                <h4 className="text-lg font-semibold text-white mb-1">
+                <h4 className="text-lg font-semibold text-zinc-900 dark:text-white mb-1">
                   {job?.companyName}
                 </h4>
-                <div className="space-y-3 mt-4 pt-4 border-t border-white/5">
+                <div className="space-y-3 mt-4 pt-4 border-t border-zinc-200/50 dark:border-zinc-800/50">
                   <div className="flex justify-between">
-                    <span className="text-sm text-zinc-500">Industry</span>
-                    <span className="text-sm font-medium text-white">
+                    <span className="text-sm text-zinc-600 dark:text-zinc-400">Industry</span>
+                    <span className="text-sm font-medium text-zinc-900 dark:text-white">
                       {job?.jobCategory}
                     </span>
                   </div>
                   <div className="flex justify-between">
-                    <span className="text-sm text-zinc-500">Vacancies</span>
-                    <span className="text-sm font-medium text-white flex items-center gap-1">
-                      <Users size={14} className="text-zinc-500" />{" "}
+                    <span className="text-sm text-zinc-600 dark:text-zinc-400">Vacancies</span>
+                    <span className="text-sm font-medium text-zinc-900 dark:text-white flex items-center gap-1">
+                      <Users size={14} className="text-zinc-400 dark:text-zinc-500" />{" "}
                       {job?.vacancies || 1}
                     </span>
                   </div>
@@ -552,8 +546,8 @@ function JobDetailsContent({ jobId }) {
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.5 }}
               >
-                <Card className="bg-[#111214] border border-white/5 rounded-2xl p-6">
-                  <h3 className="text-sm font-semibold text-zinc-500 uppercase tracking-wider mb-3">
+                <Card className="bg-white/80 dark:bg-zinc-900/80 border border-zinc-200/50 dark:border-zinc-800/50 rounded-2xl p-6 shadow-sm dark:shadow-none">
+                  <h3 className="text-sm font-semibold text-zinc-500 dark:text-zinc-500 uppercase tracking-wider mb-3">
                     Required Skills
                   </h3>
                   <div className="flex flex-wrap gap-2">
@@ -563,7 +557,7 @@ function JobDetailsContent({ jobId }) {
                         initial={{ opacity: 0, scale: 0.8 }}
                         animate={{ opacity: 1, scale: 1 }}
                         transition={{ delay: 0.1 + index * 0.05 }}
-                        className="bg-zinc-800/40 text-zinc-300 text-xs px-3 py-1.5 rounded-full border border-zinc-700/50 hover:bg-zinc-700/50 transition-colors"
+                        className="bg-white/80 dark:bg-zinc-900/80 text-zinc-700 dark:text-zinc-300 text-xs px-3 py-1.5 rounded-full border border-zinc-200/50 dark:border-zinc-800/50 hover:bg-zinc-50 dark:hover:bg-zinc-800/80 transition-colors"
                       >
                         {skill}
                       </motion.span>

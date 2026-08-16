@@ -93,7 +93,6 @@ export default function ContactPage() {
     }
     
     setIsSubmitting(true);
-    // 🔧 FUTURE: Add your backend API submission here
     setTimeout(() => {
       toast.success("Message sent successfully! We'll get back to you soon.");
       setFormData({ name: "", email: "", subject: "", message: "" });
@@ -102,9 +101,9 @@ export default function ContactPage() {
   };
 
   return (
-    <div className="min-h-screen bg-[#090a0f] text-white pt-24 pb-16 relative overflow-hidden">
+    <div className="min-h-screen bg-zinc-50 dark:bg-[#090a0f] text-zinc-900 dark:text-white pt-24 pb-16 relative overflow-hidden">
       
-      {/* 🔮 Ambient Background Orbs */}
+      {/* Ambient Background Orbs - lighter in light mode */}
       <motion.div
         animate={{
           x: [-80, 80, -80],
@@ -115,7 +114,7 @@ export default function ContactPage() {
           repeat: Infinity,
           ease: "linear",
         }}
-        className="absolute top-20 left-20 w-96 h-96 rounded-full bg-blue-500/10 blur-[120px] pointer-events-none"
+        className="absolute top-20 left-20 w-96 h-96 rounded-full bg-blue-300/10 dark:bg-blue-500/10 blur-[120px] pointer-events-none"
       />
       <motion.div
         animate={{
@@ -127,7 +126,7 @@ export default function ContactPage() {
           repeat: Infinity,
           ease: "linear",
         }}
-        className="absolute bottom-20 right-20 w-96 h-96 rounded-full bg-purple-500/10 blur-[120px] pointer-events-none"
+        className="absolute bottom-20 right-20 w-96 h-96 rounded-full bg-purple-300/10 dark:bg-purple-500/10 blur-[120px] pointer-events-none"
       />
 
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
@@ -140,21 +139,21 @@ export default function ContactPage() {
           className="text-center mb-16"
         >
           <motion.div variants={itemVariants} className="flex justify-center mb-6">
-            <div className="p-4 bg-blue-500/10 rounded-2xl border border-blue-500/20">
-              <HelpCircle className="w-12 h-12 text-blue-400" />
+            <div className="p-4 bg-blue-300/20 dark:bg-blue-500/10 rounded-2xl border border-blue-400/20 dark:border-blue-500/20">
+              <HelpCircle className="w-12 h-12 text-blue-600 dark:text-blue-400" />
             </div>
           </motion.div>
 
           <motion.h1 
             variants={itemVariants}
-            className="text-4xl md:text-5xl font-bold bg-gradient-to-r from-blue-400 via-purple-400 to-pink-400 bg-clip-text text-transparent"
+            className="text-4xl md:text-5xl font-bold bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500 dark:from-blue-400 dark:via-purple-400 dark:to-pink-400 bg-clip-text text-transparent"
           >
             How can we help?
           </motion.h1>
           
           <motion.p 
             variants={itemVariants}
-            className="text-zinc-400 text-lg mt-4 max-w-2xl mx-auto"
+            className="text-zinc-600 dark:text-zinc-400 text-lg mt-4 max-w-2xl mx-auto"
           >
             Search our FAQ or reach out to our support team. We're here to assist you with any questions or issues.
           </motion.p>
@@ -169,7 +168,7 @@ export default function ContactPage() {
         >
           <motion.div variants={itemVariants} className="flex items-center gap-3 mb-8">
             <div className="h-6 w-1 bg-purple-500 rounded-full" />
-            <h2 className="text-2xl font-semibold text-white">Frequently Asked Questions</h2>
+            <h2 className="text-2xl font-semibold text-zinc-900 dark:text-white">Frequently Asked Questions</h2>
           </motion.div>
 
           <div className="space-y-3 max-w-3xl mx-auto">
@@ -177,18 +176,18 @@ export default function ContactPage() {
               <motion.div
                 key={index}
                 variants={itemVariants}
-                className="bg-[#111214] border border-white/5 rounded-xl overflow-hidden hover:border-white/10 transition-colors duration-300"
+                className="bg-white/80 dark:bg-[#111214] border border-zinc-200/50 dark:border-white/5 rounded-xl overflow-hidden hover:border-zinc-300 dark:hover:border-white/10 transition-colors duration-300"
               >
                 <button
                   onClick={() => toggleFaq(index)}
-                  className="w-full px-6 py-4 flex items-center justify-between text-left hover:bg-white/5 transition-colors"
+                  className="w-full px-6 py-4 flex items-center justify-between text-left hover:bg-zinc-100 dark:hover:bg-white/5 transition-colors"
                 >
-                  <span className="text-white font-medium">{faq.question}</span>
+                  <span className="text-zinc-900 dark:text-white font-medium">{faq.question}</span>
                   <motion.div
                     animate={{ rotate: openFaq === index ? 180 : 0 }}
                     transition={{ duration: 0.2 }}
                   >
-                    <ChevronDown className="w-5 h-5 text-zinc-400" />
+                    <ChevronDown className="w-5 h-5 text-zinc-400 dark:text-zinc-500" />
                   </motion.div>
                 </button>
                 <AnimatePresence>
@@ -200,7 +199,7 @@ export default function ContactPage() {
                       transition={{ duration: 0.3 }}
                       className="overflow-hidden"
                     >
-                      <div className="px-6 pb-4 text-zinc-400 text-sm leading-relaxed">
+                      <div className="px-6 pb-4 text-zinc-600 dark:text-zinc-400 text-sm leading-relaxed">
                         {faq.answer}
                       </div>
                     </motion.div>
@@ -211,7 +210,7 @@ export default function ContactPage() {
           </div>
         </motion.div>
 
-        {/* ===== 🚀 ELEVATED CONTACT SECTION ===== */}
+        {/* ===== CONTACT SECTION ===== */}
         <motion.div
           initial="hidden"
           animate="visible"
@@ -220,60 +219,58 @@ export default function ContactPage() {
         >
           <motion.div variants={itemVariants} className="flex items-center gap-3 mb-8">
             <div className="h-6 w-1 bg-blue-500 rounded-full" />
-            <h2 className="text-2xl font-semibold text-white">Send us a message</h2>
+            <h2 className="text-2xl font-semibold text-zinc-900 dark:text-white">Send us a message</h2>
           </motion.div>
 
           <motion.div variants={itemVariants}>
-            {/* 🌟 Glassmorphism Container with Glowing Border */}
             <motion.div 
               whileHover={{ borderColor: "rgba(96, 165, 250, 0.4)" }}
-              className="bg-[#111214] border border-white/5 rounded-2xl overflow-hidden shadow-2xl relative"
+              className="bg-white/80 dark:bg-[#111214] border border-zinc-200/50 dark:border-white/5 rounded-2xl overflow-hidden shadow-2xl relative"
             >
-              {/* Subtle Inner Glow */}
-              <div className="absolute inset-0 bg-gradient-to-br from-blue-600/5 to-purple-600/5 pointer-events-none" />
+              <div className="absolute inset-0 bg-gradient-to-br from-blue-400/5 to-purple-400/5 dark:from-blue-600/5 dark:to-purple-600/5 pointer-events-none" />
 
               <div className="flex flex-col lg:flex-row relative z-10">
                 
                 {/* LEFT: Contact Information */}
                 <motion.div 
                   variants={contactInfoVariants}
-                  className="lg:w-1/3 bg-gradient-to-br from-zinc-900/50 to-zinc-800/20 p-8 border-b lg:border-b-0 lg:border-r border-white/5"
+                  className="lg:w-1/3 bg-gradient-to-br from-zinc-100/50 to-zinc-200/20 dark:from-zinc-900/50 dark:to-zinc-800/20 p-8 border-b lg:border-b-0 lg:border-r border-zinc-200/50 dark:border-white/5"
                 >
-                  <h3 className="text-lg font-semibold text-white mb-6">Get in touch</h3>
-                  <p className="text-zinc-400 text-sm mb-8 leading-relaxed">
+                  <h3 className="text-lg font-semibold text-zinc-900 dark:text-white mb-6">Get in touch</h3>
+                  <p className="text-zinc-600 dark:text-zinc-400 text-sm mb-8 leading-relaxed">
                     Our support team is available 24/7 to assist you with any questions, feedback, or technical issues you may encounter.
                   </p>
 
                   <div className="space-y-5">
                     <div className="flex items-start gap-4">
-                      <div className="p-3 bg-blue-500/10 rounded-xl border border-blue-500/20">
-                        <Mail className="w-5 h-5 text-blue-400" />
+                      <div className="p-3 bg-blue-300/20 dark:bg-blue-500/10 rounded-xl border border-blue-400/20 dark:border-blue-500/20">
+                        <Mail className="w-5 h-5 text-blue-600 dark:text-blue-400" />
                       </div>
                       <div>
-                        <p className="text-sm text-zinc-400">Email us</p>
-                        <a href="mailto:support@hireloop.com" className="text-white hover:text-blue-400 transition-colors text-sm font-medium">
+                        <p className="text-sm text-zinc-500 dark:text-zinc-400">Email us</p>
+                        <a href="mailto:support@hireloop.com" className="text-zinc-900 dark:text-white hover:text-blue-600 dark:hover:text-blue-400 transition-colors text-sm font-medium">
                           support@hireloop.com
                         </a>
                       </div>
                     </div>
 
                     <div className="flex items-start gap-4">
-                      <div className="p-3 bg-purple-500/10 rounded-xl border border-purple-500/20">
-                        <Clock className="w-5 h-5 text-purple-400" />
+                      <div className="p-3 bg-purple-300/20 dark:bg-purple-500/10 rounded-xl border border-purple-400/20 dark:border-purple-500/20">
+                        <Clock className="w-5 h-5 text-purple-600 dark:text-purple-400" />
                       </div>
                       <div>
-                        <p className="text-sm text-zinc-400">Response time</p>
-                        <p className="text-white text-sm font-medium">Within 24 hours</p>
+                        <p className="text-sm text-zinc-500 dark:text-zinc-400">Response time</p>
+                        <p className="text-zinc-900 dark:text-white text-sm font-medium">Within 24 hours</p>
                       </div>
                     </div>
 
                     <div className="flex items-start gap-4">
-                      <div className="p-3 bg-emerald-500/10 rounded-xl border border-emerald-500/20">
-                        <MessageSquare className="w-5 h-5 text-emerald-400" />
+                      <div className="p-3 bg-emerald-300/20 dark:bg-emerald-500/10 rounded-xl border border-emerald-400/20 dark:border-emerald-500/20">
+                        <MessageSquare className="w-5 h-5 text-emerald-600 dark:text-emerald-400" />
                       </div>
                       <div>
-                        <p className="text-sm text-zinc-400">Live chat</p>
-                        <p className="text-white text-sm font-medium">Coming soon</p>
+                        <p className="text-sm text-zinc-500 dark:text-zinc-400">Live chat</p>
+                        <p className="text-zinc-900 dark:text-white text-sm font-medium">Coming soon</p>
                       </div>
                     </div>
                   </div>
@@ -287,7 +284,7 @@ export default function ContactPage() {
                   <form onSubmit={handleSubmit} className="space-y-6">
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                       <div className="space-y-2">
-                        <label className="text-sm font-medium text-zinc-400">Full Name</label>
+                        <label className="text-sm font-medium text-zinc-600 dark:text-zinc-400">Full Name</label>
                         <div className="relative">
                           <Input
                             value={formData.name}
@@ -295,17 +292,16 @@ export default function ContactPage() {
                             onBlur={() => setFocusedField(null)}
                             onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                             placeholder="John Doe"
-                            // ✅ ADDED: placeholder:text-zinc-500 for faded grey text
-                            className={`bg-[#1c1c1e] border transition-all duration-200 text-white rounded-xl focus:ring-1 placeholder:text-zinc-500 placeholder:font-normal ${
+                            className={`bg-white/80 dark:bg-[#1c1c1e] border transition-all duration-200 text-zinc-900 dark:text-white rounded-xl focus:ring-1 placeholder:text-zinc-400 dark:placeholder:text-zinc-500 placeholder:font-normal ${
                               focusedField === 'name'
                                 ? "border-blue-500/50 ring-blue-500/20"
-                                : "border-white/10 hover:border-white/20"
+                                : "border-zinc-300/50 dark:border-white/10 hover:border-zinc-400 dark:hover:border-white/20"
                             }`}
                           />
                         </div>
                       </div>
                       <div className="space-y-2">
-                        <label className="text-sm font-medium text-zinc-400">Email Address</label>
+                        <label className="text-sm font-medium text-zinc-600 dark:text-zinc-400">Email Address</label>
                         <div className="relative">
                           <Input
                             type="email"
@@ -314,11 +310,10 @@ export default function ContactPage() {
                             onBlur={() => setFocusedField(null)}
                             onChange={(e) => setFormData({ ...formData, email: e.target.value })}
                             placeholder="john@example.com"
-                            // ✅ ADDED: placeholder:text-zinc-500 for faded grey text
-                            className={`bg-[#1c1c1e] border transition-all duration-200 text-white rounded-xl focus:ring-1 placeholder:text-zinc-500 placeholder:font-normal ${
+                            className={`bg-white/80 dark:bg-[#1c1c1e] border transition-all duration-200 text-zinc-900 dark:text-white rounded-xl focus:ring-1 placeholder:text-zinc-400 dark:placeholder:text-zinc-500 placeholder:font-normal ${
                               focusedField === 'email'
                                 ? "border-blue-500/50 ring-blue-500/20"
-                                : "border-white/10 hover:border-white/20"
+                                : "border-zinc-300/50 dark:border-white/10 hover:border-zinc-400 dark:hover:border-white/20"
                             }`}
                           />
                         </div>
@@ -326,7 +321,7 @@ export default function ContactPage() {
                     </div>
 
                     <div className="space-y-2">
-                      <label className="text-sm font-medium text-zinc-400">Subject</label>
+                      <label className="text-sm font-medium text-zinc-600 dark:text-zinc-400">Subject</label>
                       <div className="relative">
                         <Input
                           value={formData.subject}
@@ -334,18 +329,17 @@ export default function ContactPage() {
                           onBlur={() => setFocusedField(null)}
                           onChange={(e) => setFormData({ ...formData, subject: e.target.value })}
                           placeholder="What is this regarding?"
-                          // ✅ ADDED: placeholder:text-zinc-500 for faded grey text
-                          className={`bg-[#1c1c1e] border transition-all duration-200 text-white rounded-xl focus:ring-1 placeholder:text-zinc-500 placeholder:font-normal ${
+                          className={`bg-white/80 dark:bg-[#1c1c1e] border transition-all duration-200 text-zinc-900 dark:text-white rounded-xl focus:ring-1 placeholder:text-zinc-400 dark:placeholder:text-zinc-500 placeholder:font-normal ${
                             focusedField === 'subject'
                               ? "border-blue-500/50 ring-blue-500/20"
-                              : "border-white/10 hover:border-white/20"
+                              : "border-zinc-300/50 dark:border-white/10 hover:border-zinc-400 dark:hover:border-white/20"
                           }`}
                         />
                       </div>
                     </div>
 
                     <div className="space-y-2">
-                      <label className="text-sm font-medium text-zinc-400">Message</label>
+                      <label className="text-sm font-medium text-zinc-600 dark:text-zinc-400">Message</label>
                       <div className="relative">
                         <TextArea
                           value={formData.message}
@@ -354,19 +348,18 @@ export default function ContactPage() {
                           onChange={(e) => setFormData({ ...formData, message: e.target.value })}
                           placeholder="Describe your issue or question in detail..."
                           rows={5}
-                          // ✅ ADDED: placeholder:text-zinc-500 for faded grey text
-                          className={`bg-[#1c1c1e] border transition-all duration-200 text-white rounded-xl focus:ring-1 min-h-[150px] resize-none placeholder:text-zinc-500 placeholder:font-normal ${
+                          className={`bg-white/80 dark:bg-[#1c1c1e] border transition-all duration-200 text-zinc-900 dark:text-white rounded-xl focus:ring-1 min-h-[150px] resize-none placeholder:text-zinc-400 dark:placeholder:text-zinc-500 placeholder:font-normal ${
                             focusedField === 'message'
                               ? "border-blue-500/50 ring-blue-500/20"
-                              : "border-white/10 hover:border-white/20"
+                              : "border-zinc-300/50 dark:border-white/10 hover:border-zinc-400 dark:hover:border-white/20"
                           }`}
                         />
                       </div>
                     </div>
 
                     <div className="flex flex-col sm:flex-row justify-between items-center gap-4 pt-2">
-                      <p className="text-xs text-zinc-500">
-                        We typically respond within <span className="text-white">24 hours</span>.
+                      <p className="text-xs text-zinc-500 dark:text-zinc-500">
+                        We typically respond within <span className="text-zinc-900 dark:text-white">24 hours</span>.
                       </p>
                       <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.95 }}>
                         <Button
@@ -391,23 +384,23 @@ export default function ContactPage() {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.8 }}
-          className="mt-20 pt-8 border-t border-white/5 text-center"
+          className="mt-20 pt-8 border-t border-zinc-200/50 dark:border-white/5 text-center"
         >
           <div className="flex justify-center gap-6 flex-wrap">
-            <Link href="/" className="flex items-center gap-2 text-zinc-500 hover:text-zinc-300 transition-colors">
+            <Link href="/" className="flex items-center gap-2 text-zinc-500 dark:text-zinc-500 hover:text-zinc-900 dark:hover:text-zinc-300 transition-colors">
               <ArrowLeft className="w-4 h-4" />
               Back to Home
             </Link>
-            <span className="text-zinc-600">•</span>
-            <Link href="/browse-jobs" className="text-zinc-500 hover:text-zinc-300 transition-colors">
+            <span className="text-zinc-300 dark:text-zinc-600">•</span>
+            <Link href="/browse-jobs" className="text-zinc-500 dark:text-zinc-500 hover:text-zinc-900 dark:hover:text-zinc-300 transition-colors">
               Browse Jobs
             </Link>
-            <span className="text-zinc-600">•</span>
-            <Link href="/pricing" className="text-zinc-500 hover:text-zinc-300 transition-colors">
+            <span className="text-zinc-300 dark:text-zinc-600">•</span>
+            <Link href="/pricing" className="text-zinc-500 dark:text-zinc-500 hover:text-zinc-900 dark:hover:text-zinc-300 transition-colors">
               Pricing
             </Link>
           </div>
-          <p className="text-xs text-zinc-600 mt-4">
+          <p className="text-xs text-zinc-500 dark:text-zinc-600 mt-4">
             © {new Date().getFullYear()} HireLoop. All rights reserved.
           </p>
         </motion.div>

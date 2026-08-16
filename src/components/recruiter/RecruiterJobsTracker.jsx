@@ -11,7 +11,7 @@ import {
   ArrowRight,
   PlusCircle,
 } from "lucide-react";
-import {  Card } from "@heroui/react";
+import { Card } from "@heroui/react";
 
 export default function RecruiterJobsTracker({
   user,
@@ -57,7 +57,7 @@ export default function RecruiterJobsTracker({
 
   const getPlanColor = (planName) => {
     const planColors = {
-      free: "from-zinc-500 to-zinc-600",
+      free: "from-zinc-400 to-zinc-500 dark:from-zinc-500 dark:to-zinc-600",
       growth: "from-blue-500 to-purple-500",
       enterprise: "from-amber-500 to-yellow-500",
     };
@@ -91,7 +91,7 @@ export default function RecruiterJobsTracker({
       planName: planName,
       remaining: remainingCount,
       isLimitReached: isLimitReached,
-      percentage: isLimitReached ? 100 : percentage, // Force bar to 100% if over limit
+      percentage: isLimitReached ? 100 : percentage,
     });
 
     setIsLoading(false);
@@ -115,7 +115,7 @@ export default function RecruiterJobsTracker({
         exit={{ opacity: 0 }}
         className="flex items-center justify-center py-4"
       >
-        <Loader2 className="w-5 h-5 text-purple-500 animate-spin" />
+        <Loader2 className="w-5 h-5 text-purple-600 dark:text-purple-500 animate-spin" />
       </motion.div>
     );
   }
@@ -129,8 +129,8 @@ export default function RecruiterJobsTracker({
       animate="visible"
       className="w-full"
     >
-      <Card className="group relative overflow-hidden rounded-2xl border border-white/10 bg-gradient-to-br from-zinc-950 via-zinc-900 to-zinc-950 backdrop-blur-xl shadow-2xl transition-all duration-500 hover:border-blue-500/40 hover:shadow-blue-500/20">
-        {/* 🎨 Animated background orbs */}
+      <Card className="group relative overflow-hidden rounded-2xl border border-zinc-200/50 dark:border-white/10 bg-white dark:bg-gradient-to-br dark:from-zinc-950 dark:via-zinc-900 dark:to-zinc-950 backdrop-blur-xl shadow-2xl transition-all duration-500 hover:border-blue-400/50 dark:hover:border-blue-500/40 hover:shadow-blue-500/10 dark:hover:shadow-blue-500/20">
+        {/* 🎨 Animated background orbs - Dark mode only */}
         <motion.div
           animate={{
             x: [-80, 80, -80],
@@ -141,7 +141,7 @@ export default function RecruiterJobsTracker({
             repeat: Infinity,
             ease: "linear",
           }}
-          className="absolute -left-20 -top-20 h-60 w-60 rounded-full bg-purple-500/10 blur-3xl"
+          className="absolute -left-20 -top-20 h-60 w-60 rounded-full bg-purple-500/10 blur-3xl dark:bg-purple-500/10 hidden dark:block"
         />
 
         <motion.div
@@ -154,7 +154,7 @@ export default function RecruiterJobsTracker({
             repeat: Infinity,
             ease: "linear",
           }}
-          className="absolute -right-20 -bottom-24 h-64 w-64 rounded-full bg-cyan-500/10 blur-3xl"
+          className="absolute -right-20 -bottom-24 h-64 w-64 rounded-full bg-cyan-500/10 blur-3xl dark:bg-cyan-500/10 hidden dark:block"
         />
 
         {/* ✨ Shine effect */}
@@ -167,7 +167,7 @@ export default function RecruiterJobsTracker({
             duration: 4,
             ease: "linear",
           }}
-          className="absolute left-0 top-0 h-full w-24 rotate-12 bg-white/10 blur-xl"
+          className="absolute left-0 top-0 h-full w-24 rotate-12 bg-white/30 dark:bg-white/10 blur-xl"
         />
 
         <div className="relative z-10 p-7">
@@ -178,7 +178,7 @@ export default function RecruiterJobsTracker({
                 initial={{ opacity: 0, y: 15 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.4 }}
-                className="text-zinc-400 text-sm"
+                className="text-zinc-500 dark:text-zinc-400 text-sm"
               >
                 {title}
               </motion.h2>
@@ -190,7 +190,7 @@ export default function RecruiterJobsTracker({
                   type: "spring",
                   stiffness: 180,
                 }}
-                className="mt-2 text-5xl font-black tracking-tight text-white"
+                className="mt-2 text-5xl font-black tracking-tight text-zinc-900 dark:text-white"
               >
                 {stats.total}
               </motion.h1>
@@ -221,7 +221,7 @@ export default function RecruiterJobsTracker({
               </span>
             </div>
 
-            <div className="relative h-3 overflow-hidden rounded-full bg-zinc-800">
+            <div className="relative h-3 overflow-hidden rounded-full bg-zinc-200 dark:bg-zinc-800">
               <motion.div
                 initial={{ width: 0 }}
                 animate={{
@@ -245,13 +245,13 @@ export default function RecruiterJobsTracker({
                   repeat: Infinity,
                   duration: 2,
                 }}
-                className="absolute top-0 h-full w-20 bg-white/30 blur-sm"
+                className="absolute top-0 h-full w-20 bg-white/30 dark:bg-white/30 blur-sm"
               />
             </div>
           </div>
 
           {/* BOTTOM SECTION: Plan & Actions */}
-          <div className="mt-7 flex items-center justify-between">
+          <div className="mt-7 flex items-center justify-between flex-wrap gap-3">
             <div className="flex items-center gap-3">
               <motion.span
                 animate={{
@@ -262,15 +262,15 @@ export default function RecruiterJobsTracker({
                   duration: 2,
                 }}
                 className={`h-2.5 w-2.5 rounded-full ${
-                  stats.isLimitReached ? "bg-red-500" : "bg-emerald-400"
+                  stats.isLimitReached ? "bg-red-500" : "bg-emerald-500"
                 }`}
               />
 
-              <span className="text-sm font-medium text-zinc-300">
+              <span className="text-sm font-medium text-zinc-800 dark:text-zinc-300">
                 {stats.planName} Plan
               </span>
 
-              <span className="rounded-full border border-zinc-700 bg-zinc-800 px-2 py-1 text-xs text-zinc-400">
+              <span className="rounded-full border border-zinc-300/50 dark:border-zinc-700 bg-zinc-100 dark:bg-zinc-800 px-2 py-1 text-xs text-zinc-600 dark:text-zinc-400">
                 {stats.max} Jobs
               </span>
             </div>
@@ -283,7 +283,6 @@ export default function RecruiterJobsTracker({
               >
                 <button
                   onClick={() => {
-                    // Redirect to pricing page
                     window.location.href = "/pricing?tab=recruiter";
                   }}
                   className="flex items-center gap-2 rounded-xl bg-gradient-to-r from-blue-600 to-purple-600 px-4 py-2 text-sm font-medium text-white shadow-lg shadow-blue-600/20 transition-all hover:shadow-blue-600/40"

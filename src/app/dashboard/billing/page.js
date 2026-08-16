@@ -100,7 +100,6 @@ const CreditCardDisplay = ({ card }) => {
   const normalizedCardholder = card?.cardholderName || card?.cardholder || card?.name || "CARD HOLDER";
   const normalizedBrand = String(card?.brand || "VISA").toUpperCase();
 
-  // Card brand colors
   const getCardBrand = (brand) => {
     const brands = {
       VISA: {
@@ -114,17 +113,6 @@ const CreditCardDisplay = ({ card }) => {
         ),
       },
       MASTERCARD: {
-        bg: "from-red-600 via-orange-600 to-orange-800",
-        chip: "bg-yellow-400",
-        text: "text-white",
-        logo: (
-          <div className="flex items-center gap-1">
-            <div className="w-8 h-8 bg-red-500 rounded-full opacity-80"></div>
-            <div className="w-8 h-8 bg-yellow-500 rounded-full opacity-80 -ml-3"></div>
-          </div>
-        ),
-      },
-      MASTER_CARD: {
         bg: "from-red-600 via-orange-600 to-orange-800",
         chip: "bg-yellow-400",
         text: "text-white",
@@ -248,7 +236,6 @@ const BillingPage = () => {
   const [activeTab, setActiveTab] = useState("overview");
   const [isAddCardModalOpen, setIsAddCardModalOpen] = useState(false);
 
-  // Billing History Pagination States
   const [historyPage, setHistoryPage] = useState(1);
   const historyItemsPerPage = 5;
 
@@ -275,12 +262,12 @@ const BillingPage = () => {
       ]);
 
       let subscriptionData = sub || {};
-      
+
       const userPlan = user?.plan?.toLowerCase() || "free";
       const subPlan = subscriptionData?.planTier || subscriptionData?.plan?.toLowerCase() || userPlan;
-      
+
       subscriptionData.planTier = subPlan;
-      
+
       if (!subscriptionData.planName) {
         subscriptionData.planName = subPlan.charAt(0).toUpperCase() + subPlan.slice(1);
       }
@@ -337,7 +324,7 @@ const BillingPage = () => {
   const handleCancel = async () => {
     const planTier = subscription?.planTier?.toLowerCase() || user?.plan?.toLowerCase() || "free";
     const isFreePlan = planTier === "free" || planTier === "recruiter_free" || planTier === "seeker_free";
-    
+
     if (isFreePlan) {
       toast.error("You are on the Free plan. No cancellation needed.");
       setIsModalOpen(false);
@@ -348,8 +335,6 @@ const BillingPage = () => {
     try {
       const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || "http://localhost:5000";
 
-      console.log(`🔄 Attempting to cancel ${subscription?.planName || "Pro"} plan...`);
-
       const response = await fetch(`${baseUrl}/api/billing/cancel`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -358,7 +343,6 @@ const BillingPage = () => {
       });
 
       const result = await response.json();
-      console.log("📦 Cancel result:", result);
 
       if (result && result.success) {
         toast.success("Subscription cancelled successfully.");
@@ -366,7 +350,6 @@ const BillingPage = () => {
         await fetchData();
         try {
           await authClient.getSession();
-          console.log("✅ Session refreshed");
         } catch (err) {
           console.log("Could not refresh session:", err);
         }
@@ -384,13 +367,13 @@ const BillingPage = () => {
 
   const getStatusColor = (status) => {
     const map = {
-      active: "bg-emerald-500/20 text-emerald-400 border border-emerald-500/30",
-      pending: "bg-yellow-500/20 text-yellow-400 border border-yellow-500/30",
-      cancelled: "bg-red-500/20 text-red-400 border border-red-500/30",
-      inactive: "bg-zinc-700/50 text-zinc-400 border border-zinc-600",
-      paid: "bg-emerald-500/20 text-emerald-400 border border-emerald-500/30",
-      failed: "bg-red-500/20 text-red-400 border border-red-500/30",
-      trialing: "bg-blue-500/20 text-blue-400 border border-blue-500/30",
+      active: "bg-emerald-100 dark:bg-emerald-500/20 text-emerald-700 dark:text-emerald-400 border border-emerald-200/50 dark:border-emerald-500/30",
+      pending: "bg-yellow-100 dark:bg-yellow-500/20 text-yellow-700 dark:text-yellow-400 border border-yellow-200/50 dark:border-yellow-500/30",
+      cancelled: "bg-red-100 dark:bg-red-500/20 text-red-700 dark:text-red-400 border border-red-200/50 dark:border-red-500/30",
+      inactive: "bg-zinc-200/50 dark:bg-zinc-700/50 text-zinc-600 dark:text-zinc-400 border border-zinc-200/50 dark:border-zinc-600",
+      paid: "bg-emerald-100 dark:bg-emerald-500/20 text-emerald-700 dark:text-emerald-400 border border-emerald-200/50 dark:border-emerald-500/30",
+      failed: "bg-red-100 dark:bg-red-500/20 text-red-700 dark:text-red-400 border border-red-200/50 dark:border-red-500/30",
+      trialing: "bg-blue-100 dark:bg-blue-500/20 text-blue-700 dark:text-blue-400 border border-blue-200/50 dark:border-blue-500/30",
     };
     return map[status?.toLowerCase()] || map.inactive;
   };
@@ -430,10 +413,9 @@ const BillingPage = () => {
   const isFreePlan = planTier === "free" || planTier === "recruiter_free" || planTier === "seeker_free";
   const isPremiumPlan = planTier === "premium" || planTier === "recruiter_premium" || planTier === "seeker_premium";
   const isPaidPlan = !isFreePlan && !isPremiumPlan;
-  
+
   const formattedRole = user?.role ? user.role.charAt(0).toUpperCase() + user.role.slice(1) : "Seeker";
 
-  // Pagination Calculations
   const totalHistoryItems = billingHistory.length;
   const totalHistoryPages = Math.ceil(totalHistoryItems / historyItemsPerPage);
   const startIndex = (historyPage - 1) * historyItemsPerPage;
@@ -443,34 +425,34 @@ const BillingPage = () => {
   return (
     <>
       <Metadata userRole={userRole} />
-      
+
       <motion.div
         initial={{ opacity: 0, y: 30 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.6, ease: "easeOut" }}
-        className="min-h-screen bg-gradient-to-b from-zinc-950 via-zinc-900 to-zinc-950 py-8 px-4 md:px-8"
+        className="min-h-screen bg-gradient-to-b from-zinc-50 to-white dark:from-zinc-950 dark:via-zinc-900 dark:to-zinc-950 py-8 px-4 md:px-8"
       >
         <div className="max-w-7xl mx-auto">
           {/* Header */}
           <div className="mb-8 md:mt-15">
             <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
               <div>
-                <h1 className="text-3xl font-bold text-white">
+                <h1 className="text-3xl font-bold text-zinc-900 dark:text-white">
                   Subscription & Billing
                 </h1>
-                <p className="text-zinc-400 mt-1">
+                <p className="text-zinc-600 dark:text-zinc-400 mt-1">
                   Manage your subscription, payment methods, and billing history.
                 </p>
               </div>
 
               <div className="flex items-center gap-3 flex-wrap">
-                <span className="text-xs text-zinc-500 bg-zinc-800/50 px-3 py-1.5 rounded-full border border-zinc-700 flex items-center gap-2">
+                <span className="text-xs text-zinc-500 dark:text-zinc-500 bg-zinc-100 dark:bg-zinc-800/50 px-3 py-1.5 rounded-full border border-zinc-200/50 dark:border-zinc-700 flex items-center gap-2">
                   <Users className="w-3 h-3" />
                   {formattedRole}
                 </span>
                 <button
                   onClick={fetchData}
-                  className="text-xs text-zinc-400 hover:text-white transition-colors px-3 py-1.5 bg-zinc-800/50 rounded-full border border-zinc-700"
+                  className="text-xs text-zinc-500 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white transition-colors px-3 py-1.5 bg-zinc-100 dark:bg-zinc-800/50 rounded-full border border-zinc-200/50 dark:border-zinc-700"
                 >
                   Refresh
                 </button>
@@ -483,15 +465,15 @@ const BillingPage = () => {
             variants={itemVariants}
             initial="hidden"
             animate="visible"
-            className="flex gap-1 bg-zinc-900/50 border border-zinc-800 rounded-2xl p-1 mb-6 w-full md:w-auto"
+            className="flex gap-1 bg-white/80 dark:bg-zinc-900/50 border border-zinc-200/50 dark:border-zinc-800 rounded-2xl p-1 mb-6 w-full md:w-auto"
           >
             {["overview", "history", "payment"].map((tab) => (
               <button
                 key={tab}
                 onClick={() => setActiveTab(tab)}
                 className={`px-4 py-2 rounded-xl text-sm font-medium transition-all duration-300 capitalize ${activeTab === tab
-                  ? "bg-gradient-to-r from-blue-600 to-purple-600 text-white shadow-lg shadow-blue-600/20"
-                  : "text-zinc-400 hover:text-white hover:bg-zinc-800/50"
+                    ? "bg-gradient-to-r from-blue-600 to-purple-600 text-white shadow-lg shadow-blue-600/20"
+                    : "text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white hover:bg-zinc-100 dark:hover:bg-zinc-800/50"
                   }`}
               >
                 {tab === "overview" && "Overview"}
@@ -517,15 +499,15 @@ const BillingPage = () => {
                   variants={itemVariants}
                   initial="hidden"
                   animate="visible"
-                  className="bg-zinc-900/50 border border-zinc-800 rounded-2xl p-6"
+                  className="bg-white/80 dark:bg-zinc-900/50 border border-zinc-200/50 dark:border-zinc-800 rounded-2xl p-6"
                 >
                   <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
                     <div>
-                      <h3 className="text-sm font-medium text-zinc-400">
+                      <h3 className="text-sm font-medium text-zinc-500 dark:text-zinc-400">
                         CURRENT PLAN
                       </h3>
                       <div className="flex items-center gap-3 mt-1 flex-wrap">
-                        <h2 className="text-2xl font-bold text-white">
+                        <h2 className="text-2xl font-bold text-zinc-900 dark:text-white">
                           {isCancelled
                             ? "Cancelled"
                             : subscription?.planName || "Free"}
@@ -545,21 +527,21 @@ const BillingPage = () => {
                           </span>
                         </span>
                       </div>
-                      <p className="text-zinc-400 text-sm mt-1">
+                      <p className="text-zinc-600 dark:text-zinc-400 text-sm mt-1">
                         {isCancelled
                           ? "Your subscription has been cancelled. Access continues until the end of the billing period."
                           : subscription?.description ||
                           "Get started with basic features"}
                       </p>
                       {subscription?.currentPeriodEnd && !isCancelled && (
-                        <p className="text-xs text-zinc-500 mt-2 flex items-center gap-1">
+                        <p className="text-xs text-zinc-500 dark:text-zinc-500 mt-2 flex items-center gap-1">
                           <Calendar className="w-3 h-3" />
                           Next billing date:{" "}
                           {formatDate(subscription.currentPeriodEnd)}
                         </p>
                       )}
                       {isCancelled && subscription?.currentPeriodEnd && (
-                        <p className="text-xs text-yellow-500 mt-2 flex items-center gap-1">
+                        <p className="text-xs text-yellow-600 dark:text-yellow-500 mt-2 flex items-center gap-1">
                           <AlertCircle className="w-3 h-3" />
                           Your access will end on{" "}
                           {formatDate(subscription.currentPeriodEnd)}
@@ -584,7 +566,7 @@ const BillingPage = () => {
                             <button
                               onClick={() => setIsModalOpen(true)}
                               disabled={isProcessing}
-                              className="cursor-pointer px-4 py-2 bg-red-500/10 hover:bg-red-500/20 text-red-400 border border-red-500/20 rounded-xl font-medium transition-all duration-300 disabled:opacity-50 flex items-center gap-2"
+                              className="cursor-pointer px-4 py-2 bg-red-100 dark:bg-red-500/10 hover:bg-red-200 dark:hover:bg-red-500/20 text-red-700 dark:text-red-400 border border-red-200/50 dark:border-red-500/20 rounded-xl font-medium transition-all duration-300 disabled:opacity-50 flex items-center gap-2"
                             >
                               {isProcessing ? (
                                 <Loader2 className="w-4 h-4 animate-spin" />
@@ -610,7 +592,7 @@ const BillingPage = () => {
 
                   {/* Features List */}
                   {subscription?.features && subscription.features.length > 0 && (
-                    <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-6 pt-6 border-t border-zinc-800">
+                    <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-6 pt-6 border-t border-zinc-200/50 dark:border-zinc-800">
                       {subscription.features.map((feature, index) => (
                         <motion.div
                           key={index}
@@ -620,12 +602,12 @@ const BillingPage = () => {
                           className="flex items-center gap-2"
                         >
                           {feature.included ? (
-                            <CheckCircle className="w-4 h-4 text-emerald-400" />
+                            <CheckCircle className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
                           ) : (
-                            <XCircle className="w-4 h-4 text-zinc-600" />
+                            <XCircle className="w-4 h-4 text-zinc-400 dark:text-zinc-600" />
                           )}
                           <span
-                            className={`text-sm ${feature.included ? "text-zinc-300" : "text-zinc-600"}`}
+                            className={`text-sm ${feature.included ? "text-zinc-700 dark:text-zinc-300" : "text-zinc-400 dark:text-zinc-600"}`}
                           >
                             {feature.text}
                           </span>
@@ -652,8 +634,8 @@ const BillingPage = () => {
                           ? formatCurrency(subscription.amount)
                           : "$0.00",
                       icon: DollarSign,
-                      color: "text-blue-400",
-                      bg: "bg-blue-600/20",
+                      color: "text-blue-600 dark:text-blue-400",
+                      bg: "bg-blue-100 dark:bg-blue-600/20",
                     },
                     {
                       label: "Billing Cycle",
@@ -661,15 +643,15 @@ const BillingPage = () => {
                         ? "Cancelled"
                         : subscription?.billingCycle || "Monthly",
                       icon: Calendar,
-                      color: "text-emerald-400",
-                      bg: "bg-emerald-600/20",
+                      color: "text-emerald-600 dark:text-emerald-400",
+                      bg: "bg-emerald-100 dark:bg-emerald-600/20",
                     },
                     {
                       label: "Total Invoices",
                       value: billingHistory.length,
                       icon: FileText,
-                      color: "text-purple-400",
-                      bg: "bg-purple-600/20",
+                      color: "text-purple-600 dark:text-purple-400",
+                      bg: "bg-purple-100 dark:bg-purple-600/20",
                     },
                   ].map((stat, idx) => {
                     const Icon = stat.icon;
@@ -678,15 +660,15 @@ const BillingPage = () => {
                         key={idx}
                         variants={statsVariants}
                         whileHover={{ y: -4, borderColor: "rgba(255,255,255,0.1)" }}
-                        className="bg-zinc-900/50 border border-zinc-800 rounded-2xl p-4"
+                        className="bg-white/80 dark:bg-zinc-900/50 border border-zinc-200/50 dark:border-zinc-800 rounded-2xl p-4"
                       >
                         <div className="flex items-center gap-3">
                           <div className={`p-2 ${stat.bg} rounded-xl`}>
                             <Icon className={`w-5 h-5 ${stat.color}`} />
                           </div>
                           <div>
-                            <p className="text-xs text-zinc-400">{stat.label}</p>
-                            <p className="text-lg font-bold text-white">
+                            <p className="text-xs text-zinc-500 dark:text-zinc-400">{stat.label}</p>
+                            <p className="text-lg font-bold text-zinc-900 dark:text-white">
                               {stat.value}
                             </p>
                           </div>
@@ -701,15 +683,15 @@ const BillingPage = () => {
                   <motion.div
                     initial={{ opacity: 0, y: 10 }}
                     animate={{ opacity: 1, y: 0 }}
-                    className="bg-gradient-to-r from-blue-600/10 to-purple-600/10 border border-blue-500/20 rounded-2xl p-6"
+                    className="bg-gradient-to-r from-blue-100/50 to-purple-100/50 dark:from-blue-600/10 dark:to-purple-600/10 border border-blue-200/50 dark:border-blue-500/20 rounded-2xl p-6"
                   >
                     <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
                       <div>
-                        <h3 className="text-lg font-semibold text-white flex items-center gap-2">
-                          <Zap className="w-5 h-5 text-blue-400" />
+                        <h3 className="text-lg font-semibold text-zinc-900 dark:text-white flex items-center gap-2">
+                          <Zap className="w-5 h-5 text-blue-600 dark:text-blue-400" />
                           Unlock More Features
                         </h3>
-                        <p className="text-zinc-400 text-sm">
+                        <p className="text-zinc-600 dark:text-zinc-400 text-sm">
                           Upgrade to Pro or Premium to get unlimited
                           applications, salary insights, and more.
                         </p>
@@ -734,13 +716,13 @@ const BillingPage = () => {
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: -20 }}
                 transition={{ duration: 0.3 }}
-                className="bg-zinc-900/50 border border-zinc-800 rounded-2xl p-6"
+                className="bg-white/80 dark:bg-zinc-900/50 border border-zinc-200/50 dark:border-zinc-800 rounded-2xl p-6"
               >
                 <div className="flex justify-between items-center mb-4">
-                  <h3 className="text-lg font-semibold text-white">
+                  <h3 className="text-lg font-semibold text-zinc-900 dark:text-white">
                     Billing History
                   </h3>
-                  <span className="text-sm text-zinc-400">
+                  <span className="text-sm text-zinc-500 dark:text-zinc-400">
                     {billingHistory.length} transactions
                   </span>
                 </div>
@@ -749,23 +731,23 @@ const BillingPage = () => {
                   {billingHistory.length > 0 ? (
                     <table className="w-full">
                       <thead>
-                        <tr className="border-b border-zinc-800">
-                          <th className="text-left py-3 text-xs font-medium text-zinc-400 uppercase">
+                        <tr className="border-b border-zinc-200/50 dark:border-zinc-800">
+                          <th className="text-left py-3 text-xs font-medium text-zinc-500 dark:text-zinc-400 uppercase">
                             Date
                           </th>
-                          <th className="text-left py-3 text-xs font-medium text-zinc-400 uppercase">
+                          <th className="text-left py-3 text-xs font-medium text-zinc-500 dark:text-zinc-400 uppercase">
                             Plan
                           </th>
-                          <th className="text-left py-3 text-xs font-medium text-zinc-400 uppercase">
+                          <th className="text-left py-3 text-xs font-medium text-zinc-500 dark:text-zinc-400 uppercase">
                             Amount
                           </th>
-                          <th className="text-left py-3 text-xs font-medium text-zinc-400 uppercase">
+                          <th className="text-left py-3 text-xs font-medium text-zinc-500 dark:text-zinc-400 uppercase">
                             Transaction ID
                           </th>
-                          <th className="text-left py-3 text-xs font-medium text-zinc-400 uppercase">
+                          <th className="text-left py-3 text-xs font-medium text-zinc-500 dark:text-zinc-400 uppercase">
                             Status
                           </th>
-                          <th className="text-left py-3 text-xs font-medium text-zinc-400 uppercase">
+                          <th className="text-left py-3 text-xs font-medium text-zinc-500 dark:text-zinc-400 uppercase">
                             Invoice
                           </th>
                         </tr>
@@ -774,18 +756,18 @@ const BillingPage = () => {
                         {currentHistoryItems.map((bill, index) => (
                           <tr
                             key={index}
-                            className="border-b border-zinc-800/50 hover:bg-zinc-800/30 transition-colors"
+                            className="border-b border-zinc-200/50 dark:border-zinc-800/50 hover:bg-zinc-100/50 dark:hover:bg-zinc-800/30 transition-colors"
                           >
-                            <td className="py-3 text-sm text-zinc-300">
+                            <td className="py-3 text-sm text-zinc-700 dark:text-zinc-300">
                               {formatDate(bill.date)}
                             </td>
-                            <td className="py-3 text-sm text-zinc-300">
+                            <td className="py-3 text-sm text-zinc-700 dark:text-zinc-300">
                               {bill.plan}
                             </td>
-                            <td className="py-3 text-sm text-zinc-300">
+                            <td className="py-3 text-sm text-zinc-700 dark:text-zinc-300">
                               {formatCurrency(bill.amount)}
                             </td>
-                            <td className="py-3 text-sm text-zinc-400 font-mono">
+                            <td className="py-3 text-sm text-zinc-500 dark:text-zinc-400 font-mono">
                               {bill.transactionId}
                             </td>
                             <td className="py-3">
@@ -805,12 +787,12 @@ const BillingPage = () => {
                                   onClick={() =>
                                     window.open(bill.invoiceUrl, "_blank")
                                   }
-                                  className="text-blue-400 hover:text-blue-300 transition-colors"
+                                  className="text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 transition-colors"
                                 >
                                   <Download className="w-4 h-4" />
                                 </button>
                               ) : (
-                                <span className="text-zinc-600 text-xs">N/A</span>
+                                <span className="text-zinc-400 dark:text-zinc-600 text-xs">N/A</span>
                               )}
                             </td>
                           </tr>
@@ -820,13 +802,13 @@ const BillingPage = () => {
                   ) : (
                     <div className="text-center py-12">
                       <div className="flex flex-col items-center gap-3">
-                        <div className="p-3 bg-zinc-800/50 rounded-full">
-                          <FileText className="w-8 h-8 text-zinc-600" />
+                        <div className="p-3 bg-zinc-100 dark:bg-zinc-800/50 rounded-full">
+                          <FileText className="w-8 h-8 text-zinc-400 dark:text-zinc-600" />
                         </div>
-                        <p className="text-zinc-500">
+                        <p className="text-zinc-500 dark:text-zinc-500">
                           No billing history available
                         </p>
-                        <p className="text-xs text-zinc-600">
+                        <p className="text-xs text-zinc-400 dark:text-zinc-600">
                           Your transactions will appear here once you subscribe
                         </p>
                       </div>
@@ -840,7 +822,7 @@ const BillingPage = () => {
                     initial={{ opacity: 0 }}
                     animate={{ opacity: 1 }}
                     transition={{ delay: 0.6 }}
-                    className="px-6 py-5 border-t border-white/5 flex justify-center"
+                    className="px-6 py-5 border-t border-zinc-200/50 dark:border-white/5 flex justify-center"
                   >
                     <Pagination
                       currentPage={historyPage}
@@ -864,15 +846,15 @@ const BillingPage = () => {
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: -20 }}
                 transition={{ duration: 0.3 }}
-                className="bg-zinc-900/50 border border-zinc-800 rounded-2xl p-6"
+                className="bg-white/80 dark:bg-zinc-900/50 border border-zinc-200/50 dark:border-zinc-800 rounded-2xl p-6"
               >
                 <div className="flex justify-between items-center mb-4">
-                  <h3 className="text-lg font-semibold text-white">
+                  <h3 className="text-lg font-semibold text-zinc-900 dark:text-white">
                     Payment Methods
                   </h3>
                   <button
                     onClick={() => setIsAddCardModalOpen(true)}
-                    className="cursor-pointer flex items-center gap-2 px-3 py-1.5 bg-blue-600/20 hover:bg-blue-600/30 text-blue-400 rounded-xl text-sm font-medium transition-colors"
+                    className="cursor-pointer flex items-center gap-2 px-3 py-1.5 bg-blue-100 dark:bg-blue-600/20 hover:bg-blue-200 dark:hover:bg-blue-600/30 text-blue-700 dark:text-blue-400 rounded-xl text-sm font-medium transition-colors"
                   >
                     <Plus className="w-4 h-4" />
                     Add New
@@ -895,13 +877,13 @@ const BillingPage = () => {
                 ) : (
                   <div className="text-center py-12">
                     <div className="flex flex-col items-center gap-3">
-                      <div className="p-3 bg-zinc-800/50 rounded-full">
-                        <CreditCard className="w-8 h-8 text-zinc-600" />
+                      <div className="p-3 bg-zinc-100 dark:bg-zinc-800/50 rounded-full">
+                        <CreditCard className="w-8 h-8 text-zinc-400 dark:text-zinc-600" />
                       </div>
-                      <p className="text-zinc-500">
+                      <p className="text-zinc-500 dark:text-zinc-500">
                         No payment methods added yet
                       </p>
-                      <p className="text-xs text-zinc-600">
+                      <p className="text-xs text-zinc-400 dark:text-zinc-600">
                         Add a payment method to start your subscription
                       </p>
                       <button
@@ -923,18 +905,18 @@ const BillingPage = () => {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.4 }}
-            className="mt-6 bg-zinc-900/50 border border-zinc-800 rounded-2xl p-6"
+            className="mt-6 bg-white/80 dark:bg-zinc-900/50 border border-zinc-200/50 dark:border-zinc-800 rounded-2xl p-6"
           >
             <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
               <div className="flex items-start gap-4">
-                <div className="p-2 bg-blue-600/20 rounded-xl">
-                  <HelpCircle className="w-5 h-5 text-blue-400" />
+                <div className="p-2 bg-blue-100 dark:bg-blue-600/20 rounded-xl">
+                  <HelpCircle className="w-5 h-5 text-blue-600 dark:text-blue-400" />
                 </div>
                 <div>
-                  <h3 className="text-lg font-semibold text-white">
+                  <h3 className="text-lg font-semibold text-zinc-900 dark:text-white">
                     Need help with your invoice?
                   </h3>
-                  <p className="text-zinc-400 text-sm">
+                  <p className="text-zinc-600 dark:text-zinc-400 text-sm">
                     Our support team is available 24/7 to help you resolve any
                     payment issues or clarify billing details.
                   </p>
@@ -949,7 +931,7 @@ const BillingPage = () => {
                 </a>
                 <a
                   href="/privacy-policy"
-                  className="px-4 py-2 bg-zinc-800 hover:bg-zinc-700 text-zinc-300 rounded-xl font-medium transition-colors"
+                  className="px-4 py-2 bg-zinc-200 dark:bg-zinc-800 hover:bg-zinc-300 dark:hover:bg-zinc-700 text-zinc-700 dark:text-zinc-300 rounded-xl font-medium transition-colors"
                 >
                   Read Full Policy
                 </a>
@@ -958,48 +940,48 @@ const BillingPage = () => {
           </motion.div>
         </div>
 
-        {/* Cancel Subscription Modal */}
+        {/* Cancel Subscription Modal - Full Theme Support */}
         <Modal isOpen={isModalOpen} onOpenChange={() => setIsModalOpen(false)}>
           <Modal.Backdrop>
             <Modal.Container>
-              <Modal.Dialog className="sm:max-w-[400px] bg-zinc-900 border border-zinc-800 rounded-2xl">
+              <Modal.Dialog className="sm:max-w-[400px] bg-white dark:bg-zinc-900 border border-zinc-200/50 dark:border-zinc-800 rounded-2xl">
                 <Modal.CloseTrigger />
                 <Modal.Header>
-                  <Modal.Icon className="bg-red-500/10 text-red-400 rounded-full p-1">
+                  <Modal.Icon className="bg-red-100 dark:bg-red-500/10 text-red-600 dark:text-red-400 rounded-full p-1">
                     <AlertTriangle className="size-5" />
                   </Modal.Icon>
-                  <Modal.Heading className="text-white text-lg font-semibold">
+                  <Modal.Heading className="text-zinc-900 dark:text-white text-lg font-semibold">
                     Cancel Subscription
                   </Modal.Heading>
                 </Modal.Header>
                 <Modal.Body className="space-y-4">
-                  <p className="text-zinc-300">
+                  <p className="text-zinc-700 dark:text-zinc-300">
                     Are you sure you want to cancel your{" "}
-                    <span className="font-semibold text-white">
-                      {subscription?.planName || "Pro"}
+                    <span className="font-semibold text-zinc-900 dark:text-white">
+                      {subscription?.planName || subscription?.planTier || "Pro"}
                     </span>{" "}
                     subscription?
                   </p>
 
-                  <div className="p-3 bg-yellow-500/10 border border-yellow-500/20 rounded-xl">
-                    <p className="text-sm text-yellow-400">
+                  <div className="p-3 bg-yellow-100/50 dark:bg-yellow-500/10 border border-yellow-400/30 dark:border-yellow-500/20 rounded-xl">
+                    <p className="text-sm text-yellow-700 dark:text-yellow-400">
                       ⚠️ Your access will continue until the end of your current
-                      billing period ({formatDate(subscription?.currentPeriodEnd)}
+                      billing period ({formatDate(subscription?.currentPeriodEnd) || "N/A"}
                       ). After that, you'll lose access to premium features.
                     </p>
                   </div>
 
-                  <ul className="space-y-1.5 text-sm text-zinc-400">
+                  <ul className="space-y-1.5 text-sm text-zinc-600 dark:text-zinc-400">
                     <li className="flex items-center gap-2">
-                      <XCircle className="w-4 h-4 text-red-400" />
+                      <XCircle className="w-4 h-4 text-red-600 dark:text-red-400" />
                       Lose access to premium features
                     </li>
                     <li className="flex items-center gap-2">
-                      <XCircle className="w-4 h-4 text-red-400" />
+                      <XCircle className="w-4 h-4 text-red-600 dark:text-red-400" />
                       Limited to 3 applications per month
                     </li>
                     <li className="flex items-center gap-2">
-                      <CheckCircle className="w-4 h-4 text-emerald-400" />
+                      <CheckCircle className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
                       Your data will be preserved
                     </li>
                   </ul>
@@ -1007,7 +989,7 @@ const BillingPage = () => {
                 <Modal.Footer className="flex gap-3">
                   <Button
                     variant="flat"
-                    className="flex-1 bg-zinc-800 hover:bg-zinc-700 text-white rounded-xl font-medium"
+                    className="flex-1 bg-zinc-200 dark:bg-zinc-800 hover:bg-zinc-300 dark:hover:bg-zinc-700 text-zinc-900 dark:text-white rounded-xl font-medium"
                     onPress={() => setIsModalOpen(false)}
                     disabled={isProcessing}
                   >
@@ -1015,7 +997,7 @@ const BillingPage = () => {
                   </Button>
                   <Button
                     variant="flat"
-                    className="flex-1 bg-red-500/10 hover:bg-red-500/20 text-red-400 border border-red-500/20 rounded-xl font-medium disabled:opacity-50"
+                    className="flex-1 bg-red-100/50 dark:bg-red-500/10 hover:bg-red-100 dark:hover:bg-red-500/20 text-red-700 dark:text-red-400 border border-red-400/30 dark:border-red-500/20 rounded-xl font-medium disabled:opacity-50"
                     onPress={handleCancel}
                     disabled={isProcessing}
                   >
@@ -1045,54 +1027,54 @@ const BillingPage = () => {
   );
 };
 
-// Loading Skeleton
+// Loading Skeleton - Keep dark theme
 const BillingSkeleton = () => (
-  <div className="min-h-screen bg-gradient-to-b from-zinc-950 via-zinc-900 to-zinc-950 py-8 px-4 md:px-8">
+  <div className="min-h-screen bg-gradient-to-b from-zinc-50 to-white dark:from-zinc-950 dark:via-zinc-900 dark:to-zinc-950 py-8 px-4 md:px-8">
     <div className="max-w-7xl mx-auto">
       <div className="animate-pulse space-y-6">
         <div>
-          <div className="h-4 w-32 bg-zinc-800 rounded mb-4"></div>
+          <div className="h-4 w-32 bg-zinc-200 dark:bg-zinc-800 rounded mb-4"></div>
           <div className="flex justify-between">
             <div>
-              <div className="h-8 w-64 bg-zinc-800 rounded"></div>
-              <div className="h-4 w-96 bg-zinc-800 rounded mt-2"></div>
+              <div className="h-8 w-64 bg-zinc-200 dark:bg-zinc-800 rounded"></div>
+              <div className="h-4 w-96 bg-zinc-200 dark:bg-zinc-800 rounded mt-2"></div>
             </div>
-            <div className="h-6 w-24 bg-zinc-800 rounded-full"></div>
+            <div className="h-6 w-24 bg-zinc-200 dark:bg-zinc-800 rounded-full"></div>
           </div>
         </div>
-        <div className="flex gap-1 bg-zinc-900/50 border border-zinc-800 rounded-2xl p-1 w-64">
-          <div className="h-8 w-20 bg-zinc-800 rounded-xl"></div>
-          <div className="h-8 w-20 bg-zinc-800 rounded-xl"></div>
-          <div className="h-8 w-20 bg-zinc-800 rounded-xl"></div>
+        <div className="flex gap-1 bg-white/80 dark:bg-zinc-900/50 border border-zinc-200/50 dark:border-zinc-800 rounded-2xl p-1 w-64">
+          <div className="h-8 w-20 bg-zinc-200 dark:bg-zinc-800 rounded-xl"></div>
+          <div className="h-8 w-20 bg-zinc-200 dark:bg-zinc-800 rounded-xl"></div>
+          <div className="h-8 w-20 bg-zinc-200 dark:bg-zinc-800 rounded-xl"></div>
         </div>
-        <div className="bg-zinc-900/50 border border-zinc-800 rounded-2xl p-6">
+        <div className="bg-white/80 dark:bg-zinc-900/50 border border-zinc-200/50 dark:border-zinc-800 rounded-2xl p-6">
           <div className="flex justify-between">
             <div>
-              <div className="h-4 w-24 bg-zinc-800 rounded mb-2"></div>
-              <div className="h-8 w-48 bg-zinc-800 rounded mb-2"></div>
-              <div className="h-4 w-64 bg-zinc-800 rounded"></div>
+              <div className="h-4 w-24 bg-zinc-200 dark:bg-zinc-800 rounded mb-2"></div>
+              <div className="h-8 w-48 bg-zinc-200 dark:bg-zinc-800 rounded mb-2"></div>
+              <div className="h-4 w-64 bg-zinc-200 dark:bg-zinc-800 rounded"></div>
             </div>
-            <div className="h-10 w-32 bg-zinc-800 rounded-xl"></div>
+            <div className="h-10 w-32 bg-zinc-200 dark:bg-zinc-800 rounded-xl"></div>
           </div>
-          <div className="grid grid-cols-4 gap-4 mt-6 pt-6 border-t border-zinc-800">
-            <div className="h-6 w-24 bg-zinc-800 rounded"></div>
-            <div className="h-6 w-24 bg-zinc-800 rounded"></div>
-            <div className="h-6 w-24 bg-zinc-800 rounded"></div>
-            <div className="h-6 w-24 bg-zinc-800 rounded"></div>
+          <div className="grid grid-cols-4 gap-4 mt-6 pt-6 border-t border-zinc-200/50 dark:border-zinc-800">
+            <div className="h-6 w-24 bg-zinc-200 dark:bg-zinc-800 rounded"></div>
+            <div className="h-6 w-24 bg-zinc-200 dark:bg-zinc-800 rounded"></div>
+            <div className="h-6 w-24 bg-zinc-200 dark:bg-zinc-800 rounded"></div>
+            <div className="h-6 w-24 bg-zinc-200 dark:bg-zinc-800 rounded"></div>
           </div>
         </div>
         <div className="grid grid-cols-3 gap-4">
-          <div className="bg-zinc-900/50 border border-zinc-800 rounded-2xl p-4">
-            <div className="h-4 w-20 bg-zinc-800 rounded mb-2"></div>
-            <div className="h-6 w-24 bg-zinc-800 rounded"></div>
+          <div className="bg-white/80 dark:bg-zinc-900/50 border border-zinc-200/50 dark:border-zinc-800 rounded-2xl p-4">
+            <div className="h-4 w-20 bg-zinc-200 dark:bg-zinc-800 rounded mb-2"></div>
+            <div className="h-6 w-24 bg-zinc-200 dark:bg-zinc-800 rounded"></div>
           </div>
-          <div className="bg-zinc-900/50 border border-zinc-800 rounded-2xl p-4">
-            <div className="h-4 w-20 bg-zinc-800 rounded mb-2"></div>
-            <div className="h-6 w-24 bg-zinc-800 rounded"></div>
+          <div className="bg-white/80 dark:bg-zinc-900/50 border border-zinc-200/50 dark:border-zinc-800 rounded-2xl p-4">
+            <div className="h-4 w-20 bg-zinc-200 dark:bg-zinc-800 rounded mb-2"></div>
+            <div className="h-6 w-24 bg-zinc-200 dark:bg-zinc-800 rounded"></div>
           </div>
-          <div className="bg-zinc-900/50 border border-zinc-800 rounded-2xl p-4">
-            <div className="h-4 w-20 bg-zinc-800 rounded mb-2"></div>
-            <div className="h-6 w-24 bg-zinc-800 rounded"></div>
+          <div className="bg-white/80 dark:bg-zinc-900/50 border border-zinc-200/50 dark:border-zinc-800 rounded-2xl p-4">
+            <div className="h-4 w-20 bg-zinc-200 dark:bg-zinc-800 rounded mb-2"></div>
+            <div className="h-6 w-24 bg-zinc-200 dark:bg-zinc-800 rounded"></div>
           </div>
         </div>
       </div>

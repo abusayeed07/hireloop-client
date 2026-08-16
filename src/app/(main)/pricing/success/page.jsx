@@ -99,8 +99,8 @@ export default function PaymentSuccessPage() {
   // ============================================================
   if (status === "processing") {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-[#08090B] overflow-hidden px-4">
-        {/* Background Ambient Orbs */}
+      <div className="min-h-screen flex items-center justify-center bg-zinc-50 dark:bg-[#08090B] overflow-hidden px-4">
+        {/* Background Ambient Orbs - lighter in light mode */}
         <motion.div
           animate={{
             x: [0, 80, 0],
@@ -111,7 +111,7 @@ export default function PaymentSuccessPage() {
             repeat: Infinity,
             ease: "linear",
           }}
-          className="absolute top-20 left-20 w-[500px] h-[500px] bg-blue-500/20 blur-[120px] rounded-full pointer-events-none"
+          className="absolute top-20 left-20 w-[500px] h-[500px] bg-blue-300/20 dark:bg-blue-500/20 blur-[120px] rounded-full pointer-events-none"
         />
         <motion.div
           animate={{
@@ -123,32 +123,32 @@ export default function PaymentSuccessPage() {
             repeat: Infinity,
             ease: "linear",
           }}
-          className="absolute bottom-20 right-20 w-[500px] h-[500px] bg-purple-500/20 blur-[120px] rounded-full pointer-events-none"
+          className="absolute bottom-20 right-20 w-[500px] h-[500px] bg-purple-300/20 dark:bg-purple-500/20 blur-[120px] rounded-full pointer-events-none"
         />
 
         <motion.div
           initial={{ scale: 0.9, opacity: 0 }}
           animate={{ scale: 1, opacity: 1 }}
           transition={{ duration: 0.5, ease: "easeOut" }}
-          className="relative z-10 bg-[#121214]/80 backdrop-blur-xl border border-white/5 rounded-2xl p-10 shadow-2xl max-w-md w-full text-center"
+          className="relative z-10 bg-white/80 dark:bg-[#121214]/80 backdrop-blur-xl border border-zinc-200/50 dark:border-white/5 rounded-2xl p-10 shadow-2xl max-w-md w-full text-center"
         >
           <div className="flex flex-col items-center space-y-5">
             <motion.div
               animate={{ rotate: 360 }}
               transition={{ duration: 2, repeat: Infinity, ease: "linear" }}
-              className="w-20 h-20 rounded-full border-4 border-blue-500/30 border-t-blue-500 flex items-center justify-center"
+              className="w-20 h-20 rounded-full border-4 border-blue-300/50 dark:border-blue-500/30 border-t-blue-500 flex items-center justify-center"
             >
-              <div className="w-12 h-12 rounded-full bg-blue-500/20 animate-pulse" />
+              <div className="w-12 h-12 rounded-full bg-blue-300/20 dark:bg-blue-500/20 animate-pulse" />
             </motion.div>
             
             <div className="space-y-2">
-              <h2 className="text-2xl font-bold text-white">Processing Payment</h2>
-              <p className="text-zinc-400 text-sm max-w-xs mx-auto">
+              <h2 className="text-2xl font-bold text-zinc-900 dark:text-white">Processing Payment</h2>
+              <p className="text-zinc-600 dark:text-zinc-400 text-sm max-w-xs mx-auto">
                 Please wait while we securely verify your transaction and upgrade your plan.
               </p>
             </div>
 
-            <div className="w-full max-w-xs h-1.5 bg-zinc-800 rounded-full overflow-hidden mt-2">
+            <div className="w-full max-w-xs h-1.5 bg-zinc-200 dark:bg-zinc-800 rounded-full overflow-hidden mt-2">
               <motion.div
                 initial={{ x: "-100%" }}
                 animate={{ x: "100%" }}
@@ -167,8 +167,8 @@ export default function PaymentSuccessPage() {
   // ============================================================
   if (status === "success") {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-[#08090B] overflow-hidden px-4 relative">
-        {/* Background Ambient Orbs */}
+      <div className="min-h-screen flex items-center justify-center bg-zinc-50 dark:bg-[#08090B] overflow-hidden px-4 relative">
+        {/* Background Ambient Orbs - lighter in light mode */}
         <motion.div
           animate={{
             x: [0, 100, 0],
@@ -179,7 +179,7 @@ export default function PaymentSuccessPage() {
             repeat: Infinity,
             ease: "linear",
           }}
-          className="absolute top-10 left-10 w-[600px] h-[600px] bg-emerald-500/15 blur-[140px] rounded-full pointer-events-none"
+          className="absolute top-10 left-10 w-[600px] h-[600px] bg-emerald-300/15 dark:bg-emerald-500/15 blur-[140px] rounded-full pointer-events-none"
         />
         <motion.div
           animate={{
@@ -191,7 +191,7 @@ export default function PaymentSuccessPage() {
             repeat: Infinity,
             ease: "linear",
           }}
-          className="absolute bottom-10 right-10 w-[600px] h-[600px] bg-blue-500/15 blur-[140px] rounded-full pointer-events-none"
+          className="absolute bottom-10 right-10 w-[600px] h-[600px] bg-blue-300/15 dark:bg-blue-500/15 blur-[140px] rounded-full pointer-events-none"
         />
 
         {/* Floating Particles */}
@@ -226,11 +226,11 @@ export default function PaymentSuccessPage() {
         >
           <motion.div
             variants={itemVariants}
-            className="bg-[#121214]/90 backdrop-blur-xl border border-white/5 rounded-3xl p-8 shadow-2xl relative overflow-hidden"
+            className="bg-white/90 dark:bg-[#121214]/90 backdrop-blur-xl border border-zinc-200/50 dark:border-white/5 rounded-3xl p-8 shadow-2xl relative overflow-hidden"
           >
             {/* Subtle Glow inside card */}
-            <div className="absolute -top-20 -left-20 w-40 h-40 bg-emerald-500/10 rounded-full blur-3xl pointer-events-none" />
-            <div className="absolute -bottom-20 -right-20 w-40 h-40 bg-blue-500/10 rounded-full blur-3xl pointer-events-none" />
+            <div className="absolute -top-20 -left-20 w-40 h-40 bg-emerald-300/10 dark:bg-emerald-500/10 rounded-full blur-3xl pointer-events-none" />
+            <div className="absolute -bottom-20 -right-20 w-40 h-40 bg-blue-300/10 dark:bg-blue-500/10 rounded-full blur-3xl pointer-events-none" />
 
             {/* Gradient Top Border */}
             <div className="absolute top-0 left-0 right-0 h-[2px] bg-gradient-to-r from-transparent via-emerald-500 to-transparent" />
@@ -239,17 +239,17 @@ export default function PaymentSuccessPage() {
               {/* Success Icon */}
               <motion.div
                 variants={iconVariants}
-                className="w-20 h-20 rounded-full bg-emerald-500/20 flex items-center justify-center border border-emerald-500/30 mb-6 shadow-[0_0_40px_rgba(16,185,129,0.15)]"
+                className="w-20 h-20 rounded-full bg-emerald-300/20 dark:bg-emerald-500/20 flex items-center justify-center border border-emerald-400/30 dark:border-emerald-500/30 mb-6 shadow-[0_0_40px_rgba(16,185,129,0.15)]"
               >
-                <CheckCircle className="w-10 h-10 text-emerald-400" />
+                <CheckCircle className="w-10 h-10 text-emerald-600 dark:text-emerald-400" />
               </motion.div>
 
               {/* Title */}
               <motion.div variants={itemVariants} className="space-y-2 mb-6">
-                <h1 className="text-3xl font-bold bg-gradient-to-r from-white to-zinc-400 bg-clip-text text-transparent">
+                <h1 className="text-3xl font-bold bg-gradient-to-r from-zinc-900 to-zinc-500 dark:from-white dark:to-zinc-400 bg-clip-text text-transparent">
                   Payment Successful!
                 </h1>
-                <p className="text-zinc-400 text-sm">
+                <p className="text-zinc-600 dark:text-zinc-400 text-sm">
                   Your plan has been upgraded. Redirecting you in a moment...
                 </p>
               </motion.div>
@@ -257,7 +257,7 @@ export default function PaymentSuccessPage() {
               {/* Loading Bar Timer */}
               <motion.div
                 variants={itemVariants}
-                className="w-full h-1 bg-zinc-800 rounded-full overflow-hidden mb-8"
+                className="w-full h-1 bg-zinc-200 dark:bg-zinc-800 rounded-full overflow-hidden mb-8"
               >
                 <motion.div
                   initial={{ width: "0%" }}
@@ -284,7 +284,7 @@ export default function PaymentSuccessPage() {
 
                 <button
                   onClick={() => router.push("/browse-jobs")}
-                  className="w-full inline-flex items-center justify-center gap-2 text-sm font-medium text-zinc-400 hover:text-zinc-200 py-3 px-4 rounded-2xl hover:bg-zinc-800/50 transition-all duration-200"
+                  className="w-full inline-flex items-center justify-center gap-2 text-sm font-medium text-zinc-500 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-200 py-3 px-4 rounded-2xl hover:bg-zinc-100 dark:hover:bg-zinc-800/50 transition-all duration-200"
                 >
                   <span className="text-lg">🚀</span>
                   Browse Jobs
@@ -296,7 +296,7 @@ export default function PaymentSuccessPage() {
           {/* Footer Text */}
           <motion.p
             variants={itemVariants}
-            className="mt-6 text-center text-[11px] text-zinc-600"
+            className="mt-6 text-center text-[11px] text-zinc-500 dark:text-zinc-600"
           >
             A confirmation receipt has been sent to your email address.
           </motion.p>
@@ -310,8 +310,8 @@ export default function PaymentSuccessPage() {
   // ============================================================
   if (status === "error") {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-[#08090B] overflow-hidden px-4 relative">
-        {/* Error Background Orbs */}
+      <div className="min-h-screen flex items-center justify-center bg-zinc-50 dark:bg-[#08090B] overflow-hidden px-4 relative">
+        {/* Error Background Orbs - lighter in light mode */}
         <motion.div
           animate={{
             x: [0, 80, 0],
@@ -322,28 +322,28 @@ export default function PaymentSuccessPage() {
             repeat: Infinity,
             ease: "linear",
           }}
-          className="absolute top-20 left-20 w-[500px] h-[500px] bg-red-500/20 blur-[120px] rounded-full pointer-events-none"
+          className="absolute top-20 left-20 w-[500px] h-[500px] bg-red-300/20 dark:bg-red-500/20 blur-[120px] rounded-full pointer-events-none"
         />
 
         <motion.div
           initial={{ scale: 0.9, opacity: 0 }}
           animate={{ scale: 1, opacity: 1 }}
           transition={{ duration: 0.5, ease: "easeOut" }}
-          className="relative z-10 bg-[#121214]/80 backdrop-blur-xl border border-white/5 rounded-2xl p-10 shadow-2xl max-w-md w-full text-center"
+          className="relative z-10 bg-white/80 dark:bg-[#121214]/80 backdrop-blur-xl border border-zinc-200/50 dark:border-white/5 rounded-2xl p-10 shadow-2xl max-w-md w-full text-center"
         >
           <div className="flex flex-col items-center space-y-4">
             <motion.div
               initial={{ scale: 0 }}
               animate={{ scale: 1 }}
               transition={{ type: "spring", damping: 10 }}
-              className="w-20 h-20 rounded-full bg-red-500/20 flex items-center justify-center border border-red-500/30"
+              className="w-20 h-20 rounded-full bg-red-300/20 dark:bg-red-500/20 flex items-center justify-center border border-red-400/30 dark:border-red-500/30"
             >
-              <XCircle className="w-10 h-10 text-red-400" />
+              <XCircle className="w-10 h-10 text-red-600 dark:text-red-400" />
             </motion.div>
             
             <div className="space-y-2">
-              <h2 className="text-2xl font-bold text-white">Verification Failed</h2>
-              <p className="text-zinc-400 text-sm max-w-xs mx-auto">
+              <h2 className="text-2xl font-bold text-zinc-900 dark:text-white">Verification Failed</h2>
+              <p className="text-zinc-600 dark:text-zinc-400 text-sm max-w-xs mx-auto">
                 We couldn't verify your payment. Please try again or contact support.
               </p>
             </div>

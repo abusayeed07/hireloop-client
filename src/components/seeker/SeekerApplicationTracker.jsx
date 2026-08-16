@@ -55,7 +55,7 @@ export default function SeekerApplicationTracker({
 
   const getPlanColor = (planName) => {
     const planColors = {
-      free: "from-zinc-500 to-zinc-600",
+      free: "from-zinc-400 to-zinc-500 dark:from-zinc-500 dark:to-zinc-600",
       pro: "from-blue-500 to-purple-500",
       premium: "from-amber-500 to-yellow-500",
     };
@@ -78,7 +78,6 @@ export default function SeekerApplicationTracker({
     const planName = getPlanName(userPlan);
     const max = getMaxApplications(userPlan);
     
-    // 🟢 FIX: Handle over-limit gracefully
     const remainingCount = Math.max(0, max - totalApplications);
     const percentage = max > 0 ? Math.min((totalApplications / max) * 100, 100) : 0;
     const isLimitReached = totalApplications >= max;
@@ -89,7 +88,7 @@ export default function SeekerApplicationTracker({
       planName: planName,
       remaining: remainingCount,
       isLimitReached: isLimitReached,
-      percentage: isLimitReached ? 100 : percentage, // Force bar to 100% if over limit
+      percentage: isLimitReached ? 100 : percentage,
     });
 
     setIsLoading(false);
@@ -113,7 +112,7 @@ export default function SeekerApplicationTracker({
         exit={{ opacity: 0 }}
         className="flex items-center justify-center py-4"
       >
-        <Loader2 className="w-5 h-5 text-purple-500 animate-spin" />
+        <Loader2 className="w-5 h-5 text-purple-500 dark:text-purple-400 animate-spin" />
       </motion.div>
     );
   }
@@ -127,9 +126,9 @@ export default function SeekerApplicationTracker({
       animate="visible"
       className="w-full"
     >
-      <Card className="group relative overflow-hidden rounded-2xl border border-white/10 bg-gradient-to-br from-zinc-950 via-zinc-900 to-zinc-950 backdrop-blur-xl shadow-2xl transition-all duration-500 hover:border-purple-500/40 hover:shadow-purple-500/20">
+      <Card className="group relative overflow-hidden rounded-2xl border border-zinc-200/50 dark:border-white/10 bg-white/80 dark:bg-gradient-to-br dark:from-zinc-950 dark:via-zinc-900 dark:to-zinc-950 backdrop-blur-xl shadow-2xl transition-all duration-500 hover:border-purple-400/50 dark:hover:border-purple-500/40 hover:shadow-purple-500/20">
         
-        {/* 🎨 Animated background */}
+        {/* 🎨 Animated background - lighter in light mode */}
         <motion.div
           animate={{
             x: [-80, 80, -80],
@@ -140,7 +139,7 @@ export default function SeekerApplicationTracker({
             repeat: Infinity,
             ease: "linear",
           }}
-          className="absolute -top-20 -left-20 h-60 w-60 rounded-full bg-purple-500/10 blur-3xl"
+          className="absolute -top-20 -left-20 h-60 w-60 rounded-full bg-purple-300/20 dark:bg-purple-500/10 blur-3xl"
         />
 
         <motion.div
@@ -153,10 +152,10 @@ export default function SeekerApplicationTracker({
             repeat: Infinity,
             ease: "linear",
           }}
-          className="absolute -bottom-24 -right-20 h-64 w-64 rounded-full bg-cyan-500/10 blur-3xl"
+          className="absolute -bottom-24 -right-20 h-64 w-64 rounded-full bg-cyan-300/20 dark:bg-cyan-500/10 blur-3xl"
         />
 
-        {/* ✨ Shine effect */}
+        {/* ✨ Shine effect - lighter in light mode */}
         <motion.div
           animate={{
             x: ["-120%", "220%"],
@@ -166,7 +165,7 @@ export default function SeekerApplicationTracker({
             duration: 4,
             ease: "linear",
           }}
-          className="absolute top-0 left-0 h-full w-24 rotate-12 bg-white/10 blur-xl"
+          className="absolute top-0 left-0 h-full w-24 rotate-12 bg-white/20 dark:bg-white/10 blur-xl"
         />
 
         <div className="relative z-10 p-7">
@@ -178,7 +177,7 @@ export default function SeekerApplicationTracker({
                 initial={{ opacity: 0, y: 15 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.4 }}
-                className="text-zinc-400 text-sm"
+                className="text-zinc-500 dark:text-zinc-400 text-sm"
               >
                 {title}
               </motion.h2>
@@ -190,12 +189,12 @@ export default function SeekerApplicationTracker({
                   type: "spring",
                   stiffness: 180,
                 }}
-                className="mt-2 text-5xl font-black tracking-tight text-white"
+                className="mt-2 text-5xl font-black tracking-tight text-zinc-900 dark:text-white"
               >
                 {stats.total}
               </motion.h1>
 
-              <p className="mt-1 text-sm text-zinc-500">
+              <p className="mt-1 text-sm text-zinc-500 dark:text-zinc-500">
                 {stats.remaining} applications remaining
               </p>
             </div>
@@ -214,14 +213,14 @@ export default function SeekerApplicationTracker({
 
           {/* Middle Section: Progress Bar */}
           <div className="mt-8">
-            <div className="mb-2 flex justify-between text-xs text-zinc-500">
+            <div className="mb-2 flex justify-between text-xs text-zinc-500 dark:text-zinc-500">
               <span>Monthly Usage</span>
               <span>
                 {stats.total}/{stats.max}
               </span>
             </div>
 
-            <div className="relative h-3 overflow-hidden rounded-full bg-zinc-800">
+            <div className="relative h-3 overflow-hidden rounded-full bg-zinc-200 dark:bg-zinc-800">
               <motion.div
                 initial={{ width: 0 }}
                 animate={{
@@ -262,25 +261,24 @@ export default function SeekerApplicationTracker({
                   duration: 2,
                 }}
                 className={`h-2.5 w-2.5 rounded-full ${
-                  stats.isLimitReached ? "bg-red-500" : "bg-emerald-400"
+                  stats.isLimitReached ? "bg-red-500" : "bg-emerald-500"
                 }`}
               />
 
-              <span className="text-sm font-medium text-zinc-300">
+              <span className="text-sm font-medium text-zinc-700 dark:text-zinc-300">
                 {stats.planName} Plan
               </span>
 
-              <span className="rounded-full border border-zinc-700 bg-zinc-800 px-2 py-1 text-xs text-zinc-400">
+              <span className="rounded-full border border-zinc-300/50 dark:border-zinc-700 bg-zinc-100 dark:bg-zinc-800 px-2 py-1 text-xs text-zinc-600 dark:text-zinc-400">
                 {stats.max} Apps
               </span>
             </div>
 
-            {/* ✅ ADDED: Upgrade Button - Only shows if limit reached and not Premium */}
+            {/* ✅ Upgrade Button - Shows when limit reached and not Premium */}
             {stats.isLimitReached && !isPremium && (
               <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
                 <button
                   onClick={() => {
-                    // Redirect to pricing page
                     window.location.href = "/pricing?tab=seeker";
                   }}
                   className="flex items-center gap-2 rounded-xl bg-gradient-to-r from-blue-600 to-purple-600 px-4 py-2 text-sm font-medium text-white shadow-lg shadow-blue-600/20 transition-all hover:shadow-blue-600/40"

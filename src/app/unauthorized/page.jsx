@@ -17,11 +17,9 @@ const UnauthorizedPage = () => {
   const router = useRouter();
   const searchParams = useSearchParams();
 
-  // Read dynamic params from URL
   const customMessage = searchParams.get('message');
   const redirectUrl = searchParams.get('redirect');
   
-  // Dynamic UI States
   const title = customMessage ? "Access Restricted" : "Access Denied";
   const subtitle = customMessage ? "Unauthorized" : "Unauthorized";
   const description = customMessage || 
@@ -43,7 +41,6 @@ const UnauthorizedPage = () => {
     return () => clearInterval(timer);
   }, []);
 
-  // Handle automatic redirect after countdown hits 0
   useEffect(() => {
     if (countdown === 0) {
       if (redirectUrl) {
@@ -55,12 +52,12 @@ const UnauthorizedPage = () => {
   }, [countdown, redirectUrl, router]);
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-zinc-950 via-zinc-900 to-zinc-950 flex items-center justify-center px-4 relative overflow-hidden">
-      {/* Background Decorative Elements */}
+    <div className="min-h-screen bg-gradient-to-br from-zinc-50 to-zinc-100 dark:from-zinc-950 dark:via-zinc-900 dark:to-zinc-950 flex items-center justify-center px-4 relative overflow-hidden">
+      {/* Background Decorative Elements - lighter in light mode */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        <div className="absolute -top-40 -right-40 w-80 h-80 bg-red-600/5 rounded-full blur-3xl" />
-        <div className="absolute -bottom-40 -left-40 w-80 h-80 bg-red-600/5 rounded-full blur-3xl" />
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full h-full bg-gradient-to-r from-red-600/5 to-transparent blur-3xl" />
+        <div className="absolute -top-40 -right-40 w-80 h-80 bg-red-300/20 dark:bg-red-600/5 rounded-full blur-3xl" />
+        <div className="absolute -bottom-40 -left-40 w-80 h-80 bg-red-300/20 dark:bg-red-600/5 rounded-full blur-3xl" />
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full h-full bg-gradient-to-r from-red-300/10 to-transparent dark:from-red-600/5 to-transparent blur-3xl" />
       </div>
 
       <motion.div
@@ -70,10 +67,10 @@ const UnauthorizedPage = () => {
         className="relative z-10 max-w-md w-full"
       >
         {/* Main Card */}
-        <div className="bg-zinc-900/50 backdrop-blur-xl border border-zinc-800 rounded-3xl p-8 shadow-2xl overflow-hidden">
+        <div className="bg-white/80 dark:bg-zinc-900/50 backdrop-blur-xl border border-zinc-200/50 dark:border-zinc-800 rounded-3xl p-8 shadow-2xl overflow-hidden">
           {/* Glow Effect */}
-          <div className="absolute -top-20 -right-20 w-40 h-40 bg-red-500/10 rounded-full blur-3xl pointer-events-none" />
-          <div className="absolute -bottom-20 -left-20 w-40 h-40 bg-red-500/10 rounded-full blur-3xl pointer-events-none" />
+          <div className="absolute -top-20 -right-20 w-40 h-40 bg-red-300/20 dark:bg-red-500/10 rounded-full blur-3xl pointer-events-none" />
+          <div className="absolute -bottom-20 -left-20 w-40 h-40 bg-red-300/20 dark:bg-red-500/10 rounded-full blur-3xl pointer-events-none" />
 
           <div className="relative">
             {/* Animated Icon */}
@@ -91,7 +88,7 @@ const UnauthorizedPage = () => {
               <div className="relative">
                 <div className="absolute inset-0 bg-red-600/20 rounded-full blur-2xl animate-pulse" />
                 <div className="relative w-24 h-24 bg-gradient-to-br from-red-600/20 to-red-700/20 rounded-full flex items-center justify-center border-2 border-red-500/30 shadow-xl shadow-red-600/10">
-                  <Shield className="w-12 h-12 text-red-500" />
+                  <Shield className="w-12 h-12 text-red-600 dark:text-red-500" />
                   <motion.div
                     animate={{
                       scale: [1, 1.2, 1],
@@ -115,7 +112,7 @@ const UnauthorizedPage = () => {
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.3 }}
-              className="text-3xl md:text-4xl font-bold text-white text-center mb-2"
+              className="text-3xl md:text-4xl font-bold text-zinc-900 dark:text-white text-center mb-2"
             >
               {title}
             </motion.h1>
@@ -128,7 +125,7 @@ const UnauthorizedPage = () => {
               className="flex items-center justify-center gap-2 mb-6"
             >
               <div className="h-px w-12 bg-gradient-to-r from-transparent to-red-500" />
-              <span className="text-sm text-red-400 font-medium uppercase tracking-wider">
+              <span className="text-sm text-red-600 dark:text-red-400 font-medium uppercase tracking-wider">
                 {subtitle}
               </span>
               <div className="h-px w-12 bg-gradient-to-l from-transparent to-red-500" />
@@ -139,7 +136,7 @@ const UnauthorizedPage = () => {
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ delay: 0.5 }}
-              className="text-zinc-400 text-center leading-relaxed mb-8"
+              className="text-zinc-600 dark:text-zinc-400 text-center leading-relaxed mb-8"
             >
               {description}
             </motion.p>
@@ -149,14 +146,14 @@ const UnauthorizedPage = () => {
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ delay: 0.7 }}
-              className="flex items-center justify-center gap-2 text-sm text-zinc-500 mb-6"
+              className="flex items-center justify-center gap-2 text-sm text-zinc-500 dark:text-zinc-500 mb-6"
             >
               <Lock className="w-4 h-4" />
-              <span>Redirecting in <strong className="text-white">{countdown}</strong> seconds</span>
+              <span>Redirecting in <strong className="text-zinc-900 dark:text-white">{countdown}</strong> seconds</span>
             </motion.div>
 
             {/* Divider */}
-            <div className="border-t border-zinc-800 my-6" />
+            <div className="border-t border-zinc-200/50 dark:border-zinc-800 my-6" />
 
             {/* Action Buttons */}
             <motion.div
@@ -173,7 +170,7 @@ const UnauthorizedPage = () => {
                     router.back();
                   }
                 }}
-                className="cursor-pointer flex-1 flex items-center justify-center gap-2 px-4 py-3 bg-zinc-800 hover:bg-zinc-700 text-white rounded-xl transition-all duration-200 hover:scale-105 text-sm font-medium"
+                className="cursor-pointer flex-1 flex items-center justify-center gap-2 px-4 py-3 bg-zinc-200 dark:bg-zinc-800 hover:bg-zinc-300 dark:hover:bg-zinc-700 text-zinc-700 dark:text-white rounded-xl transition-all duration-200 hover:scale-105 text-sm font-medium"
               >
                 <ArrowLeft className="w-4 h-4" />
                 Go Back
@@ -197,7 +194,7 @@ const UnauthorizedPage = () => {
             >
               <Link
                 href={`mailto:${process.env.NEXT_PUBLIC_SUPPORT_EMAIL || 'support@hireloop.com'}`}
-                className="inline-flex items-center gap-2 text-xs text-zinc-500 hover:text-zinc-300 transition-colors"
+                className="inline-flex items-center gap-2 text-xs text-zinc-500 dark:text-zinc-500 hover:text-zinc-900 dark:hover:text-zinc-300 transition-colors"
               >
                 <Mail className="w-3.5 h-3.5" />
                 Contact Support
@@ -211,10 +208,10 @@ const UnauthorizedPage = () => {
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 0.9 }}
-          className="text-center text-xs text-zinc-600 mt-6"
+          className="text-center text-xs text-zinc-500 dark:text-zinc-600 mt-6"
         >
           Need help? Contact our{" "}
-          <Link href="/support" className="text-blue-400 hover:text-blue-300 transition">
+          <Link href="/support" className="text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 transition">
             support team
           </Link>
         </motion.p>

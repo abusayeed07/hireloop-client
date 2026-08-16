@@ -25,9 +25,12 @@ import {
   Briefcase,
   FileText,
   Compass,
+  Moon,
+  Sun,
 } from "lucide-react";
 
 import { useRouter } from "next/navigation";
+import { useTheme } from "next-themes";
 
 import { authClient } from "@/lib/auth-client";
 import AIAssistantFloatingButton from "./AIAssistantFloatingButton";
@@ -35,10 +38,8 @@ import BlobWrapper from "./BlobWrapper";
 import { MessageWithAvatar, getBotTheme } from "./MessageWithAvatar";
 
 // ============================================================
-// SESSION
+// SESSION - Removed chat history storage
 // ============================================================
-
-const SESSION_KEY = "hireloop_chat_history";
 
 // ============================================================
 // FAQ RESPONSES
@@ -461,11 +462,6 @@ const handleJobCategoryCommand = (query) => {
 
 // ============================================================
 // GENERIC JOB / CATEGORY REQUEST DETECTOR
-//
-// If the user mentions jobs/categories/positions/etc. but we
-// couldn't pin down a SPECIFIC category above, treat it as a
-// generic "show me what's available" request and surface all
-// categories as tappable chips instead of plain text.
 // ============================================================
 
 const GENERIC_JOBS_REGEX =
@@ -493,14 +489,6 @@ const SLEEP_MESSAGE = "💤 Taking a nap... Wake me when you need me! 😴";
 
 // ============================================================
 // TIMING
-//
-// - IDLE_DELAY_MS: wait after going idle before the FIRST hint.
-// - AUTO_MESSAGE_INTERVAL_MS: gap between subsequent hints. Hints
-//   loop through AUTO_MESSAGES forever (not just once) until the
-//   sleep timer fires.
-// - SLEEP_AFTER_MS: total idle time (independent of how many
-//   hints played) before the blob falls asleep — ~2.5 min per
-//   "if I don't use it for 2-3 min it should sleep".
 // ============================================================
 
 const IDLE_DELAY_MS = 20000;
@@ -515,6 +503,7 @@ const POKE_SPEECH_VISIBLE_MS = 3000;
 
 const AIAssistant = () => {
   const router = useRouter();
+  const { theme, setTheme } = useTheme();
   const { data: session } = authClient.useSession();
   const user = session?.user;
   const userRole = user?.role || "guest";
@@ -548,6 +537,8 @@ const AIAssistant = () => {
   // ==========================================================
 
   const getInitialMessage = useCallback(() => {
+    const themeText = theme === 'dark' ? '🌙 Dark mode is active' : '☀️ Light mode is active';
+    
     if (userRole === "admin") {
       return {
         id: 1,
@@ -562,6 +553,9 @@ I can help you:
 - 📋 Generate reports
 - 🛡️ Moderate content
 - 🔍 Find jobs by category
+- 🌓 Switch theme (say "dark mode" or "light mode")
+
+${themeText}
 
 What would you like to manage today?`,
         timestamp: new Date(),
@@ -582,6 +576,9 @@ I can help you:
 - 📊 Track applications
 - 💡 Get career advice
 - 🔎 Search jobs by category
+- 🌓 Switch theme (say "dark mode" or "light mode")
+
+${themeText}
 
 Try:
 "Show me education jobs"
@@ -604,7 +601,10 @@ I can help you:
 - 👥 Find top talent
 - 📊 Review applications
 - 🤝 Manage hiring
-- 🔍 Search candidates by skills`,
+- 🔍 Search candidates by skills
+- 🌓 Switch theme (say "dark mode" or "light mode")
+
+${themeText}`,
         timestamp: new Date(),
       };
     }
@@ -622,6 +622,9 @@ I can help you:
 - 💼 Discover recruiter features
 - 🔑 Get started with an account
 - 🔎 Find jobs by category
+- 🌓 Switch theme (say "dark mode" or "light mode")
+
+${themeText}
 
 Try:
 "Show me education jobs"
@@ -629,45 +632,19 @@ Try:
 "Give me sales jobs"`,
       timestamp: new Date(),
     };
-  }, [userRole, user]);
+  }, [userRole, user, theme]);
 
   // ==========================================================
-  // LOAD / SAVE CHAT HISTORY
+  // LOAD CHAT - No storage, always starts fresh
   // ==========================================================
 
   useEffect(() => {
     setIsMounted(true);
-
-    try {
-      const saved = localStorage.getItem(SESSION_KEY);
-      if (saved) {
-        const parsed = JSON.parse(saved);
-        if (Array.isArray(parsed) && parsed.length > 0) {
-          const restored = parsed.map((message) => ({
-            ...message,
-            timestamp: new Date(message.timestamp),
-          }));
-          setMessages(restored);
-          return;
-        }
-      }
-    } catch (error) {
-      console.error("Could not restore chat history:", error);
-    }
-
+    // Always start with fresh initial message
     setMessages([getInitialMessage()]);
   }, [getInitialMessage]);
 
-  useEffect(() => {
-    if (!isMounted || messages.length === 0) return;
-
-    try {
-      localStorage.setItem(SESSION_KEY, JSON.stringify(messages));
-    } catch (error) {
-      console.error("Could not save chat history:", error);
-    }
-  }, [messages, isMounted]);
-
+  // Scroll to bottom when messages change
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages]);
@@ -676,6 +653,8 @@ Try:
     if (isOpen && !isMinimized) {
       const timer = setTimeout(() => {
         inputRef.current?.focus();
+        // Scroll to bottom when opened
+        messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
       }, 300);
       return () => clearTimeout(timer);
     }
@@ -713,17 +692,31 @@ Try:
   }, []);
 
   // ==========================================================
-  // FIND RESPONSE
+  // FIND RESPONSE - Added theme switching
   // ==========================================================
 
   const findBestResponse = useCallback(
     (query) => {
       const lowerQuery = normalizeText(query);
 
-      // ------------------------------------------------------
-      // JOB CATEGORY FIRST (specific category match)
-      // ------------------------------------------------------
+      // ✅ THEME SWITCHING COMMANDS
+      if (lowerQuery.includes("dark mode") || lowerQuery.includes("dark theme")) {
+        setTheme("dark");
+        return {
+          response: "🌙 Switched to **Dark Mode**! The interface is now darker and easier on the eyes. 💙",
+          action: null,
+        };
+      }
 
+      if (lowerQuery.includes("light mode") || lowerQuery.includes("light theme")) {
+        setTheme("light");
+        return {
+          response: "☀️ Switched to **Light Mode**! Everything is now bright and clean. ✨",
+          action: null,
+        };
+      }
+
+      // ✅ JOB CATEGORY FIRST (specific category match)
       const jobCommand = handleJobCategoryCommand(query);
 
       if (jobCommand) {
@@ -745,25 +738,16 @@ Redirecting you to browse jobs with the "${displayCategory}" category filter...`
         };
       }
 
-      // ------------------------------------------------------
-      // ROLE RESPONSE
-      // ------------------------------------------------------
-
+      // ✅ ROLE RESPONSE
       const roleResponse = getRoleBasedResponses(userRole, query, user);
       if (roleResponse) return roleResponse;
 
-      // ------------------------------------------------------
-      // FAQ
-      // ------------------------------------------------------
-
+      // ✅ FAQ
       for (const [key, value] of Object.entries(FAQ_RESPONSES)) {
         if (lowerQuery.includes(key)) return value;
       }
 
-      // ------------------------------------------------------
-      // KEYWORDS
-      // ------------------------------------------------------
-
+      // ✅ KEYWORDS
       const keywords = {
         apply: "how to apply",
         browse: "where is browse jobs",
@@ -780,15 +764,7 @@ Redirecting you to browse jobs with the "${displayCategory}" category filter...`
         if (lowerQuery.includes(word)) return FAQ_RESPONSES[key];
       }
 
-      // ------------------------------------------------------
-      // NEW: GENERIC JOB / CATEGORY REQUEST
-      //
-      // User mentioned jobs/categories/positions/etc. but didn't
-      // name a specific one ("find jobs", "show me jobs", "what
-      // categories do you have"). Surface all categories as
-      // tappable suggestion chips instead of the plain-text default.
-      // ------------------------------------------------------
-
+      // ✅ GENERIC JOB / CATEGORY REQUEST
       if (GENERIC_JOBS_REGEX.test(lowerQuery)) {
         return {
           response:
@@ -800,7 +776,7 @@ Redirecting you to browse jobs with the "${displayCategory}" category filter...`
 
       return FAQ_RESPONSES.default;
     },
-    [userRole, user]
+    [userRole, user, setTheme]
   );
 
   // ==========================================================
@@ -856,6 +832,11 @@ Redirecting you to browse jobs with the "${displayCategory}" category filter...`
         setMessages((prev) => [...prev, botMessage]);
         setIsTyping(false);
         setBlobMood("happy");
+
+        // Scroll to bottom after new message
+        setTimeout(() => {
+          messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+        }, 100);
 
         if (response.isJobSearch && response.action) {
           setTimeout(() => {
@@ -915,17 +896,6 @@ Redirecting you to browse jobs with the "${displayCategory}" category filter...`
 
   // ==========================================================
   // AUTO MESSAGE
-  //
-  // Two independent timers run while the chat is closed:
-  //
-  // 1. A REPEATING hint cycle (showNextAutoMessage) that loops
-  //    through AUTO_MESSAGES forever, roughly every
-  //    AUTO_MESSAGE_INTERVAL_MS — "time to time it will say
-  //    something".
-  //
-  // 2. A ONE-SHOT sleep timer (SLEEP_AFTER_MS) that fires once,
-  //    independent of how many hints have played, and puts the
-  //    blob to sleep after a sustained stretch of inactivity.
   // ==========================================================
 
   const goToSleep = useCallback(() => {
@@ -1031,16 +1001,11 @@ Redirecting you to browse jobs with the "${displayCategory}" category filter...`
             <button
               type="button"
               onClick={() => {
-                // Tapping while asleep only wakes the blob up
-                // ("opens its eyes") — it does NOT open the chat.
-                // A second tap (isSleeping now false) opens the
-                // popup as normal.
                 if (isSleeping) {
                   wakeUp();
                   startIdleTimer();
                   return;
                 }
-
                 setIsOpen(true);
               }}
               className="relative cursor-pointer hover:scale-105 transition-transform duration-300"
@@ -1082,13 +1047,13 @@ Redirecting you to browse jobs with the "${displayCategory}" category filter...`
             }}
             exit={{ scale: 0.8, opacity: 0, y: 20 }}
             transition={{ type: "spring", damping: 20 }}
-            className={`fixed bottom-6 right-6 z-50 bg-[#121214] border border-zinc-800 rounded-2xl shadow-2xl shadow-blue-500/10 ${
+            className={`fixed bottom-6 right-6 z-50 bg-white dark:bg-[#121214] border border-zinc-200/50 dark:border-zinc-800 rounded-2xl shadow-2xl shadow-blue-500/10 ${
               isMinimized
                 ? "p-4 overflow-visible"
                 : "flex flex-col overflow-visible"
             }`}
           >
-            <div className="relative overflow-visible flex items-center justify-between p-4 border-b border-zinc-800 bg-gradient-to-r from-blue-600/10 to-purple-600/10 rounded-t-2xl">
+            <div className="relative overflow-visible flex items-center justify-between p-4 border-b border-zinc-200/50 dark:border-zinc-800 bg-gradient-to-r from-blue-600/10 to-purple-600/10 rounded-t-2xl">
               <div className="flex items-center gap-3">
                 <div className="relative w-10 h-10 shrink-0 ml-1 overflow-visible">
                   <BlobWrapper
@@ -1104,7 +1069,7 @@ Redirecting you to browse jobs with the "${displayCategory}" category filter...`
                 </div>
 
                 <div>
-                  <h3 className="text-white font-semibold text-sm flex items-center gap-1">
+                  <h3 className="text-zinc-900 dark:text-white font-semibold text-sm flex items-center gap-1">
                     HireSync
                     <Sparkles className="w-3 h-3 text-yellow-400" />
                   </h3>
@@ -1123,7 +1088,7 @@ Redirecting you to browse jobs with the "${displayCategory}" category filter...`
                 <button
                   type="button"
                   onClick={() => setIsMinimized(!isMinimized)}
-                  className="p-1.5 hover:bg-zinc-800 rounded-lg transition-colors text-zinc-400 hover:text-white"
+                  className="p-1.5 hover:bg-zinc-100 dark:hover:bg-zinc-800 rounded-lg transition-colors text-zinc-500 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white"
                   aria-label={isMinimized ? "Maximize" : "Minimize"}
                 >
                   {isMinimized ? (
@@ -1144,7 +1109,7 @@ Redirecting you to browse jobs with the "${displayCategory}" category filter...`
                       startIdleTimer();
                     }, 300);
                   }}
-                  className="p-1.5 hover:bg-zinc-800 rounded-lg transition-colors text-zinc-400 hover:text-white"
+                  className="p-1.5 hover:bg-zinc-100 dark:hover:bg-zinc-800 rounded-lg transition-colors text-zinc-500 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white"
                   aria-label="Close assistant"
                 >
                   <X className="w-4 h-4" />
@@ -1154,7 +1119,7 @@ Redirecting you to browse jobs with the "${displayCategory}" category filter...`
 
             {!isMinimized && (
               <>
-                <div className="flex-1 overflow-y-auto overflow-x-visible p-4 space-y-3 bg-gradient-to-b from-[#0d0d0e] to-[#121214]">
+                <div className="flex-1 overflow-y-auto overflow-x-visible p-4 space-y-3 bg-zinc-50/80 dark:bg-gradient-to-b dark:from-[#0d0d0e] dark:to-[#121214]">
                   {messages.map((message) => (
                     <React.Fragment key={message.id}>
                       <MessageWithAvatar
@@ -1168,11 +1133,7 @@ Redirecting you to browse jobs with the "${displayCategory}" category filter...`
                         showRole={true}
                       />
 
-                      {/* CATEGORY SUGGESTION CHIPS — shown under any
-                          bot message that couldn't match a specific
-                          category (e.g. "find jobs", "what categories
-                          do you have"). */}
-
+                      {/* CATEGORY SUGGESTION CHIPS */}
                       {message.type === "bot" && message.showCategories && (
                         <div className="flex flex-wrap gap-2 pl-10 -mt-1">
                           {Object.entries(CATEGORY_DISPLAY_NAMES).map(
@@ -1208,7 +1169,7 @@ Redirecting you to browse jobs with the "${displayCategory}" category filter...`
                         />
                       </div>
 
-                      <div className="bg-zinc-800/50 border border-zinc-700/50 rounded-2xl p-3">
+                      <div className="bg-zinc-200 dark:bg-zinc-800/50 border border-zinc-300/50 dark:border-zinc-700/50 rounded-2xl p-3">
                         <div className="flex gap-1">
                           <span
                             className="w-2 h-2 bg-blue-400 rounded-full animate-bounce"
@@ -1413,10 +1374,28 @@ Redirecting you to browse jobs with the "${displayCategory}" category filter...`
                       <HelpCircle className="w-3 h-3 text-red-400" />
                       Help
                     </button>
+
+                    <button
+                      type="button"
+                      onClick={() => handleSuggestionClick("Dark mode")}
+                      className="suggestion-button"
+                    >
+                      <Moon className="w-3 h-3 text-purple-400" />
+                      Dark Mode
+                    </button>
+
+                    <button
+                      type="button"
+                      onClick={() => handleSuggestionClick("Light mode")}
+                      className="suggestion-button"
+                    >
+                      <Sun className="w-3 h-3 text-yellow-400" />
+                      Light Mode
+                    </button>
                   </div>
                 )}
 
-                <div className="p-4 border-t border-zinc-800 bg-[#0d0d0e] rounded-b-2xl">
+                <div className="p-4 border-t border-zinc-200/50 dark:border-zinc-800 bg-zinc-50/80 dark:bg-[#0d0d0e] rounded-b-2xl">
                   <form
                     onSubmit={(event) => {
                       event.preventDefault();
@@ -1434,7 +1413,7 @@ Redirecting you to browse jobs with the "${displayCategory}" category filter...`
                           ? "💤 Wake me up by typing..."
                           : "Ask me or search jobs..."
                       }
-                      className="flex-1 min-w-0 bg-zinc-800/50 border border-zinc-700 rounded-xl px-4 py-2.5 text-white placeholder:text-zinc-500 outline-none focus:border-blue-500/50 transition-colors text-sm"
+                      className="flex-1 min-w-0 bg-white dark:bg-zinc-800/50 border border-zinc-300/50 dark:border-zinc-700 rounded-xl px-4 py-2.5 text-zinc-900 dark:text-white placeholder:text-zinc-400 dark:placeholder:text-zinc-500 outline-none focus:border-blue-500/50 transition-colors text-sm"
                     />
 
                     <button
@@ -1458,19 +1437,39 @@ Redirecting you to browse jobs with the "${displayCategory}" category filter...`
           align-items: center;
           gap: 0.375rem;
           padding: 0.375rem 0.75rem;
-          background: rgba(39, 39, 42, 0.5);
+          background: rgba(39, 39, 42, 0.3);
           color: rgb(212, 212, 216);
           font-size: 0.75rem;
           line-height: 1rem;
           border-radius: 9999px;
-          border: 1px solid rgba(63, 63, 70, 0.5);
+          border: 1px solid rgba(63, 63, 70, 0.3);
           transition: all 150ms ease;
           cursor: pointer;
         }
 
         .suggestion-button:hover {
-          background: rgba(63, 63, 70, 0.6);
+          background: rgba(63, 63, 70, 0.4);
           color: white;
+        }
+
+        .dark .suggestion-button {
+          background: rgba(39, 39, 42, 0.5);
+          border-color: rgba(63, 63, 70, 0.5);
+        }
+
+        .dark .suggestion-button:hover {
+          background: rgba(63, 63, 70, 0.6);
+        }
+
+        .light .suggestion-button {
+          background: rgba(220, 220, 225, 0.5);
+          border-color: rgba(200, 200, 205, 0.5);
+          color: rgb(50, 50, 55);
+        }
+
+        .light .suggestion-button:hover {
+          background: rgba(200, 200, 205, 0.6);
+          color: rgb(20, 20, 25);
         }
       `}</style>
     </>

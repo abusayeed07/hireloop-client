@@ -106,10 +106,14 @@ export default function EditJobPage({ params }) {
 
   if (isPending || loading) {
     return (
-      <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="min-h-[85vh] flex items-center justify-center">
+      <motion.div 
+        initial={{ opacity: 0 }} 
+        animate={{ opacity: 1 }} 
+        className="min-h-[85vh] flex items-center justify-center bg-zinc-50 dark:bg-[#0d0d0e]"
+      >
         <div className="text-center">
           <div className="w-16 h-16 border-4 border-purple-500 border-t-transparent rounded-full animate-spin mx-auto mb-4" />
-          <p className="text-zinc-400 text-sm font-medium tracking-wide">Loading Job Data...</p>
+          <p className="text-zinc-600 dark:text-zinc-400 text-sm font-medium tracking-wide">Loading Job Data...</p>
         </div>
       </motion.div>
     );
@@ -130,22 +134,25 @@ export default function EditJobPage({ params }) {
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5, ease: "easeOut" }}
-        className="min-h-screen bg-gradient-to-br from-[#0d0d0e] via-[#0f0f11] to-[#0d0d0e] p-8"
+        className="min-h-screen bg-zinc-50 dark:bg-[#0d0d0e] p-8"
       >
         <div className="max-w-5xl mx-auto">
           
           {/* Header with Back Button */}
           <div className="mb-8 flex items-center gap-4">
-            <Link href="/dashboard/recruiter/jobs" className="inline-flex items-center gap-2 text-zinc-400 hover:text-white transition-colors">
+            <Link 
+              href="/dashboard/recruiter/jobs" 
+              className="inline-flex items-center gap-2 text-zinc-500 dark:text-zinc-400 hover:text-zinc-800 dark:hover:text-white transition-colors"
+            >
               <ArrowLeft className="w-4 h-4" />
               <span className="text-sm font-medium">Back to Manage Jobs</span>
             </Link>
-            <div className="h-4 w-px bg-zinc-700" />
-            <h1 className="text-2xl font-bold text-white tracking-tight">Edit Job Posting</h1>
+            <div className="h-4 w-px bg-zinc-300/50 dark:bg-zinc-700" />
+            <h1 className="text-2xl font-bold text-zinc-900 dark:text-white tracking-tight">Edit Job Posting</h1>
           </div>
 
           {/* Render the existing PostJobForm */}
-          <div className="border border-white/5 rounded-2xl p-6 bg-zinc-900/50 backdrop-blur-sm shadow-2xl">
+          <div className="border border-zinc-200/50 dark:border-white/5 rounded-2xl p-6 bg-white/80 dark:bg-zinc-900/50 backdrop-blur-sm shadow-2xl">
             <PostJobForm 
               user={session.user} 
               company={company} 

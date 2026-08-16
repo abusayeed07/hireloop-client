@@ -168,3 +168,60 @@
     @apply font-sans;
    }
 }
+
+
+/* ============================================
+   DaisyUI Swap - Rotate Animation
+   ============================================ */
+.swap {
+  display: inline-flex;
+  cursor: pointer;
+  vertical-align: middle;
+  position: relative;
+  user-select: none;
+}
+
+.swap > * {
+  grid-column-start: 1;
+  grid-row-start: 1;
+  transition-duration: 300ms;
+  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+  transition-property: transform, opacity;
+}
+
+.swap input {
+  appearance: none;
+}
+
+.swap .swap-on,
+.swap input:checked ~ .swap-off {
+  opacity: 0;
+}
+
+.swap input:checked ~ .swap-on,
+.swap .swap-off {
+  opacity: 1;
+}
+
+.swap-rotate .swap-on,
+.swap-rotate .swap-off {
+  transition-duration: 300ms;
+  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+  transition-property: transform, opacity;
+}
+
+.swap-rotate input:checked ~ .swap-off {
+  transform: rotate(45deg);
+}
+
+.swap-rotate input:checked ~ .swap-on {
+  transform: rotate(0deg);
+}
+
+.swap-rotate .swap-off {
+  transform: rotate(0deg);
+}
+
+.swap-rotate .swap-on {
+  transform: rotate(45deg);
+}

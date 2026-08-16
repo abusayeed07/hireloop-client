@@ -5,13 +5,13 @@ import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import Image from "next/image";
 import { motion, AnimatePresence } from "framer-motion";
-import { Menu, X, HelpCircle, Shield, Ban } from "lucide-react";
+import { Menu, X, HelpCircle, Shield } from "lucide-react";
 import logoImg from "../../public/logo.png";
 import toast from "react-hot-toast";
 import { authClient } from "@/lib/auth-client";
-import { useSessionWithSuspension } from "@/hooks/useSessionWithSuspension";
+import ThemeToggle from "./ThemeToggle";
 
-// 1️⃣ ADDED CSS BUBBLE ANIMATION
+// 1️⃣ CSS BUBBLE ANIMATION
 const bubbleStyles = `
   @keyframes floatBubbleNav {
     0% { transform: translate(0, 0) scale(1) rotate(0deg); }
@@ -71,6 +71,27 @@ const bubbleStyles = `
   }
 `;
 
+// ============================================================
+// NAV LINK ENTRANCE ANIMATION
+// ============================================================
+
+const navContainerVariants = {
+  hidden: { opacity: 0 },
+  visible: {
+    opacity: 1,
+    transition: { staggerChildren: 0.06, delayChildren: 0.1 },
+  },
+};
+
+const navItemVariants = {
+  hidden: { opacity: 0, y: -8 },
+  visible: {
+    opacity: 1,
+    y: 0,
+    transition: { type: "spring", stiffness: 300, damping: 24 },
+  },
+};
+
 const Navbar = () => {
   const router = useRouter();
   const pathName = usePathname();
@@ -82,30 +103,24 @@ const Navbar = () => {
   const [isVisible, setIsVisible] = useState(true);
   const [signingOut, setSigningOut] = useState(false);
 
-  // ✅ Use the suspension-aware session hook
   const { data: sessionData, isPending: sessionPending } =
     authClient.useSession();
   const user = sessionData?.user ?? null;
 
-  // ✅ Check if user is suspended (the hook would handle this, but we also check directly)
   useEffect(() => {
     if (user?.status === 'suspended') {
-      console.log('🚫 Suspended user detected in Navbar');
       toast.error('Your account has been suspended. Please contact support.', {
         duration: 5000,
       });
-      // Auto logout
       authClient.signOut();
       router.push('/account-suspended');
     }
   }, [user, router]);
 
-  // Fix Hydration Mismatch
   useEffect(() => {
     setMounted(true);
   }, []);
 
-  // Scroll Handler
   useEffect(() => {
     const controlNavbar = () => {
       if (typeof window !== "undefined") {
@@ -121,12 +136,10 @@ const Navbar = () => {
     return () => window.removeEventListener("scroll", controlNavbar);
   }, [lastScrollY]);
 
-  // Close mobile menu on route change
   useEffect(() => {
     setIsMobileMenuOpen(false);
   }, [pathName]);
 
-  // Click Outside Handler
   useEffect(() => {
     const handleClickOutside = (event) => {
       if (isDropdownOpen && !event.target.closest(".dropdown-container")) {
@@ -137,7 +150,6 @@ const Navbar = () => {
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, [isDropdownOpen]);
 
-  // Prevent body scroll when mobile menu is open
   useEffect(() => {
     if (isMobileMenuOpen) {
       document.body.style.overflow = "hidden";
@@ -149,7 +161,6 @@ const Navbar = () => {
     };
   }, [isMobileMenuOpen]);
 
-  // Sign Out Handler
   const handleSignOut = async () => {
     if (signingOut) return;
     setSigningOut(true);
@@ -208,7 +219,6 @@ const Navbar = () => {
     return null;
   };
 
-  // ✅ Get user role badge
   const getRoleBadge = () => {
     if (!user) return null;
     const role = user.role?.toLowerCase();
@@ -262,16 +272,16 @@ const Navbar = () => {
 
   if (!mounted || sessionPending) {
     return (
-      <div className="fixed top-0 left-0 w-full z-50 bg-black/60 backdrop-blur-xl border-b border-white/5">
+      <div className="fixed top-0 left-0 w-full z-50 bg-zinc-50/80 dark:bg-background/60 backdrop-blur-xl border-b border-zinc-200/50 dark:border-border">
         <div className="container mx-auto px-4 lg:px-8">
           <div className="flex justify-between items-center h-16 lg:h-20">
             <div className="flex-shrink-0">
               <div className="relative w-32 h-8">
-                <div className="w-full h-full bg-white/10 rounded-lg animate-pulse"></div>
+                <div className="w-full h-full bg-zinc-200 dark:bg-foreground/10 rounded-lg animate-pulse"></div>
               </div>
             </div>
             <div className="hidden lg:flex items-center gap-3">
-              <div className="w-24 h-9 bg-white/5 animate-pulse rounded-lg"></div>
+              <div className="w-24 h-9 bg-zinc-200 dark:bg-foreground/5 animate-pulse rounded-lg"></div>
             </div>
           </div>
         </div>
@@ -279,7 +289,6 @@ const Navbar = () => {
     );
   }
 
-  // ✅ If user is suspended, don't render navbar (redirect happens in useEffect)
   if (user?.status === 'suspended') {
     return null;
   }
@@ -289,7 +298,7 @@ const Navbar = () => {
 
     return (
       <>
-        <div className="px-4 py-3 border-b border-white/10">
+        <div className="px-4 py-3 border-b border-zinc-200/50 dark:border-border">
           <div className="flex items-center gap-3">
             {getAvatarImage() ? (
               <Image
@@ -306,13 +315,12 @@ const Navbar = () => {
               </div>
             )}
             <div className="flex-1 min-w-0">
-              <p className="text-white text-sm font-medium truncate">
+              <p className="text-zinc-900 dark:text-foreground text-sm font-medium truncate">
                 {user.name || "User"}
               </p>
-              <p className="text-gray-400 text-xs truncate">
+              <p className="text-zinc-500 dark:text-muted-foreground text-xs truncate">
                 {user.email || ""}
               </p>
-              {/* ✅ Role badge in dropdown */}
               {roleBadge && (
                 <span className={`inline-flex items-center gap-1 text-[8px] font-medium px-1.5 py-0.5 rounded-full border ${roleBadge.color}`}>
                   {roleBadge.icon}
@@ -328,26 +336,26 @@ const Navbar = () => {
             setIsDropdownOpen(false);
             router.push("/profile");
           }}
-          className="block w-full text-left px-4 py-2.5 text-gray-300 hover:bg-white/5 hover:text-white transition-colors"
+          className="block w-full text-left px-4 py-2.5 text-zinc-600 dark:text-muted-foreground hover:bg-zinc-100 dark:hover:bg-foreground/5 hover:text-zinc-900 dark:hover:text-foreground transition-colors"
         >
           Profile
         </button>
         <Link
           href="/contact"
           onClick={() => setIsDropdownOpen(false)}
-          className="flex items-center gap-2 w-full text-left px-4 py-2.5 text-gray-300 hover:bg-white/5 hover:text-white transition-colors"
+          className="flex items-center gap-2 w-full text-left px-4 py-2.5 text-zinc-600 dark:text-muted-foreground hover:bg-zinc-100 dark:hover:bg-foreground/5 hover:text-zinc-900 dark:hover:text-foreground transition-colors"
         >
-          <HelpCircle className="w-4 h-4 text-zinc-400" />
+          <HelpCircle className="w-4 h-4 text-zinc-500 dark:text-muted-foreground" />
           Help & Support
         </Link>
-        <div className="border-t border-white/10 my-1"></div>
+        <div className="border-t border-zinc-200/50 dark:border-border my-1"></div>
         <button
           onClick={() => {
             setIsDropdownOpen(false);
             handleSignOut();
           }}
           disabled={signingOut}
-          className="block w-full text-left px-4 py-2.5 text-red-400 hover:bg-red-500/10 hover:text-red-300 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+          className="block w-full text-left px-4 py-2.5 text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-500/10 hover:text-red-700 dark:hover:text-red-300 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
         >
           {signingOut ? "Signing out..." : "Sign Out"}
         </button>
@@ -357,16 +365,14 @@ const Navbar = () => {
 
   return (
     <>
-      {/* 2️⃣ INJECT CSS BUBBLE STYLES */}
       <style>{bubbleStyles}</style>
 
       <motion.nav
         initial={{ y: -100 }}
         animate={{ y: isVisible ? 0 : -100 }}
         transition={{ duration: 0.3, ease: "easeInOut" }}
-        className="fixed top-0 left-0 w-full z-50 bg-black/60 backdrop-blur-xl border-b border-white/5 shadow-lg"
+        className="fixed top-0 left-0 w-full z-50 bg-zinc-50/80 dark:bg-background/80 backdrop-blur-xl border-b border-zinc-200/50 dark:border-border shadow-sm transition-colors duration-500"
       >
-        {/* 3️⃣ ADD BUBBLE LAYER INSIDE NAVBAR */}
         <div className="relative w-full h-full overflow-hidden">
           <div className="nav-bubble nav-bubble-1"></div>
           <div className="nav-bubble nav-bubble-2"></div>
@@ -374,7 +380,6 @@ const Navbar = () => {
           <div className="nav-bubble nav-bubble-4"></div>
         </div>
 
-        {/* NAVBAR CONTENT (Sits directly above the bubbles with z-index) */}
         <div className="relative z-10 container mx-auto px-4 lg:px-8">
           <div className="flex justify-between items-center h-16 lg:h-20">
             {/* Logo */}
@@ -398,32 +403,65 @@ const Navbar = () => {
             </div>
 
             {/* Desktop Links */}
-            <div className="hidden lg:flex items-center gap-3">
-              <div className="flex items-center gap-1 bg-white/5 backdrop-blur-sm rounded-xl p-1 border border-white/10 shadow-inner">
-                {navLinks.map((link) => (
-                  <Link
-                    key={link.href}
-                    href={link.href}
-                    className={`px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 whitespace-nowrap ${
-                      pathName === link.href
-                        ? "bg-white/10 text-blue-400 shadow-sm"
-                        : "text-gray-300 hover:text-blue-400 hover:bg-white/5"
-                    }`}
-                  >
-                    {link.icon ? (
-                      <link.icon className="w-4 h-4 inline-block mr-2" />
-                    ) : null}
-                    {link.label}
-                  </Link>
-                ))}
+            <motion.div
+              variants={navContainerVariants}
+              initial="hidden"
+              animate="visible"
+              className="hidden lg:flex items-center gap-3"
+            >
+              <motion.div
+                variants={navItemVariants}
+                className="flex items-center gap-1 bg-zinc-100/50 dark:bg-foreground/5 backdrop-blur-sm rounded-xl p-1 border border-zinc-200/50 dark:border-border shadow-inner transition-colors duration-500"
+              >
+                {/* ✅ THEME TOGGLE */}
+                <ThemeToggle />
 
-                <div className="w-px h-5 bg-white/10 mx-1"></div>
+                <div className="w-px h-5 bg-zinc-200/50 dark:bg-border mx-1"></div>
+
+                {navLinks.map((link) => {
+                  const isActive = pathName === link.href;
+
+                  return (
+                    <Link
+                      key={link.href}
+                      href={link.href}
+                      className="relative px-4 py-2 rounded-lg text-sm font-medium whitespace-nowrap"
+                    >
+                      {isActive && (
+                        <motion.span
+                          layoutId="navActivePill"
+                          className="absolute inset-0 bg-zinc-200/50 dark:bg-foreground/10 rounded-lg shadow-sm"
+                          transition={{
+                            type: "spring",
+                            stiffness: 380,
+                            damping: 30,
+                          }}
+                        />
+                      )}
+
+                      <span
+                        className={`relative z-10 flex items-center transition-colors duration-200 ${
+                          isActive
+                            ? "text-blue-600 dark:text-blue-400"
+                            : "text-zinc-600 dark:text-muted-foreground hover:text-blue-600 dark:hover:text-blue-400"
+                        }`}
+                      >
+                        {link.icon ? (
+                          <link.icon className="w-4 h-4 inline-block mr-2" />
+                        ) : null}
+                        {link.label}
+                      </span>
+                    </Link>
+                  );
+                })}
+
+                <div className="w-px h-5 bg-zinc-200/50 dark:bg-border mx-1"></div>
 
                 {user ? (
                   <div className="relative dropdown-container">
                     <button
                       onClick={() => setIsDropdownOpen(!isDropdownOpen)}
-                      className="flex items-center gap-2 cursor-pointer px-2 py-1 rounded-lg hover:bg-white/5 transition-all border border-transparent hover:border-blue-500/30"
+                      className="flex items-center gap-2 cursor-pointer px-2 py-1 rounded-lg hover:bg-zinc-100 dark:hover:bg-foreground/5 transition-all border border-transparent hover:border-blue-500/30"
                     >
                       {getAvatarImage() ? (
                         <Image
@@ -439,11 +477,11 @@ const Navbar = () => {
                           {getUserInitials()}
                         </div>
                       )}
-                      <span className="hidden xl:block text-sm text-white font-medium ml-1">
+                      <span className="hidden xl:block text-sm text-zinc-900 dark:text-foreground font-medium ml-1">
                         {user.name?.split(" ")[0] || user.name || "User"}
                       </span>
                       <svg
-                        className={`w-4 h-4 text-gray-400 transition-transform duration-200 ${
+                        className={`w-4 h-4 text-zinc-500 dark:text-muted-foreground transition-transform duration-200 ${
                           isDropdownOpen ? "rotate-180" : ""
                         }`}
                         fill="none"
@@ -466,7 +504,7 @@ const Navbar = () => {
                           animate={{ opacity: 1, y: 0 }}
                           exit={{ opacity: 0, y: -10 }}
                           transition={{ duration: 0.15 }}
-                          className="absolute right-0 mt-2 w-56 bg-black/90 backdrop-blur-xl border border-white/10 rounded-xl shadow-2xl py-2 z-[100]"
+                          className="absolute right-0 mt-2 w-56 bg-white/95 dark:bg-popover/95 backdrop-blur-xl border border-zinc-200/50 dark:border-border rounded-xl shadow-2xl py-2 z-[100]"
                         >
                           {renderDesktopDropdownItems()}
                         </motion.div>
@@ -476,7 +514,7 @@ const Navbar = () => {
                 ) : (
                   <>
                     <Link href="/signin">
-                      <button className="px-4 py-2 text-sm font-semibold text-blue-400 hover:text-blue-300 transition-colors">
+                      <button className="px-4 py-2 text-sm font-semibold text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 transition-colors">
                         Sign In
                       </button>
                     </Link>
@@ -487,14 +525,16 @@ const Navbar = () => {
                     </Link>
                   </>
                 )}
-              </div>
-            </div>
+              </motion.div>
+            </motion.div>
 
             {/* Mobile Menu Toggle */}
             <div className="lg:hidden flex items-center gap-2">
+              <ThemeToggle />
+
               <button
                 onClick={() => setIsMobileMenuOpen(true)}
-                className="p-2 text-white bg-white/5 rounded-lg border border-white/10 hover:bg-white/10 transition-colors"
+                className="p-2 text-zinc-900 dark:text-foreground bg-zinc-100/50 dark:bg-foreground/5 rounded-lg border border-zinc-200/50 dark:border-border hover:bg-zinc-200/50 dark:hover:bg-foreground/10 transition-colors"
               >
                 <Menu className="w-5 h-5" />
               </button>
@@ -515,7 +555,6 @@ const Navbar = () => {
             transition={{ duration: 0.3 }}
             className="fixed inset-0 z-[100] lg:hidden"
           >
-            {/* Backdrop */}
             <motion.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
@@ -524,16 +563,15 @@ const Navbar = () => {
               onClick={() => setIsMobileMenuOpen(false)}
             />
 
-            {/* Menu Panel */}
             <motion.div
               initial={{ x: "100%" }}
               animate={{ x: 0 }}
               exit={{ x: "100%" }}
               transition={{ type: "spring", damping: 25, stiffness: 200 }}
-              className="absolute right-0 top-0 h-full w-4/5 max-w-sm bg-zinc-900/95 backdrop-blur-xl border-l border-white/10 shadow-2xl overflow-y-auto"
+              className="absolute right-0 top-0 h-full w-4/5 max-w-sm bg-white/95 dark:bg-background/95 backdrop-blur-xl border-l border-zinc-200/50 dark:border-border shadow-2xl overflow-y-auto transition-colors duration-500"
             >
               {/* Header */}
-              <div className="flex items-center justify-between p-4 border-b border-white/10">
+              <div className="flex items-center justify-between p-4 border-b border-zinc-200/50 dark:border-border">
                 <Link href="/" onClick={() => setIsMobileMenuOpen(false)}>
                   <div className="relative w-28 h-7">
                     <Image
@@ -546,7 +584,7 @@ const Navbar = () => {
                 </Link>
                 <button
                   onClick={() => setIsMobileMenuOpen(false)}
-                  className="p-2 text-white bg-white/5 rounded-lg hover:bg-white/10 transition-colors"
+                  className="p-2 text-zinc-900 dark:text-foreground bg-zinc-100/50 dark:bg-foreground/5 rounded-lg hover:bg-zinc-200/50 dark:hover:bg-foreground/10 transition-colors"
                 >
                   <X className="w-5 h-5" />
                 </button>
@@ -554,7 +592,7 @@ const Navbar = () => {
 
               {/* User Info - Mobile */}
               {user && (
-                <div className="p-4 border-b border-white/10">
+                <div className="p-4 border-b border-zinc-200/50 dark:border-border">
                   <div className="flex items-center gap-3">
                     {getAvatarImage() ? (
                       <Image
@@ -571,13 +609,12 @@ const Navbar = () => {
                       </div>
                     )}
                     <div className="flex-1 min-w-0">
-                      <p className="text-white text-sm font-medium truncate">
+                      <p className="text-zinc-900 dark:text-foreground text-sm font-medium truncate">
                         {user.name || "User"}
                       </p>
-                      <p className="text-gray-400 text-xs truncate">
+                      <p className="text-zinc-500 dark:text-muted-foreground text-xs truncate">
                         {user.email || ""}
                       </p>
-                      {/* ✅ Role badge in mobile */}
                       {roleBadge && (
                         <span className={`inline-flex items-center gap-1 text-[8px] font-medium px-1.5 py-0.5 rounded-full border ${roleBadge.color}`}>
                           {roleBadge.icon}
@@ -598,8 +635,8 @@ const Navbar = () => {
                     onClick={() => setIsMobileMenuOpen(false)}
                     className={`flex items-center gap-3 px-3 py-3 rounded-lg text-sm font-medium transition-all duration-200 ${
                       pathName === link.href
-                        ? "bg-white/10 text-blue-400"
-                        : "text-gray-300 hover:text-white hover:bg-white/5"
+                        ? "bg-zinc-100 dark:bg-foreground/10 text-blue-600 dark:text-blue-400"
+                        : "text-zinc-600 dark:text-muted-foreground hover:text-zinc-900 dark:hover:text-foreground hover:bg-zinc-100 dark:hover:bg-foreground/5"
                     }`}
                   >
                     {link.icon && <link.icon className="w-4 h-4" />}
@@ -609,7 +646,7 @@ const Navbar = () => {
               </div>
 
               {/* Divider */}
-              <div className="mx-4 border-t border-white/10"></div>
+              <div className="mx-4 border-t border-zinc-200/50 dark:border-border"></div>
 
               {/* Auth Actions - Mobile */}
               <div className="p-4 space-y-2">
@@ -620,14 +657,14 @@ const Navbar = () => {
                         setIsMobileMenuOpen(false);
                         router.push("/profile");
                       }}
-                      className="w-full px-4 py-2.5 text-sm font-medium text-gray-300 hover:text-white hover:bg-white/5 rounded-lg transition-colors text-left"
+                      className="w-full px-4 py-2.5 text-sm font-medium text-zinc-600 dark:text-muted-foreground hover:text-zinc-900 dark:hover:text-foreground hover:bg-zinc-100 dark:hover:bg-foreground/5 rounded-lg transition-colors text-left"
                     >
                       Profile Settings
                     </button>
                     <Link
                       href="/contact"
                       onClick={() => setIsMobileMenuOpen(false)}
-                      className="flex items-center gap-2 w-full px-4 py-2.5 text-sm font-medium text-gray-300 hover:text-white hover:bg-white/5 rounded-lg transition-colors"
+                      className="flex items-center gap-2 w-full px-4 py-2.5 text-sm font-medium text-zinc-600 dark:text-muted-foreground hover:text-zinc-900 dark:hover:text-foreground hover:bg-zinc-100 dark:hover:bg-foreground/5 rounded-lg transition-colors"
                     >
                       <HelpCircle className="w-4 h-4" />
                       Help & Support
@@ -638,7 +675,7 @@ const Navbar = () => {
                         handleSignOut();
                       }}
                       disabled={signingOut}
-                      className="w-full px-4 py-2.5 text-sm font-medium text-red-400 hover:text-red-300 hover:bg-red-500/10 rounded-lg transition-colors text-left disabled:opacity-50 disabled:cursor-not-allowed"
+                      className="w-full px-4 py-2.5 text-sm font-medium text-red-600 dark:text-red-400 hover:text-red-700 dark:hover:text-red-300 hover:bg-red-50 dark:hover:bg-red-500/10 rounded-lg transition-colors text-left disabled:opacity-50 disabled:cursor-not-allowed"
                     >
                       {signingOut ? "Signing out..." : "Sign Out"}
                     </button>
@@ -648,7 +685,7 @@ const Navbar = () => {
                     <Link
                       href="/signin"
                       onClick={() => setIsMobileMenuOpen(false)}
-                      className="block w-full px-4 py-2.5 text-sm font-medium text-center text-blue-400 hover:text-blue-300 border border-blue-500/20 hover:border-blue-500/40 rounded-lg transition-colors"
+                      className="block w-full px-4 py-2.5 text-sm font-medium text-center text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 border border-blue-500/20 hover:border-blue-500/40 rounded-lg transition-colors"
                     >
                       Sign In
                     </Link>
@@ -664,8 +701,8 @@ const Navbar = () => {
               </div>
 
               {/* Footer */}
-              <div className="p-4 border-t border-white/10 mt-2">
-                <p className="text-center text-[10px] text-gray-500">
+              <div className="p-4 border-t border-zinc-200/50 dark:border-border mt-2">
+                <p className="text-center text-[10px] text-zinc-500 dark:text-muted-foreground">
                   © 2026 HireLoop. All rights reserved.
                 </p>
               </div>

@@ -9,7 +9,6 @@ import {
     updateApplicationStatus,
     getApplicationStats,
 } from "@/lib/api/applications";
-// ✅ We need to import this to check if a company exists
 import { getLoggedInRecruiterCompany } from "@/lib/api/companies";
 import {
     Briefcase,
@@ -35,8 +34,7 @@ import {
 import toast from "react-hot-toast";
 import Pagination from "@/components/Pagination";
 import Metadata from "@/components/Metadata";
-// ✅ Import your LoadingPage component
-import LoadingPage from "@/app/loading"; // Adjust path as needed
+import LoadingPage from "@/app/loading";
 
 // 🎨 Animation Variants
 const containerVariants = {
@@ -67,18 +65,18 @@ const statsVariants = {
 };
 
 const statusColors = {
-    pending: "bg-yellow-500/15 text-yellow-400 border-yellow-500/20",
-    applied: "bg-yellow-500/15 text-yellow-400 border-yellow-500/20",
-    reviewed: "bg-blue-500/15 text-blue-400 border-blue-500/20",
-    review: "bg-blue-500/15 text-blue-400 border-blue-500/20",
-    shortlisted: "bg-green-500/15 text-green-400 border-green-500/20",
-    interview: "bg-purple-500/15 text-purple-400 border-purple-500/20",
-    interviewing: "bg-purple-500/15 text-purple-400 border-purple-500/20",
-    hired: "bg-emerald-500/15 text-emerald-400 border-emerald-500/20",
-    accepted: "bg-emerald-500/15 text-emerald-400 border-emerald-500/20",
-    offered: "bg-emerald-500/15 text-emerald-400 border-emerald-500/20",
-    rejected: "bg-red-500/15 text-red-400 border-red-500/20",
-    closed: "bg-zinc-500/15 text-zinc-400 border-zinc-500/20",
+    pending: "bg-yellow-100 dark:bg-yellow-500/15 text-yellow-700 dark:text-yellow-400 border-yellow-200/50 dark:border-yellow-500/20",
+    applied: "bg-yellow-100 dark:bg-yellow-500/15 text-yellow-700 dark:text-yellow-400 border-yellow-200/50 dark:border-yellow-500/20",
+    reviewed: "bg-blue-100 dark:bg-blue-500/15 text-blue-700 dark:text-blue-400 border-blue-200/50 dark:border-blue-500/20",
+    review: "bg-blue-100 dark:bg-blue-500/15 text-blue-700 dark:text-blue-400 border-blue-200/50 dark:border-blue-500/20",
+    shortlisted: "bg-green-100 dark:bg-green-500/15 text-green-700 dark:text-green-400 border-green-200/50 dark:border-green-500/20",
+    interview: "bg-purple-100 dark:bg-purple-500/15 text-purple-700 dark:text-purple-400 border-purple-200/50 dark:border-purple-500/20",
+    interviewing: "bg-purple-100 dark:bg-purple-500/15 text-purple-700 dark:text-purple-400 border-purple-200/50 dark:border-purple-500/20",
+    hired: "bg-emerald-100 dark:bg-emerald-500/15 text-emerald-700 dark:text-emerald-400 border-emerald-200/50 dark:border-emerald-500/20",
+    accepted: "bg-emerald-100 dark:bg-emerald-500/15 text-emerald-700 dark:text-emerald-400 border-emerald-200/50 dark:border-emerald-500/20",
+    offered: "bg-emerald-100 dark:bg-emerald-500/15 text-emerald-700 dark:text-emerald-400 border-emerald-200/50 dark:border-emerald-500/20",
+    rejected: "bg-red-100 dark:bg-red-500/15 text-red-700 dark:text-red-400 border-red-200/50 dark:border-red-500/20",
+    closed: "bg-zinc-100 dark:bg-zinc-500/15 text-zinc-700 dark:text-zinc-400 border-zinc-200/50 dark:border-zinc-500/20",
 };
 
 const statusLabels = {
@@ -111,7 +109,6 @@ const ManageAllApplications = () => {
     const { data: session, isPending } = authClient.useSession();
     const user = session?.user;
 
-    // ✅ Add a state for redirection
     const [isRedirecting, setIsRedirecting] = useState(false);
     const [applications, setApplications] = useState([]);
     const [stats, setStats] = useState({});
@@ -127,7 +124,6 @@ const ManageAllApplications = () => {
     const page = 1;
     const itemsPerPage = 10;
 
-    // ✅ Updated Fetch logic: Check Company FIRST
     useEffect(() => {
         const fetchData = async () => {
             if (!user?.id) {
@@ -136,11 +132,9 @@ const ManageAllApplications = () => {
             }
 
             try {
-                // 1. FIRST: Check if the recruiter actually has a company!
                 const company = await getLoggedInRecruiterCompany();
                 
                 if (!company || Object.keys(company).length === 0) {
-                    // Show a toast and redirect them immediately
                     toast.error('⚠️ No company found. Please create a company profile first!', {
                         duration: 4000,
                         position: 'top-right',
@@ -153,7 +147,6 @@ const ManageAllApplications = () => {
                     return; 
                 }
 
-                // 2. If company exists, proceed with fetching applications
                 const [appsData, statsData] = await Promise.all([
                     getRecruiterApplications(),
                     getApplicationStats(),
@@ -163,7 +156,6 @@ const ManageAllApplications = () => {
 
             } catch (error) {
                 console.error("❌ Error fetching data:", error);
-                // Check if the 404 might be related to a missing company
                 if (error.message?.includes("404")) {
                     toast.error("Company profile not found. Redirecting...");
                     setIsRedirecting(true);
@@ -183,7 +175,6 @@ const ManageAllApplications = () => {
         }
     }, [user?.id, isPending, router]);
 
-    // Filter applications
     const filteredApplications = useMemo(() => {
         let result = applications || [];
 
@@ -212,14 +203,12 @@ const ManageAllApplications = () => {
         return result;
     }, [applications, searchQuery, statusFilter]);
 
-    // Pagination
     const totalItems = filteredApplications.length;
     const totalPages = Math.ceil(totalItems / itemsPerPage);
     const startIndex = (page - 1) * itemsPerPage;
     const endIndex = startIndex + itemsPerPage;
     const currentItems = filteredApplications.slice(startIndex, endIndex);
 
-    // Stats
     const statsData = [
         { label: "Total", value: stats.total || 0, icon: Briefcase, color: "cyan" },
         { label: "Pending", value: stats.pending || 0, icon: Hourglass, color: "yellow" },
@@ -228,7 +217,6 @@ const ManageAllApplications = () => {
         { label: "Hired", value: stats.hired || 0, icon: Users, color: "emerald" },
     ];
 
-    // Handle status update
     const handleStatusUpdate = async (applicationId, newStatus) => {
         setUpdatingId(applicationId);
         try {
@@ -242,7 +230,6 @@ const ManageAllApplications = () => {
                             : app
                     )
                 );
-                // Refresh stats
                 const updatedStats = await getApplicationStats();
                 setStats(updatedStats);
             } else {
@@ -256,7 +243,6 @@ const ManageAllApplications = () => {
         }
     };
 
-    // Handle notes update
     const handleOpenNotes = (application) => {
         setSelectedApplication(application);
         setNotesText(application.recruiterNotes || "");
@@ -291,7 +277,6 @@ const ManageAllApplications = () => {
         }
     };
 
-    // Refresh data
     const handleRefresh = async () => {
         setLoading(true);
         try {
@@ -310,13 +295,11 @@ const ManageAllApplications = () => {
         }
     };
 
-    // Clear filters
     const clearFilters = () => {
         setSearchQuery("");
         setStatusFilter("all");
     };
 
-    // Get unique statuses for filter
     const uniqueStatuses = useMemo(() => {
         const statuses = new Set();
         applications?.forEach(app => {
@@ -325,7 +308,6 @@ const ManageAllApplications = () => {
         return Array.from(statuses);
     }, [applications]);
 
-    // ✅ Use your LoadingPage component instead of inline spinner
     if ((loading || isPending) && !isRedirecting) {
         return (
             <LoadingPage 
@@ -346,7 +328,6 @@ const ManageAllApplications = () => {
         );
     }
 
-    // If redirecting, don't render the page
     if (isRedirecting) {
         return null;
     }
@@ -354,25 +335,25 @@ const ManageAllApplications = () => {
     return (
         <>
             <Metadata page="recruiter-applications" />
-            <div className="min-h-screen bg-gradient-to-br from-[#0d0d0e] via-[#0f0f11] to-[#0d0d0e] p-8">
+            <div className="min-h-screen bg-gradient-to-br from-zinc-50 to-white dark:from-[#0d0d0e] dark:via-[#0f0f11] dark:to-[#0d0d0e] p-8">
                 <div className="max-w-7xl mx-auto">
                     {/* Header */}
                     <motion.div
                         initial={{ opacity: 0, y: -20 }}
                         animate={{ opacity: 1, y: 0 }}
-                        className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-8 md:pt-10 "
+                        className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-8 md:pt-10"
                     >
                         <div>
-                            <h1 className="text-3xl font-bold bg-gradient-to-r from-white to-zinc-400 bg-clip-text text-transparent">
+                            <h1 className="text-3xl font-bold bg-gradient-to-r from-zinc-900 to-zinc-500 dark:from-white dark:to-zinc-400 bg-clip-text text-transparent">
                                 Job Applications
                             </h1>
-                            <p className="text-zinc-400 text-sm mt-1">
+                            <p className="text-zinc-600 dark:text-zinc-400 text-sm mt-1">
                                 Review and manage applications for your job postings.
                             </p>
                         </div>
                         <button
                             onClick={handleRefresh}
-                            className="flex items-center gap-2 px-4 py-2 bg-zinc-800/50 hover:bg-zinc-700/50 text-zinc-300 rounded-lg text-sm transition-all border border-white/5"
+                            className="flex items-center gap-2 px-4 py-2 bg-zinc-100 dark:bg-zinc-800/50 hover:bg-zinc-200 dark:hover:bg-zinc-700/50 text-zinc-700 dark:text-zinc-300 rounded-lg text-sm transition-all border border-zinc-200/50 dark:border-white/5"
                             disabled={loading}
                         >
                             <RefreshCw className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} />
@@ -389,6 +370,20 @@ const ManageAllApplications = () => {
                     >
                         {statsData.map((stat, idx) => {
                             const Icon = stat.icon;
+                            const colorMap = {
+                                cyan: "text-cyan-600 dark:text-cyan-400",
+                                yellow: "text-yellow-600 dark:text-yellow-400",
+                                green: "text-green-600 dark:text-green-400",
+                                red: "text-red-600 dark:text-red-400",
+                                emerald: "text-emerald-600 dark:text-emerald-400",
+                            };
+                            const bgMap = {
+                                cyan: "bg-cyan-100 dark:bg-cyan-500/10 border-cyan-200/50 dark:border-cyan-500/20",
+                                yellow: "bg-yellow-100 dark:bg-yellow-500/10 border-yellow-200/50 dark:border-yellow-500/20",
+                                green: "bg-green-100 dark:bg-green-500/10 border-green-200/50 dark:border-green-500/20",
+                                red: "bg-red-100 dark:bg-red-500/10 border-red-200/50 dark:border-red-500/20",
+                                emerald: "bg-emerald-100 dark:bg-emerald-500/10 border-emerald-200/50 dark:border-emerald-500/20",
+                            };
                             return (
                                 <motion.div
                                     key={idx}
@@ -397,17 +392,17 @@ const ManageAllApplications = () => {
                                         y: -4,
                                         borderColor: "rgba(255,255,255,0.1)",
                                     }}
-                                    className="bg-[#121214]/80 backdrop-blur-sm border border-zinc-800/50 rounded-xl p-4 transition-all"
+                                    className="bg-white/80 dark:bg-[#121214]/80 backdrop-blur-sm border border-zinc-200/50 dark:border-zinc-800/50 rounded-xl p-4 transition-all"
                                 >
                                     <div className="flex items-center justify-between">
-                                        <span className="text-zinc-400 text-xs font-medium uppercase tracking-wider">
+                                        <span className="text-zinc-500 dark:text-zinc-400 text-xs font-medium uppercase tracking-wider">
                                             {stat.label}
                                         </span>
-                                        <div className={`w-8 h-8 bg-${stat.color}-500/10 rounded-lg flex items-center justify-center border border-${stat.color}-500/20`}>
-                                            <Icon className={`w-4 h-4 text-${stat.color}-400`} />
+                                        <div className={`w-8 h-8 ${bgMap[stat.color]} rounded-lg flex items-center justify-center border ${stat.color === 'cyan' ? 'border-cyan-200/50 dark:border-cyan-500/20' : ''}`}>
+                                            <Icon className={`w-4 h-4 ${colorMap[stat.color]}`} />
                                         </div>
                                     </div>
-                                    <p className="text-2xl font-bold text-white mt-1">{stat.value}</p>
+                                    <p className="text-2xl font-bold text-zinc-900 dark:text-white mt-1">{stat.value}</p>
                                 </motion.div>
                             );
                         })}
@@ -421,20 +416,20 @@ const ManageAllApplications = () => {
                         className="flex flex-col md:flex-row gap-4 mb-6"
                     >
                         <div className="relative flex-1">
-                            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-500" />
+                            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-400 dark:text-zinc-500" />
                             <input
                                 type="text"
                                 placeholder="Search by job title, applicant, email..."
                                 value={searchQuery}
                                 onChange={(e) => setSearchQuery(e.target.value)}
-                                className="w-full pl-10 pr-4 py-2.5 bg-zinc-900/50 border border-zinc-800 rounded-lg text-white placeholder:text-zinc-500 outline-none focus:border-zinc-600 transition-all"
+                                className="w-full pl-10 pr-4 py-2.5 bg-white/80 dark:bg-zinc-900/50 border border-zinc-300/50 dark:border-zinc-800 rounded-lg text-zinc-900 dark:text-white placeholder:text-zinc-400 dark:placeholder:text-zinc-500 outline-none focus:border-zinc-400 dark:focus:border-zinc-600 transition-all"
                             />
                         </div>
                         <div className="relative">
                             <select
                                 value={statusFilter}
                                 onChange={(e) => setStatusFilter(e.target.value)}
-                                className="appearance-none pl-4 pr-10 py-2.5 bg-zinc-900/50 border border-zinc-800 rounded-lg text-white outline-none focus:border-zinc-600 transition-all cursor-pointer min-w-[150px]"
+                                className="appearance-none pl-4 pr-10 py-2.5 bg-white/80 dark:bg-zinc-900/50 border border-zinc-300/50 dark:border-zinc-800 rounded-lg text-zinc-900 dark:text-white outline-none focus:border-zinc-400 dark:focus:border-zinc-600 transition-all cursor-pointer min-w-[150px]"
                             >
                                 <option value="all">All Status</option>
                                 {uniqueStatuses.map(status => (
@@ -443,18 +438,18 @@ const ManageAllApplications = () => {
                                     </option>
                                 ))}
                             </select>
-                            <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-500 pointer-events-none" />
+                            <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-400 dark:text-zinc-500 pointer-events-none" />
                         </div>
                         {(searchQuery || statusFilter !== "all") && (
                             <button
                                 onClick={clearFilters}
-                                className="px-4 py-2.5 bg-zinc-800/50 hover:bg-zinc-700/50 text-zinc-300 rounded-lg text-sm transition-all flex items-center gap-2"
+                                className="px-4 py-2.5 bg-zinc-100 dark:bg-zinc-800/50 hover:bg-zinc-200 dark:hover:bg-zinc-700/50 text-zinc-700 dark:text-zinc-300 rounded-lg text-sm transition-all flex items-center gap-2"
                             >
                                 <X className="w-4 h-4" />
                                 Clear
                             </button>
                         )}
-                        <span className="text-xs text-zinc-500 flex items-center">
+                        <span className="text-xs text-zinc-500 dark:text-zinc-500 flex items-center">
                             {totalItems} result{totalItems !== 1 ? 's' : ''}
                         </span>
                     </motion.div>
@@ -464,13 +459,13 @@ const ManageAllApplications = () => {
                         initial={{ opacity: 0 }}
                         animate={{ opacity: 1 }}
                         transition={{ delay: 0.3 }}
-                        className="bg-[#121214]/80 backdrop-blur-sm border border-zinc-800/50 rounded-xl overflow-hidden"
+                        className="bg-white/80 dark:bg-[#121214]/80 backdrop-blur-sm border border-zinc-200/50 dark:border-zinc-800/50 rounded-xl overflow-hidden"
                     >
                         {totalItems === 0 ? (
                             <div className="p-12 text-center">
-                                <Briefcase className="w-16 h-16 text-zinc-600 mx-auto mb-4" />
-                                <h3 className="text-xl font-semibold text-white mb-2">No applications</h3>
-                                <p className="text-zinc-400 text-sm">
+                                <Briefcase className="w-16 h-16 text-zinc-300 dark:text-zinc-600 mx-auto mb-4" />
+                                <h3 className="text-xl font-semibold text-zinc-900 dark:text-white mb-2">No applications</h3>
+                                <p className="text-zinc-600 dark:text-zinc-400 text-sm">
                                     {searchQuery || statusFilter !== "all"
                                         ? "No applications match your filters"
                                         : "You haven't received any applications yet"
@@ -480,16 +475,16 @@ const ManageAllApplications = () => {
                         ) : (
                             <div className="overflow-x-auto">
                                 <table className="w-full text-left text-sm">
-                                    <thead className="bg-zinc-900/50 border-b border-zinc-800">
+                                    <thead className="bg-zinc-100/50 dark:bg-zinc-900/50 border-b border-zinc-200/50 dark:border-zinc-800">
                                         <tr>
-                                            <th className="px-4 py-3 text-zinc-400 font-medium">Applicant</th>
-                                            <th className="px-4 py-3 text-zinc-400 font-medium">Job</th>
-                                            <th className="px-4 py-3 text-zinc-400 font-medium">Applied</th>
-                                            <th className="px-4 py-3 text-zinc-400 font-medium">Status</th>
-                                            <th className="px-4 py-3 text-zinc-400 font-medium">Actions</th>
+                                            <th className="px-4 py-3 text-zinc-600 dark:text-zinc-400 font-medium">Applicant</th>
+                                            <th className="px-4 py-3 text-zinc-600 dark:text-zinc-400 font-medium">Job</th>
+                                            <th className="px-4 py-3 text-zinc-600 dark:text-zinc-400 font-medium">Applied</th>
+                                            <th className="px-4 py-3 text-zinc-600 dark:text-zinc-400 font-medium">Status</th>
+                                            <th className="px-4 py-3 text-zinc-600 dark:text-zinc-400 font-medium">Actions</th>
                                         </tr>
                                     </thead>
-                                    <tbody className="divide-y divide-zinc-800/50">
+                                    <tbody className="divide-y divide-zinc-200/50 dark:divide-zinc-800/50">
                                         <AnimatePresence mode="popLayout">
                                             {currentItems.map((app, index) => (
                                                 <motion.tr
@@ -499,29 +494,29 @@ const ManageAllApplications = () => {
                                                     animate="visible"
                                                     exit={{ opacity: 0, x: -20 }}
                                                     whileHover={{
-                                                        backgroundColor: "rgba(255,255,255,0.02)",
+                                                        backgroundColor: "rgba(0,0,0,0.02)",
                                                     }}
                                                     className="transition-colors"
                                                 >
                                                     <td className="px-4 py-4">
                                                         <div>
-                                                            <p className="text-white font-medium">{app.applicantName || 'Unknown'}</p>
-                                                            <p className="text-xs text-zinc-500 flex items-center gap-1 mt-0.5">
+                                                            <p className="text-zinc-900 dark:text-white font-medium">{app.applicantName || 'Unknown'}</p>
+                                                            <p className="text-xs text-zinc-500 dark:text-zinc-500 flex items-center gap-1 mt-0.5">
                                                                 <Mail className="w-3 h-3" />
                                                                 {app.applicantEmail || 'No email'}
                                                             </p>
                                                         </div>
                                                     </td>
                                                     <td className="px-4 py-4">
-                                                        <p className="text-zinc-300">{app.jobTitle || 'Unknown Job'}</p>
-                                                        <p className="text-xs text-zinc-500">{app.companyName}</p>
+                                                        <p className="text-zinc-700 dark:text-zinc-300">{app.jobTitle || 'Unknown Job'}</p>
+                                                        <p className="text-xs text-zinc-500 dark:text-zinc-500">{app.companyName}</p>
                                                     </td>
                                                     <td className="px-4 py-4">
                                                         <div className="flex flex-col">
-                                                            <span className="text-zinc-400 text-xs">
+                                                            <span className="text-zinc-600 dark:text-zinc-400 text-xs">
                                                                 {app.appliedAt ? new Date(app.appliedAt).toLocaleDateString() : 'N/A'}
                                                             </span>
-                                                            <span className="text-[10px] text-zinc-500">
+                                                            <span className="text-[10px] text-zinc-500 dark:text-zinc-500">
                                                                 {app.appliedAt ? new Date(app.appliedAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : ''}
                                                             </span>
                                                         </div>
@@ -537,7 +532,7 @@ const ManageAllApplications = () => {
                                                                 value={app.status || 'pending'}
                                                                 onChange={(e) => handleStatusUpdate(app._id, e.target.value)}
                                                                 disabled={updatingId === app._id}
-                                                                className="bg-zinc-800/50 border border-zinc-700 rounded-lg px-2 py-1.5 text-white text-xs outline-none focus:border-zinc-500 transition-all disabled:opacity-50 min-w-[100px]"
+                                                                className="bg-white/80 dark:bg-zinc-800/50 border border-zinc-300/50 dark:border-zinc-700 rounded-lg px-2 py-1.5 text-zinc-900 dark:text-white text-xs outline-none focus:border-zinc-400 dark:focus:border-zinc-500 transition-all disabled:opacity-50 min-w-[100px]"
                                                             >
                                                                 {statusOptions.map((opt) => (
                                                                     <option key={opt.value} value={opt.value}>
@@ -547,15 +542,14 @@ const ManageAllApplications = () => {
                                                             </select>
                                                             <button
                                                                 onClick={() => handleOpenNotes(app)}
-                                                                className="p-1.5 hover:bg-zinc-700/50 rounded-lg text-zinc-400 hover:text-white transition-colors"
+                                                                className="p-1.5 hover:bg-zinc-200 dark:hover:bg-zinc-700/50 rounded-lg text-zinc-400 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white transition-colors"
                                                                 title="Add Notes"
                                                             >
                                                                 <MessageSquare className="w-4 h-4" />
                                                             </button>
-                                                            {/* ✅ Updated View button - Navigates to detail page */}
                                                             <button
                                                                 onClick={() => router.push(`/dashboard/recruiter/applications/${app._id}`)}
-                                                                className="p-1.5 hover:bg-zinc-700/50 rounded-lg text-zinc-400 hover:text-white transition-colors"
+                                                                className="p-1.5 hover:bg-zinc-200 dark:hover:bg-zinc-700/50 rounded-lg text-zinc-400 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white transition-colors"
                                                                 title="View Full Application"
                                                             >
                                                                 <Eye className="w-4 h-4" />
@@ -571,7 +565,7 @@ const ManageAllApplications = () => {
                         )}
                     </motion.div>
 
-                    {/* Notes Modal */}
+                    {/* ✅ FIXED: Notes Modal with Theme Support */}
                     <AnimatePresence>
                         {showNotesModal && selectedApplication && (
                             <motion.div
@@ -585,41 +579,41 @@ const ManageAllApplications = () => {
                                     initial={{ scale: 0.9, opacity: 0 }}
                                     animate={{ scale: 1, opacity: 1 }}
                                     exit={{ scale: 0.9, opacity: 0 }}
-                                    className="bg-[#121214] border border-zinc-800 rounded-2xl max-w-lg w-full p-6 shadow-2xl"
+                                    className="bg-white/95 dark:bg-[#121214] border border-zinc-200/50 dark:border-zinc-800 rounded-2xl max-w-lg w-full p-6 shadow-2xl"
                                     onClick={(e) => e.stopPropagation()}
                                 >
                                     <div className="flex items-center justify-between mb-4">
-                                        <h3 className="text-lg font-semibold text-white">
+                                        <h3 className="text-lg font-semibold text-zinc-900 dark:text-white">
                                             Recruiter Notes
                                         </h3>
                                         <button
                                             onClick={() => setShowNotesModal(false)}
-                                            className="p-1 hover:bg-zinc-800 rounded-lg text-zinc-400 hover:text-white transition-colors"
+                                            className="p-1 hover:bg-zinc-100 dark:hover:bg-zinc-800 rounded-lg text-zinc-400 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white transition-colors"
                                         >
                                             <X className="w-5 h-5" />
                                         </button>
                                     </div>
                                     <div className="mb-4">
-                                        <p className="text-sm text-zinc-400">
-                                            <span className="text-zinc-500">Applicant:</span> {selectedApplication.applicantName}
+                                        <p className="text-sm text-zinc-600 dark:text-zinc-400">
+                                            <span className="text-zinc-500 dark:text-zinc-500">Applicant:</span> {selectedApplication.applicantName}
                                         </p>
-                                        <p className="text-sm text-zinc-400">
-                                            <span className="text-zinc-500">Job:</span> {selectedApplication.jobTitle}
+                                        <p className="text-sm text-zinc-600 dark:text-zinc-400">
+                                            <span className="text-zinc-500 dark:text-zinc-500">Job:</span> {selectedApplication.jobTitle}
                                         </p>
-                                        <p className="text-sm text-zinc-400">
-                                            <span className="text-zinc-500">Status:</span> {statusLabels[selectedApplication.status] || selectedApplication.status}
+                                        <p className="text-sm text-zinc-600 dark:text-zinc-400">
+                                            <span className="text-zinc-500 dark:text-zinc-500">Status:</span> {statusLabels[selectedApplication.status] || selectedApplication.status}
                                         </p>
                                     </div>
                                     <textarea
                                         value={notesText}
                                         onChange={(e) => setNotesText(e.target.value)}
                                         placeholder="Add your notes about this candidate..."
-                                        className="w-full bg-zinc-900/50 border border-zinc-800 rounded-lg p-3 text-white placeholder:text-zinc-500 outline-none focus:border-zinc-600 transition-all resize-none min-h-[120px]"
+                                        className="w-full bg-white/80 dark:bg-zinc-900/50 border border-zinc-300/50 dark:border-zinc-800 rounded-lg p-3 text-zinc-900 dark:text-white placeholder:text-zinc-400 dark:placeholder:text-zinc-500 outline-none focus:border-zinc-400 dark:focus:border-zinc-600 transition-all resize-none min-h-[120px]"
                                     />
                                     <div className="flex justify-end gap-3 mt-4">
                                         <button
                                             onClick={() => setShowNotesModal(false)}
-                                            className="px-4 py-2 bg-zinc-800 hover:bg-zinc-700 text-white rounded-lg text-sm transition-all"
+                                            className="px-4 py-2 bg-zinc-200 dark:bg-zinc-800 hover:bg-zinc-300 dark:hover:bg-zinc-700 text-zinc-700 dark:text-white rounded-lg text-sm transition-all"
                                         >
                                             Cancel
                                         </button>

@@ -2,8 +2,8 @@ import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { Toaster } from "react-hot-toast";
 import Metadata from "@/components/Metadata";
-// ✅ Import the AI Assistant component
 import AIAssistant from "@/components/ai/AIAssistant";
+import { Providers } from "./providers";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -15,30 +15,26 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
-// ✅ ADDED THIS METADATA BLOCK
 export const metadata = {
   title: "HireLoop",
   description: "Find your dream job or top talent.",
   icons: {
-    icon: "/icon.svg", // Tells Next.js to use the icon.svg file you create in src/app
+    icon: "/icon.svg",
   },
 };
 
-export default function RootLayout({
-  children,
-}) {
+export default function RootLayout({ children }) {
   return (
-    <html lang="en">
-      <body
-        className={`${geistSans.variable} ${geistMono.variable}`}
-      >
-        <Metadata />
-        {children}
+    <html lang="en" suppressHydrationWarning>
+      <body className={`${geistSans.variable} ${geistMono.variable}`}>
+        <Providers>
+          <Metadata />
+          {children}
 
-        <Toaster position="top-right" />
-        
-        {/* ✅ AI Assistant - Available on all pages */}
-        <AIAssistant />
+          <Toaster position="top-right" />
+
+          <AIAssistant />
+        </Providers>
       </body>
     </html>
   );

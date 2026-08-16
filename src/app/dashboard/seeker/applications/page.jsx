@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useMemo } from "react";
+import { useState, useEffect, useMemo, useCallback } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import Image from "next/image";
@@ -23,9 +23,9 @@ import {
   Clock,
   XCircle,
   MessageSquare,
+  RefreshCw,
 } from "lucide-react";
 import { Button } from "@heroui/react";
-import { ArrowDownToSquare } from "@gravity-ui/icons";
 import { motion, AnimatePresence } from "framer-motion";
 import { getMyApplications } from "@/lib/api/applications";
 import { authClient } from "@/lib/auth-client";
@@ -69,8 +69,13 @@ const ApplicationPage = () => {
 
   const [applications, setApplications] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [searchQuery, setSearchQuery] = useState(searchParams?.get("search") || "");
-  const [searchInput, setSearchInput] = useState(searchParams?.get("search") || "");
+  const [refreshing, setRefreshing] = useState(false);
+  const [searchQuery, setSearchQuery] = useState(
+    searchParams?.get("search") || "",
+  );
+  const [searchInput, setSearchInput] = useState(
+    searchParams?.get("search") || "",
+  );
   const [showFilters, setShowFilters] = useState(false);
   const [filters, setFilters] = useState({
     status: searchParams?.get("status") || "",
@@ -78,45 +83,59 @@ const ApplicationPage = () => {
     dateRange: searchParams?.get("dateRange") || "",
   });
 
-  const [currentTab, setCurrentTab] = useState(searchParams?.get("tab") || "active");
+  const [currentTab, setCurrentTab] = useState(
+    searchParams?.get("tab") || "active",
+  );
   const tab = currentTab;
 
   const page = parseInt(searchParams?.get("page")) || 1;
   const itemsPerPage = 5;
 
-  // ✅ NEW: State for notes modal
+  // ✅ State for notes modal
   const [selectedApplication, setSelectedApplication] = useState(null);
   const [showNotesModal, setShowNotesModal] = useState(false);
 
-  // Fetch applications
-  useEffect(() => {
-    const fetchApplications = async () => {
-      try {
-        setLoading(true);
-        const data = await getMyApplications();
-        console.log("📋 Fetched applications:", data);
-        
-        const sortedData = (data || []).sort((a, b) => {
-          const dateA = new Date(a.appliedAt || a.createdAt || 0);
-          const dateB = new Date(b.appliedAt || b.createdAt || 0);
-          return dateB - dateA;
-        });
-        
-        setApplications(sortedData);
-      } catch (error) {
-        console.error("Failed to fetch applications:", error);
-        toast.error("Failed to load applications");
-      } finally {
-        setLoading(false);
-      }
-    };
+  // Fetch applications - wrapped in useCallback
+  const fetchApplications = useCallback(async (showLoading = true) => {
+    if (!user?.id) {
+      setLoading(false);
+      return;
+    }
 
+    try {
+      if (showLoading) {
+        setLoading(true);
+      } else {
+        setRefreshing(true);
+      }
+
+      const data = await getMyApplications();
+      console.log("📋 Fetched applications:", data);
+
+      const sortedData = (data || []).sort((a, b) => {
+        const dateA = new Date(a.appliedAt || a.createdAt || 0);
+        const dateB = new Date(b.appliedAt || b.createdAt || 0);
+        return dateB - dateA;
+      });
+
+      setApplications(sortedData);
+      toast.success("Applications refreshed successfully!");
+    } catch (error) {
+      console.error("Failed to fetch applications:", error);
+      toast.error("Failed to load applications");
+    } finally {
+      setLoading(false);
+      setRefreshing(false);
+    }
+  }, [user?.id]);
+
+  useEffect(() => {
     if (user?.id) {
-      fetchApplications();
+      fetchApplications(true);
     } else {
       setLoading(false);
     }
-  }, [user?.id]);
+  }, [user?.id, fetchApplications]);
 
   // Enhanced filtering logic
   const filteredApplications = useMemo(() => {
@@ -134,7 +153,7 @@ const ApplicationPage = () => {
           app.status,
           app.description,
         ].filter(Boolean);
-        
+
         if (app.skills) {
           if (Array.isArray(app.skills)) {
             searchableFields.push(app.skills.join(" "));
@@ -142,29 +161,29 @@ const ApplicationPage = () => {
             searchableFields.push(app.skills);
           }
         }
-        
-        return searchableFields.some(field => 
-          field.toLowerCase().includes(query)
+
+        return searchableFields.some((field) =>
+          field.toLowerCase().includes(query),
         );
       });
     }
 
     if (filters.status) {
-      result = result.filter((app) => 
-        app.status?.toLowerCase() === filters.status.toLowerCase()
+      result = result.filter(
+        (app) => app.status?.toLowerCase() === filters.status.toLowerCase(),
       );
     }
 
     if (filters.jobType) {
-      result = result.filter((app) => 
-        app.jobType?.toLowerCase() === filters.jobType.toLowerCase()
+      result = result.filter(
+        (app) => app.jobType?.toLowerCase() === filters.jobType.toLowerCase(),
       );
     }
 
     if (filters.dateRange) {
       const now = new Date();
       const cutoff = new Date();
-      
+
       switch (filters.dateRange) {
         case "today":
           cutoff.setHours(0, 0, 0, 0);
@@ -181,7 +200,7 @@ const ApplicationPage = () => {
         default:
           break;
       }
-      
+
       result = result.filter((app) => {
         const appDate = new Date(app.appliedAt || app.createdAt);
         return appDate >= cutoff;
@@ -190,12 +209,12 @@ const ApplicationPage = () => {
 
     const archivedStatuses = ["rejected", "closed", "withdrawn"];
     if (tab === "archived") {
-      result = result.filter((app) => 
-        archivedStatuses.includes(app.status?.toLowerCase())
+      result = result.filter((app) =>
+        archivedStatuses.includes(app.status?.toLowerCase()),
       );
     } else {
-      result = result.filter((app) => 
-        !archivedStatuses.includes(app.status?.toLowerCase())
+      result = result.filter(
+        (app) => !archivedStatuses.includes(app.status?.toLowerCase()),
       );
     }
 
@@ -211,13 +230,16 @@ const ApplicationPage = () => {
 
   // Stats calculations
   const totalApplied = applications?.length || 0;
-  const pending = applications?.filter(
-    (item) => item.status === "pending" || item.status === "applied"
-  ).length || 0;
-  const rejected = applications?.filter(
-    (item) => item.status === "rejected"
-  ).length || 0;
-  const successRate = totalApplied === 0 ? 0 : Math.round(((totalApplied - rejected) / totalApplied) * 100);
+  const pending =
+    applications?.filter(
+      (item) => item.status === "pending" || item.status === "applied",
+    ).length || 0;
+  const rejected =
+    applications?.filter((item) => item.status === "rejected").length || 0;
+  const successRate =
+    totalApplied === 0
+      ? 0
+      : Math.round(((totalApplied - rejected) / totalApplied) * 100);
 
   // Helper functions
   const getStatusColor = (status) => {
@@ -239,41 +261,46 @@ const ApplicationPage = () => {
   };
 
   const getStatusBadge = (status) => {
-    if (status === "success" || status === "hired" || status === "accepted" || status === "offered") {
+    if (
+      status === "success" ||
+      status === "hired" ||
+      status === "accepted" ||
+      status === "offered"
+    ) {
       return {
         label: "Success",
         icon: <CheckCircle2 className="w-3 h-3" />,
-        color: "bg-emerald-500/15 text-emerald-400 border-emerald-500/20"
+        color: "bg-emerald-500/15 text-emerald-400 border-emerald-500/20",
       };
     } else if (status === "rejected") {
       return {
         label: "Rejected",
         icon: <XCircle className="w-3 h-3" />,
-        color: "bg-red-500/15 text-red-400 border-red-500/20"
+        color: "bg-red-500/15 text-red-400 border-red-500/20",
       };
     } else if (status === "shortlisted") {
       return {
         label: "Shortlisted",
         icon: <CheckCircle2 className="w-3 h-3" />,
-        color: "bg-green-500/15 text-green-400 border-green-500/20"
+        color: "bg-green-500/15 text-green-400 border-green-500/20",
       };
     } else if (status === "review" || status === "reviewed") {
       return {
         label: "Under Review",
         icon: <Clock className="w-3 h-3" />,
-        color: "bg-blue-500/15 text-blue-400 border-blue-500/20"
+        color: "bg-blue-500/15 text-blue-400 border-blue-500/20",
       };
     } else if (status === "interview" || status === "interviewing") {
       return {
         label: "Interview",
         icon: <CalendarDays className="w-3 h-3" />,
-        color: "bg-purple-500/15 text-purple-400 border-purple-500/20"
+        color: "bg-purple-500/15 text-purple-400 border-purple-500/20",
       };
     } else {
       return {
         label: "Pending",
         icon: <Clock className="w-3 h-3" />,
-        color: "bg-yellow-500/15 text-yellow-400 border-yellow-500/20"
+        color: "bg-yellow-500/15 text-yellow-400 border-yellow-500/20",
       };
     }
   };
@@ -297,14 +324,14 @@ const ApplicationPage = () => {
   // Build URL with all params
   const buildUrl = (newParams) => {
     const params = new URLSearchParams();
-    
+
     if (searchQuery) params.set("search", searchQuery);
     if (filters.status) params.set("status", filters.status);
     if (filters.jobType) params.set("jobType", filters.jobType);
     if (filters.dateRange) params.set("dateRange", filters.dateRange);
     if (tab) params.set("tab", tab);
     if (newParams.page) params.set("page", newParams.page);
-    
+
     return `/dashboard/seeker/applications?${params.toString()}`;
   };
 
@@ -355,12 +382,13 @@ const ApplicationPage = () => {
   };
 
   const handleViewJobDetails = (application) => {
-    const jobId = application?.jobId || 
-                  application?.job_id || 
-                  application?.job?._id || 
-                  application?.job?.id ||
-                  application?.jobID;
-    
+    const jobId =
+      application?.jobId ||
+      application?.job_id ||
+      application?.job?._id ||
+      application?.job?.id ||
+      application?.jobID;
+
     if (jobId) {
       router.push(`/browse-jobs/${jobId}`);
     } else {
@@ -368,16 +396,41 @@ const ApplicationPage = () => {
     }
   };
 
-  // ✅ NEW: Handle opening notes modal
+  // ✅ Handle opening notes modal
   const handleOpenNotes = (application) => {
     setSelectedApplication(application);
     setShowNotesModal(true);
   };
 
+  // ✅ Handle refresh - updated to properly refresh
+  const handleRefresh = async () => {
+    if (refreshing) return;
+    setRefreshing(true);
+    
+    try {
+      const data = await getMyApplications();
+      console.log("📋 Refreshed applications:", data);
+
+      const sortedData = (data || []).sort((a, b) => {
+        const dateA = new Date(a.appliedAt || a.createdAt || 0);
+        const dateB = new Date(b.appliedAt || b.createdAt || 0);
+        return dateB - dateA;
+      });
+
+      setApplications(sortedData);
+      toast.success("Applications refreshed successfully!");
+    } catch (error) {
+      console.error("Failed to refresh applications:", error);
+      toast.error("Failed to refresh applications");
+    } finally {
+      setRefreshing(false);
+    }
+  };
+
   // Get unique statuses for filter
   const uniqueStatuses = useMemo(() => {
     const statuses = new Set();
-    applications?.forEach(app => {
+    applications?.forEach((app) => {
       if (app.status) statuses.add(app.status);
     });
     return Array.from(statuses);
@@ -386,7 +439,7 @@ const ApplicationPage = () => {
   // Get unique job types for filter
   const uniqueJobTypes = useMemo(() => {
     const types = new Set();
-    applications?.forEach(app => {
+    applications?.forEach((app) => {
       if (app.jobType) types.add(app.jobType);
     });
     return Array.from(types);
@@ -394,7 +447,7 @@ const ApplicationPage = () => {
 
   if (loading) {
     return (
-      <LoadingPage 
+      <LoadingPage
         title="Loading Applications"
         message="Fetching your application history..."
         customStats={[
@@ -408,20 +461,23 @@ const ApplicationPage = () => {
   }
 
   return (
-    <div className="min-h-screen bg-[#090a0f]">
+    <div className="min-h-screen bg-zinc-50 dark:bg-[#090a0f]">
       <div className="absolute top-0 right-0 w-[600px] h-[600px] bg-cyan-500/5 blur-[120px] rounded-full pointer-events-none -z-10" />
 
-      <div className="border-b border-white/5 bg-[#090a0f]/80 backdrop-blur-xl sticky top-0 z-20 shadow-lg shadow-black/20">
+      <div className="border-b border-zinc-200/50 dark:border-white/5 bg-white/80 dark:bg-[#090a0f]/80 backdrop-blur-xl sticky top-0 z-20 shadow-lg shadow-black/5 dark:shadow-black/20">
         <div className="max-w-7xl mx-auto px-6 py-4 flex flex-col sm:flex-row items-center justify-between gap-4">
-          <form onSubmit={handleSearch} className="w-full max-w-sm relative group">
+          <form
+            onSubmit={handleSearch}
+            className="w-full max-w-sm relative group"
+          >
             <div className="absolute inset-0 bg-gradient-to-r from-cyan-500/20 to-blue-500/20 rounded-xl blur-md opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-500 group-hover:text-cyan-400 transition-colors z-10" />
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-400 dark:text-zinc-500 group-hover:text-cyan-400 transition-colors z-10" />
             <input
               type="text"
               value={searchInput}
               onChange={(e) => handleSearchChange(e.target.value)}
               placeholder="Search by title, company, skills..."
-              className="w-full bg-[#111214] border border-white/5 rounded-xl pl-10 pr-20 py-2.5 text-white placeholder:text-zinc-500 focus:outline-none focus:border-cyan-500/50 focus:ring-1 focus:ring-cyan-500/50 transition-all relative z-10 shadow-lg shadow-black/20"
+              className="w-full bg-white dark:bg-[#111214] border border-zinc-200/50 dark:border-white/5 rounded-xl pl-10 pr-20 py-2.5 text-zinc-900 dark:text-white placeholder:text-zinc-400 dark:placeholder:text-zinc-500 focus:outline-none focus:border-cyan-500/50 focus:ring-1 focus:ring-cyan-500/50 transition-all relative z-10 shadow-lg shadow-black/5 dark:shadow-black/20"
             />
             <div className="absolute right-1 top-1/2 -translate-y-1/2 flex items-center gap-1 z-10">
               {searchInput && (
@@ -433,7 +489,7 @@ const ApplicationPage = () => {
                     const url = buildUrl({ page: 1 });
                     router.push(url);
                   }}
-                  className="p-1.5 hover:bg-white/10 rounded-lg text-zinc-400 hover:text-white transition-colors"
+                  className="p-1.5 hover:bg-zinc-100 dark:hover:bg-white/10 rounded-lg text-zinc-400 dark:text-zinc-400 hover:text-zinc-700 dark:hover:text-white transition-colors"
                 >
                   <X className="w-4 h-4" />
                 </button>
@@ -441,10 +497,10 @@ const ApplicationPage = () => {
               <button
                 type="button"
                 onClick={() => setShowFilters(!showFilters)}
-                className={`p-1.5 hover:bg-white/10 rounded-lg transition-colors ${
-                  Object.values(filters).some(f => f) 
-                    ? "text-cyan-400 bg-cyan-500/10" 
-                    : "text-zinc-400 hover:text-white"
+                className={`p-1.5 hover:bg-zinc-100 dark:hover:bg-white/10 rounded-lg transition-colors ${
+                  Object.values(filters).some((f) => f)
+                    ? "text-cyan-400 bg-cyan-500/10"
+                    : "text-zinc-400 dark:text-zinc-400 hover:text-zinc-700 dark:hover:text-white"
                 }`}
               >
                 <Filter className="w-4 h-4" />
@@ -461,13 +517,13 @@ const ApplicationPage = () => {
           <div className="flex items-center gap-4 w-full sm:w-auto justify-end">
             <motion.button
               whileHover={{ scale: 1.05 }}
-              className="p-2 hover:bg-white/5 rounded-full transition-colors text-zinc-400 hover:text-white"
+              className="p-2 hover:bg-zinc-100 dark:hover:bg-white/5 rounded-full transition-colors text-zinc-400 dark:text-zinc-400 hover:text-zinc-700 dark:hover:text-white"
             >
               <Bell className="w-5 h-5" />
             </motion.button>
             <motion.button
               whileHover={{ scale: 1.05 }}
-              className="p-2 hover:bg-white/5 rounded-full transition-colors text-zinc-400 hover:text-white"
+              className="p-2 hover:bg-zinc-100 dark:hover:bg-white/5 rounded-full transition-colors text-zinc-400 dark:text-zinc-400 hover:text-zinc-700 dark:hover:text-white"
             >
               <Mail className="w-5 h-5" />
             </motion.button>
@@ -494,18 +550,20 @@ const ApplicationPage = () => {
               animate={{ height: "auto", opacity: 1 }}
               exit={{ height: 0, opacity: 0 }}
               transition={{ duration: 0.3 }}
-              className="overflow-hidden border-t border-white/5"
+              className="overflow-hidden border-t border-zinc-200/50 dark:border-white/5"
             >
-              <div className="max-w-7xl mx-auto px-6 py-4 flex flex-wrap items-center gap-4 bg-[#0a0b0d]/50">
+              <div className="max-w-7xl mx-auto px-6 py-4 flex flex-wrap items-center gap-4 bg-zinc-100/50 dark:bg-[#0a0b0d]/50">
                 <div className="flex items-center gap-2">
                   <label className="text-xs text-zinc-500">Status:</label>
                   <select
                     value={filters.status}
-                    onChange={(e) => handleFilterChange("status", e.target.value)}
-                    className="bg-[#111214] border border-white/5 rounded-lg px-3 py-1.5 text-white text-sm focus:outline-none focus:border-cyan-500/50"
+                    onChange={(e) =>
+                      handleFilterChange("status", e.target.value)
+                    }
+                    className="bg-white dark:bg-[#111214] border border-zinc-200/50 dark:border-white/5 rounded-lg px-3 py-1.5 text-zinc-900 dark:text-white text-sm focus:outline-none focus:border-cyan-500/50"
                   >
                     <option value="">All Statuses</option>
-                    {uniqueStatuses.map(status => (
+                    {uniqueStatuses.map((status) => (
                       <option key={status} value={status}>
                         {status.charAt(0).toUpperCase() + status.slice(1)}
                       </option>
@@ -517,12 +575,16 @@ const ApplicationPage = () => {
                   <label className="text-xs text-zinc-500">Type:</label>
                   <select
                     value={filters.jobType}
-                    onChange={(e) => handleFilterChange("jobType", e.target.value)}
-                    className="bg-[#111214] border border-white/5 rounded-lg px-3 py-1.5 text-white text-sm focus:outline-none focus:border-cyan-500/50"
+                    onChange={(e) =>
+                      handleFilterChange("jobType", e.target.value)
+                    }
+                    className="bg-white dark:bg-[#111214] border border-zinc-200/50 dark:border-white/5 rounded-lg px-3 py-1.5 text-zinc-900 dark:text-white text-sm focus:outline-none focus:border-cyan-500/50"
                   >
                     <option value="">All Types</option>
-                    {uniqueJobTypes.map(type => (
-                      <option key={type} value={type}>{type}</option>
+                    {uniqueJobTypes.map((type) => (
+                      <option key={type} value={type}>
+                        {type}
+                      </option>
                     ))}
                   </select>
                 </div>
@@ -531,8 +593,10 @@ const ApplicationPage = () => {
                   <label className="text-xs text-zinc-500">Date:</label>
                   <select
                     value={filters.dateRange}
-                    onChange={(e) => handleFilterChange("dateRange", e.target.value)}
-                    className="bg-[#111214] border border-white/5 rounded-lg px-3 py-1.5 text-white text-sm focus:outline-none focus:border-cyan-500/50"
+                    onChange={(e) =>
+                      handleFilterChange("dateRange", e.target.value)
+                    }
+                    className="bg-white dark:bg-[#111214] border border-zinc-200/50 dark:border-white/5 rounded-lg px-3 py-1.5 text-zinc-900 dark:text-white text-sm focus:outline-none focus:border-cyan-500/50"
                   >
                     <option value="">All Time</option>
                     <option value="today">Today</option>
@@ -542,7 +606,7 @@ const ApplicationPage = () => {
                   </select>
                 </div>
 
-                {(searchQuery || Object.values(filters).some(f => f)) && (
+                {(searchQuery || Object.values(filters).some((f) => f)) && (
                   <button
                     onClick={clearFilters}
                     className="text-xs text-cyan-400 hover:text-cyan-300 transition-colors flex items-center gap-1"
@@ -553,7 +617,7 @@ const ApplicationPage = () => {
                 )}
 
                 <span className="text-xs text-zinc-500 ml-auto">
-                  {totalItems} result{totalItems !== 1 ? 's' : ''}
+                  {totalItems} result{totalItems !== 1 ? "s" : ""}
                 </span>
               </div>
             </motion.div>
@@ -568,25 +632,25 @@ const ApplicationPage = () => {
           className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-8"
         >
           <div>
-            <h1 className="text-3xl font-bold text-white flex items-center gap-3">
+            <h1 className="text-3xl font-bold text-zinc-900 dark:text-white flex items-center gap-3">
               My Applications
-              <span className="text-sm font-medium text-zinc-400 bg-zinc-800/50 border border-white/5 px-3 py-1 rounded-full">
+              <span className="text-sm font-medium text-zinc-500 dark:text-zinc-400 bg-zinc-200 dark:bg-zinc-800/50 border border-zinc-200/50 dark:border-white/5 px-3 py-1 rounded-full">
                 {totalApplied}
               </span>
             </h1>
-            <p className="text-zinc-400 mt-1 text-sm">
+            <p className="text-zinc-500 dark:text-zinc-400 mt-1 text-sm">
               Track your job applications and interview progress in real-time.
             </p>
           </div>
 
           <div className="flex flex-wrap items-center gap-4">
-            <div className="relative bg-[#111214] border border-white/5 rounded-xl p-1 flex gap-1 shadow-lg shadow-black/20">
+            <div className="relative bg-white dark:bg-[#111214] border border-zinc-200/50 dark:border-white/5 rounded-xl p-1 flex gap-1 shadow-lg shadow-black/5 dark:shadow-black/20">
               <button
                 onClick={() => handleTabChange("active")}
                 className={`px-5 py-2 rounded-lg text-sm font-medium transition-all duration-300 ${
                   tab === "active"
                     ? "bg-gradient-to-r from-cyan-600 to-blue-600 text-white shadow-lg shadow-cyan-600/25"
-                    : "text-zinc-400 hover:text-white hover:bg-white/5"
+                    : "text-zinc-500 dark:text-zinc-400 hover:text-zinc-800 dark:hover:text-white hover:bg-zinc-100 dark:hover:bg-white/5"
                 }`}
               >
                 Active
@@ -596,26 +660,33 @@ const ApplicationPage = () => {
                 className={`px-5 py-2 rounded-lg text-sm font-medium transition-all duration-300 ${
                   tab === "archived"
                     ? "bg-gradient-to-r from-cyan-600 to-blue-600 text-white shadow-lg shadow-cyan-600/25"
-                    : "text-zinc-400 hover:text-white hover:bg-white/5"
+                    : "text-zinc-500 dark:text-zinc-400 hover:text-zinc-800 dark:hover:text-white hover:bg-zinc-100 dark:hover:bg-white/5"
                 }`}
               >
                 Archived
               </button>
             </div>
 
+            {/* ✅ Refresh Button */}
             <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
               <Button
                 color="primary"
-                startContent={<Download className="w-4 h-4" />}
-                className="bg-gradient-to-r from-cyan-600 to-blue-600 hover:from-cyan-500 hover:to-blue-500 text-white rounded-xl py-2.5 shadow-lg shadow-cyan-600/20 hover:shadow-cyan-600/40 transition-all font-medium"
+                startContent={
+                  <RefreshCw
+                    className={`w-4 h-4 ${refreshing ? "animate-spin" : ""}`}
+                  />
+                }
+                className="bg-gradient-to-r from-cyan-600 to-blue-600 hover:from-cyan-500 hover:to-blue-500 text-white rounded-xl py-2.5 shadow-lg shadow-cyan-600/20 hover:shadow-cyan-600/40 transition-all font-medium disabled:opacity-70 disabled:cursor-not-allowed"
+                onClick={handleRefresh}
+                disabled={refreshing}
               >
-                <ArrowDownToSquare className="w-4 h-4" /> Export PDF
+                {refreshing ? "Refreshing..." : "Refresh"}
               </Button>
             </motion.div>
           </div>
         </motion.div>
 
-        {/* Stats Grid - Updated: Total Applied, Pending, Rejected, Success Rate */}
+        {/* Stats Grid */}
         <motion.div
           variants={containerVariants}
           initial="hidden"
@@ -658,14 +729,14 @@ const ApplicationPage = () => {
                   borderColor: "rgba(255,255,255,0.1)",
                   boxShadow: `0 10px 30px -10px rgba(6, 182, 212, 0.1)`,
                 }}
-                className="bg-[#111214] border border-white/5 rounded-2xl p-6 shadow-lg shadow-black/20 transition-all"
+                className="bg-white dark:bg-[#111214] border border-zinc-200/50 dark:border-white/5 rounded-2xl p-6 shadow-lg shadow-black/5 dark:shadow-black/20 transition-all"
               >
                 <div className="flex items-center justify-between">
                   <div>
-                    <p className="text-zinc-500 text-xs font-medium uppercase tracking-wider">
+                    <p className="text-zinc-500 dark:text-zinc-500 text-xs font-medium uppercase tracking-wider">
                       {stat.label}
                     </p>
-                    <p className="text-3xl font-bold text-white mt-1 tracking-tight">
+                    <p className="text-3xl font-bold text-zinc-900 dark:text-white mt-1 tracking-tight">
                       {stat.value}
                     </p>
                   </div>
@@ -685,14 +756,14 @@ const ApplicationPage = () => {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.3 }}
-          className="bg-[#111214] border border-white/5 rounded-2xl overflow-hidden shadow-xl shadow-black/20"
+          className="bg-white dark:bg-[#111214] border border-zinc-200/50 dark:border-white/5 rounded-2xl overflow-hidden shadow-xl shadow-black/5 dark:shadow-black/20"
         >
           {totalItems === 0 ? (
             <div className="py-24 text-center relative overflow-hidden">
               <motion.div
                 animate={{ y: [0, -15, 0] }}
                 transition={{ duration: 6, repeat: Infinity }}
-                className="absolute -top-10 -left-10 text-zinc-800/30"
+                className="absolute -top-10 -left-10 text-zinc-200 dark:text-zinc-800/30"
               >
                 <FolderArchive className="w-32 h-32 fill-current" />
               </motion.div>
@@ -700,7 +771,7 @@ const ApplicationPage = () => {
               <motion.div
                 animate={{ y: [0, 15, 0] }}
                 transition={{ duration: 8, repeat: Infinity }}
-                className="absolute -bottom-10 -right-10 text-zinc-800/30"
+                className="absolute -bottom-10 -right-10 text-zinc-200 dark:text-zinc-800/30"
               >
                 <Briefcase className="w-32 h-32 fill-current" />
               </motion.div>
@@ -711,13 +782,13 @@ const ApplicationPage = () => {
                   animate={{ scale: 1, opacity: 1 }}
                   className="relative z-10"
                 >
-                  <div className="w-20 h-20 bg-zinc-800/30 rounded-full flex items-center justify-center mx-auto mb-6 border border-white/5 backdrop-blur-sm">
-                    <FolderArchive className="w-10 h-10 text-zinc-500" />
+                  <div className="w-20 h-20 bg-zinc-200 dark:bg-zinc-800/30 rounded-full flex items-center justify-center mx-auto mb-6 border border-zinc-200/50 dark:border-white/5 backdrop-blur-sm">
+                    <FolderArchive className="w-10 h-10 text-zinc-400 dark:text-zinc-500" />
                   </div>
-                  <h2 className="text-2xl font-bold text-white mb-2">
+                  <h2 className="text-2xl font-bold text-zinc-900 dark:text-white mb-2">
                     Archive is Empty
                   </h2>
-                  <p className="text-zinc-400 max-w-sm mx-auto text-sm">
+                  <p className="text-zinc-500 dark:text-zinc-400 max-w-sm mx-auto text-sm">
                     Applications only appear here if their current tracking
                     status is updated to rejected or closed.
                   </p>
@@ -731,10 +802,10 @@ const ApplicationPage = () => {
                   <div className="w-20 h-20 bg-cyan-500/10 rounded-full flex items-center justify-center mx-auto mb-6 border border-cyan-500/20">
                     <FileSearch className="w-10 h-10 text-cyan-400" />
                   </div>
-                  <h2 className="text-2xl font-bold text-white mb-2">
+                  <h2 className="text-2xl font-bold text-zinc-900 dark:text-white mb-2">
                     No Active Applications
                   </h2>
-                  <p className="text-zinc-400 max-w-sm mx-auto text-sm mb-6">
+                  <p className="text-zinc-500 dark:text-zinc-400 max-w-sm mx-auto text-sm mb-6">
                     You haven't applied to any jobs yet or your filters returned
                     no hits.
                   </p>
@@ -758,26 +829,26 @@ const ApplicationPage = () => {
             <>
               <div className="overflow-x-auto">
                 <table className="min-w-full">
-                  <thead className="bg-[#0a0b0d] border-b border-white/5">
+                  <thead className="bg-zinc-100/50 dark:bg-[#0a0b0d] border-b border-zinc-200/50 dark:border-white/5">
                     <tr>
-                      <th className="text-left px-6 py-4 text-[10px] font-semibold text-zinc-500 uppercase tracking-wider">
+                      <th className="text-left px-6 py-4 text-[10px] font-semibold text-zinc-500 dark:text-zinc-500 uppercase tracking-wider">
                         Job Title
                       </th>
-                      <th className="text-left px-6 py-4 text-[10px] font-semibold text-zinc-500 uppercase tracking-wider">
+                      <th className="text-left px-6 py-4 text-[10px] font-semibold text-zinc-500 dark:text-zinc-500 uppercase tracking-wider">
                         Company
                       </th>
-                      <th className="text-left px-6 py-4 text-[10px] font-semibold text-zinc-500 uppercase tracking-wider">
+                      <th className="text-left px-6 py-4 text-[10px] font-semibold text-zinc-500 dark:text-zinc-500 uppercase tracking-wider">
                         Applied
                       </th>
-                      <th className="text-left px-6 py-4 text-[10px] font-semibold text-zinc-500 uppercase tracking-wider">
+                      <th className="text-left px-6 py-4 text-[10px] font-semibold text-zinc-500 dark:text-zinc-500 uppercase tracking-wider">
                         Status
                       </th>
-                      <th className="text-right px-6 py-4 text-[10px] font-semibold text-zinc-500 uppercase tracking-wider">
+                      <th className="text-right px-6 py-4 text-[10px] font-semibold text-zinc-500 dark:text-zinc-500 uppercase tracking-wider">
                         Action
                       </th>
                     </tr>
                   </thead>
-                  <tbody className="divide-y divide-white/5">
+                  <tbody className="divide-y divide-zinc-200/50 dark:divide-white/5">
                     <AnimatePresence mode="popLayout">
                       {currentItems.map((application, index) => {
                         const logoUrl =
@@ -797,13 +868,13 @@ const ApplicationPage = () => {
                             animate="visible"
                             exit={{ opacity: 0, x: -20 }}
                             whileHover={{
-                              backgroundColor: "rgba(255,255,255,0.02)",
+                              backgroundColor: "rgba(0,0,0,0.02)",
                             }}
                             className="transition-colors group"
                           >
                             <td className="px-6 py-4">
                               <div className="flex items-center gap-3">
-                                <div className="w-10 h-10 rounded-xl bg-zinc-800/30 border border-white/5 flex items-center justify-center overflow-hidden shrink-0 relative">
+                                <div className="w-10 h-10 rounded-xl bg-zinc-100 dark:bg-zinc-800/30 border border-zinc-200/50 dark:border-white/5 flex items-center justify-center overflow-hidden shrink-0 relative">
                                   {logoUrl ? (
                                     <Image
                                       src={logoUrl}
@@ -817,19 +888,19 @@ const ApplicationPage = () => {
                                       unoptimized
                                     />
                                   ) : (
-                                    <Building2 className="w-5 h-5 text-zinc-500" />
+                                    <Building2 className="w-5 h-5 text-zinc-400 dark:text-zinc-500" />
                                   )}
                                 </div>
                                 <div>
-                                  <div className="font-medium text-white group-hover:text-cyan-400 transition-colors">
+                                  <div className="font-medium text-zinc-900 dark:text-white group-hover:text-cyan-400 transition-colors">
                                     {application.jobTitle ||
                                       "Untitled Position"}
                                   </div>
-                                  <div className="text-sm text-zinc-500 flex items-center gap-2 mt-0.5">
+                                  <div className="text-sm text-zinc-500 dark:text-zinc-500 flex items-center gap-2 mt-0.5">
                                     <span>
                                       {application.jobType || "Full-time"}
                                     </span>
-                                    <span className="w-1 h-1 rounded-full bg-zinc-700" />
+                                    <span className="w-1 h-1 rounded-full bg-zinc-300 dark:bg-zinc-700" />
                                     <span>
                                       {application.location || "Remote"}
                                     </span>
@@ -838,14 +909,14 @@ const ApplicationPage = () => {
                               </div>
                             </td>
                             <td className="px-6 py-4">
-                              <span className="text-white font-medium">
+                              <span className="text-zinc-900 dark:text-white font-medium">
                                 {application.companyName ||
                                   application.name ||
                                   "Unknown Company"}
                               </span>
                             </td>
                             <td className="px-6 py-4">
-                              <p className="text-white text-sm">
+                              <p className="text-zinc-900 dark:text-white text-sm">
                                 {formatDate(
                                   application.appliedAt ||
                                     application.createdAt,
@@ -860,11 +931,10 @@ const ApplicationPage = () => {
                                   {badge.icon}
                                   {badge.label}
                                 </span>
-                                {/* ✅ NEW: Show recruiter notes if they exist */}
                                 {application.recruiterNotes && (
                                   <button
                                     onClick={() => handleOpenNotes(application)}
-                                    className="flex items-center gap-1 text-[10px] text-blue-400 hover:text-blue-300 transition-colors hover:underline w-fit"
+                                    className="flex items-center gap-1 text-[10px] text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 transition-colors hover:underline w-fit"
                                   >
                                     <MessageSquare className="w-3 h-3" />
                                     <span>Note from recruiter</span>
@@ -876,7 +946,9 @@ const ApplicationPage = () => {
                               <motion.button
                                 whileHover={{ x: 4 }}
                                 whileTap={{ scale: 0.95 }}
-                                onClick={() => handleViewJobDetails(application)}
+                                onClick={() =>
+                                  handleViewJobDetails(application)
+                                }
                                 className="inline-flex items-center gap-1.5 text-sm text-cyan-400 hover:text-cyan-300 transition-colors bg-cyan-500/10 hover:bg-cyan-500/20 px-3 py-1.5 rounded-lg border border-cyan-500/20"
                               >
                                 <span>View Details</span>
@@ -896,7 +968,7 @@ const ApplicationPage = () => {
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
                   transition={{ delay: 0.6 }}
-                  className="px-6 py-5 border-t border-white/5 flex justify-center"
+                  className="px-6 py-5 border-t border-zinc-200/50 dark:border-white/5 flex justify-center"
                 >
                   <Pagination
                     currentPage={page}
@@ -915,7 +987,7 @@ const ApplicationPage = () => {
         </motion.div>
       </div>
 
-      {/* ✅ NEW: Notes Modal */}
+      {/* ✅ Notes Modal */}
       <AnimatePresence>
         {showNotesModal && selectedApplication && (
           <motion.div
@@ -929,33 +1001,37 @@ const ApplicationPage = () => {
               initial={{ scale: 0.9, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
               exit={{ scale: 0.9, opacity: 0 }}
-              className="bg-[#121214] border border-zinc-800 rounded-2xl max-w-md w-full p-6 shadow-2xl"
+              className="bg-white dark:bg-[#121214] border border-zinc-200/50 dark:border-zinc-800 rounded-2xl max-w-md w-full p-6 shadow-2xl"
               onClick={(e) => e.stopPropagation()}
             >
               <div className="flex items-center justify-between mb-4">
-                <h3 className="text-lg font-semibold text-white">
+                <h3 className="text-lg font-semibold text-zinc-900 dark:text-white">
                   Recruiter's Note
                 </h3>
                 <button
                   onClick={() => setShowNotesModal(false)}
-                  className="p-1 hover:bg-zinc-800 rounded-lg text-zinc-400 hover:text-white transition-colors"
+                  className="p-1 hover:bg-zinc-100 dark:hover:bg-zinc-800 rounded-lg text-zinc-400 dark:text-zinc-400 hover:text-zinc-800 dark:hover:text-white transition-colors"
                 >
                   <X className="w-5 h-5" />
                 </button>
               </div>
               <div className="mb-4">
-                <p className="text-sm text-zinc-400">
-                  <span className="text-zinc-500">Job:</span> {selectedApplication.jobTitle}
+                <p className="text-sm text-zinc-500 dark:text-zinc-400">
+                  <span className="text-zinc-500">Job:</span>{" "}
+                  {selectedApplication.jobTitle}
                 </p>
-                <p className="text-sm text-zinc-400">
-                  <span className="text-zinc-500">Company:</span> {selectedApplication.companyName}
+                <p className="text-sm text-zinc-500 dark:text-zinc-400">
+                  <span className="text-zinc-500">Company:</span>{" "}
+                  {selectedApplication.companyName}
                 </p>
-                <p className="text-sm text-zinc-400 mb-3">
-                  <span className="text-zinc-500">Status:</span> {getStatusBadge(selectedApplication.status).label}
+                <p className="text-sm text-zinc-500 dark:text-zinc-400 mb-3">
+                  <span className="text-zinc-500">Status:</span>{" "}
+                  {getStatusBadge(selectedApplication.status).label}
                 </p>
-                <div className="p-4 bg-blue-500/5 border border-blue-500/20 rounded-lg">
-                  <p className="text-sm text-zinc-300 whitespace-pre-wrap">
-                    {selectedApplication.recruiterNotes || "No notes from recruiter yet."}
+                <div className="p-4 bg-blue-50 dark:bg-blue-500/5 border border-blue-200/50 dark:border-blue-500/20 rounded-lg">
+                  <p className="text-sm text-zinc-700 dark:text-zinc-300 whitespace-pre-wrap">
+                    {selectedApplication.recruiterNotes ||
+                      "No notes from recruiter yet."}
                   </p>
                 </div>
               </div>
