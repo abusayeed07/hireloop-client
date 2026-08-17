@@ -413,10 +413,10 @@ const Navbar = () => {
                 variants={navItemVariants}
                 className="flex items-center gap-1 bg-zinc-100/50 dark:bg-foreground/5 backdrop-blur-sm rounded-xl p-1 border border-zinc-200/50 dark:border-border shadow-inner transition-colors duration-500"
               >
-                {/* ✅ THEME TOGGLE */}
-                <ThemeToggle />
+                {/* ✅ THEME TOGGLE - HIDDEN FOR NON-USERS */}
+                {user && <ThemeToggle />}
 
-                <div className="w-px h-5 bg-zinc-200/50 dark:bg-border mx-1"></div>
+                {user && <div className="w-px h-5 bg-zinc-200/50 dark:bg-border mx-1"></div>}
 
                 {navLinks.map((link) => {
                   const isActive = pathName === link.href;
@@ -530,7 +530,8 @@ const Navbar = () => {
 
             {/* Mobile Menu Toggle */}
             <div className="lg:hidden flex items-center gap-2">
-              <ThemeToggle />
+              {/* ✅ THEME TOGGLE - HIDDEN FOR NON-USERS ON MOBILE */}
+              {user && <ThemeToggle />}
 
               <button
                 onClick={() => setIsMobileMenuOpen(true)}

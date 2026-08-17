@@ -37,7 +37,7 @@ import Image from "next/image";
 import toast from "react-hot-toast";
 import Link from "next/link";
 import LoadingPage from "@/app/loading";
-import { getAdminCompanyById } from "@/lib/api/companies"; // ✅ Import the correct function
+import { getAdminCompanyById } from "@/lib/api/companies";
 import { FaInstagram, FaLinkedin, FaTwitter, FaYoutube } from "react-icons/fa";
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_BASE_URL || "http://localhost:5000";
@@ -207,11 +207,11 @@ export default function AdminCompanyDetailsPage() {
 
   if (!company) {
     return (
-      <div className="min-h-screen bg-[#090a0f] flex items-center justify-center">
+      <div className="min-h-screen bg-zinc-50 dark:bg-[#090a0f] flex items-center justify-center">
         <div className="text-center">
-          <Building2 className="w-16 h-16 text-zinc-600 mx-auto mb-4" />
-          <h2 className="text-2xl font-bold text-white">Company Not Found</h2>
-          <p className="text-zinc-400 mt-2">The company you're looking for doesn't exist.</p>
+          <Building2 className="w-16 h-16 text-zinc-400 dark:text-zinc-600 mx-auto mb-4" />
+          <h2 className="text-2xl font-bold text-zinc-900 dark:text-white">Company Not Found</h2>
+          <p className="text-zinc-600 dark:text-zinc-400 mt-2">The company you're looking for doesn't exist.</p>
           <Link href="/admin/companies">
             <button className="mt-6 px-6 py-3 bg-gradient-to-r from-blue-600 to-cyan-600 text-white rounded-xl hover:from-blue-700 hover:to-cyan-700 transition-all">
               Back to Companies
@@ -224,9 +224,9 @@ export default function AdminCompanyDetailsPage() {
 
   const getStatusBadge = (status) => {
     const styles = {
-      pending: "bg-yellow-500/10 text-yellow-400 border-yellow-500/30",
-      approved: "bg-emerald-500/10 text-emerald-400 border-emerald-500/30",
-      rejected: "bg-red-500/10 text-red-400 border-red-500/30",
+      pending: "bg-yellow-100 dark:bg-yellow-500/10 text-yellow-700 dark:text-yellow-400 border-yellow-200/50 dark:border-yellow-500/30",
+      approved: "bg-emerald-100 dark:bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 border-emerald-200/50 dark:border-emerald-500/30",
+      rejected: "bg-red-100 dark:bg-red-500/10 text-red-700 dark:text-red-400 border-red-200/50 dark:border-red-500/30",
     };
     const icons = {
       pending: <Clock className="w-4 h-4" />,
@@ -244,7 +244,7 @@ export default function AdminCompanyDetailsPage() {
   const statusBadge = getStatusBadge(company.status);
 
   return (
-    <div className="min-h-screen bg-[#090a0f] p-6">
+    <div className="min-h-screen bg-zinc-50 dark:bg-[#090a0f] p-6">
       <div className="max-w-5xl mx-auto">
         {/* Back Button */}
         <motion.div
@@ -253,7 +253,7 @@ export default function AdminCompanyDetailsPage() {
           className="mb-6"
         >
           <Link href="/admin/companies">
-            <button className="flex items-center gap-2 text-zinc-400 hover:text-white transition-colors">
+            <button className="flex items-center gap-2 text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white transition-colors">
               <ArrowLeft className="w-4 h-4" />
               <span>Back to Companies</span>
             </button>
@@ -265,13 +265,13 @@ export default function AdminCompanyDetailsPage() {
           variants={cardVariants}
           initial="initial"
           animate="animate"
-          className="bg-[#111214]/80 backdrop-blur-sm border border-white/5 rounded-2xl overflow-hidden"
+          className="bg-white/80 dark:bg-[#111214]/80 backdrop-blur-sm border border-zinc-200/50 dark:border-white/5 rounded-2xl overflow-hidden"
         >
           {/* Header */}
-          <div className="p-6 border-b border-white/5 bg-zinc-900/30">
+          <div className="p-6 border-b border-zinc-200/50 dark:border-white/5 bg-zinc-100/50 dark:bg-zinc-900/30">
             <div className="flex items-start justify-between">
               <div className="flex items-center gap-4">
-                <div className="w-16 h-16 rounded-xl bg-zinc-900 border border-white/10 flex items-center justify-center overflow-hidden">
+                <div className="w-16 h-16 rounded-xl bg-zinc-200 dark:bg-zinc-900 border border-zinc-200/50 dark:border-white/10 flex items-center justify-center overflow-hidden">
                   {company.logo ? (
                     <Image
                       src={company.logo}
@@ -281,14 +281,14 @@ export default function AdminCompanyDetailsPage() {
                       className="object-contain p-2"
                     />
                   ) : (
-                    <Building2 className="w-8 h-8 text-zinc-500" />
+                    <Building2 className="w-8 h-8 text-zinc-400 dark:text-zinc-500" />
                   )}
                 </div>
                 <div>
-                  <h1 className="text-2xl font-bold text-white">{company.name}</h1>
+                  <h1 className="text-2xl font-bold text-zinc-900 dark:text-white">{company.name}</h1>
                   <div className="flex items-center gap-3 mt-1">
-                    <span className="text-sm text-zinc-400">{company.industry || "General"}</span>
-                    <span className="text-zinc-600">•</span>
+                    <span className="text-sm text-zinc-600 dark:text-zinc-400">{company.industry || "General"}</span>
+                    <span className="text-zinc-400 dark:text-zinc-600">•</span>
                     <span className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-medium border ${statusBadge.className}`}>
                       {statusBadge.icon}
                       {statusBadge.label}
@@ -303,7 +303,7 @@ export default function AdminCompanyDetailsPage() {
                   <button
                     onClick={() => setShowRejectModal(true)}
                     disabled={updating}
-                    className="px-4 py-2 bg-red-500/10 text-red-400 hover:bg-red-500/20 rounded-lg border border-red-500/20 hover:border-red-500/40 transition-all duration-300 flex items-center gap-2 disabled:opacity-50"
+                    className="px-4 py-2 bg-red-100 dark:bg-red-500/10 text-red-700 dark:text-red-400 hover:bg-red-200 dark:hover:bg-red-500/20 rounded-lg border border-red-200/50 dark:border-red-500/20 hover:border-red-400/50 dark:hover:border-red-500/40 transition-all duration-300 flex items-center gap-2 disabled:opacity-50"
                   >
                     <X className="w-4 h-4" />
                     Reject
@@ -334,31 +334,31 @@ export default function AdminCompanyDetailsPage() {
               animate="visible"
               className="grid grid-cols-1 md:grid-cols-2 gap-4"
             >
-              <div className="bg-zinc-900/30 border border-white/5 rounded-xl p-4">
+              <div className="bg-zinc-100/50 dark:bg-zinc-900/30 border border-zinc-200/50 dark:border-white/5 rounded-xl p-4">
                 <div className="flex items-center gap-2 text-zinc-500 mb-1">
                   <Building2 className="w-4 h-4" />
                   <span className="text-xs font-medium uppercase tracking-wider">Industry</span>
                 </div>
-                <p className="text-white font-medium">{company.industry || "Not specified"}</p>
+                <p className="text-zinc-900 dark:text-white font-medium">{company.industry || "Not specified"}</p>
               </div>
 
-              <div className="bg-zinc-900/30 border border-white/5 rounded-xl p-4">
+              <div className="bg-zinc-100/50 dark:bg-zinc-900/30 border border-zinc-200/50 dark:border-white/5 rounded-xl p-4">
                 <div className="flex items-center gap-2 text-zinc-500 mb-1">
                   <MapPin className="w-4 h-4" />
                   <span className="text-xs font-medium uppercase tracking-wider">Location</span>
                 </div>
-                <p className="text-white font-medium">{company.location || "Not specified"}</p>
+                <p className="text-zinc-900 dark:text-white font-medium">{company.location || "Not specified"}</p>
               </div>
 
-              <div className="bg-zinc-900/30 border border-white/5 rounded-xl p-4">
+              <div className="bg-zinc-100/50 dark:bg-zinc-900/30 border border-zinc-200/50 dark:border-white/5 rounded-xl p-4">
                 <div className="flex items-center gap-2 text-zinc-500 mb-1">
                   <Users className="w-4 h-4" />
                   <span className="text-xs font-medium uppercase tracking-wider">Employee Count</span>
                 </div>
-                <p className="text-white font-medium">{company.employeeCount || "Not specified"}</p>
+                <p className="text-zinc-900 dark:text-white font-medium">{company.employeeCount || "Not specified"}</p>
               </div>
 
-              <div className="bg-zinc-900/30 border border-white/5 rounded-xl p-4">
+              <div className="bg-zinc-100/50 dark:bg-zinc-900/30 border border-zinc-200/50 dark:border-white/5 rounded-xl p-4">
                 <div className="flex items-center gap-2 text-zinc-500 mb-1">
                   <Link2 className="w-4 h-4" />
                   <span className="text-xs font-medium uppercase tracking-wider">Website</span>
@@ -367,26 +367,26 @@ export default function AdminCompanyDetailsPage() {
                   href={company.websiteUrl}
                   target="_blank"
                   rel="noreferrer"
-                  className="text-blue-400 hover:underline font-medium"
+                  className="text-blue-600 dark:text-blue-400 hover:underline font-medium"
                 >
                   {company.websiteUrl || "Not specified"}
                 </a>
               </div>
 
-              <div className="bg-zinc-900/30 border border-white/5 rounded-xl p-4">
+              <div className="bg-zinc-100/50 dark:bg-zinc-900/30 border border-zinc-200/50 dark:border-white/5 rounded-xl p-4">
                 <div className="flex items-center gap-2 text-zinc-500 mb-1">
                   <Calendar className="w-4 h-4" />
                   <span className="text-xs font-medium uppercase tracking-wider">Founded Year</span>
                 </div>
-                <p className="text-white font-medium">{company.foundedYear || "Not specified"}</p>
+                <p className="text-zinc-900 dark:text-white font-medium">{company.foundedYear || "Not specified"}</p>
               </div>
 
-              <div className="bg-zinc-900/30 border border-white/5 rounded-xl p-4">
+              <div className="bg-zinc-100/50 dark:bg-zinc-900/30 border border-zinc-200/50 dark:border-white/5 rounded-xl p-4">
                 <div className="flex items-center gap-2 text-zinc-500 mb-1">
                   <Briefcase className="w-4 h-4" />
                   <span className="text-xs font-medium uppercase tracking-wider">Company Type</span>
                 </div>
-                <p className="text-white font-medium">{company.companyType || "Not specified"}</p>
+                <p className="text-zinc-900 dark:text-white font-medium">{company.companyType || "Not specified"}</p>
               </div>
             </motion.div>
 
@@ -394,13 +394,13 @@ export default function AdminCompanyDetailsPage() {
             {company.description && (
               <motion.div
                 variants={itemVariants}
-                className="bg-zinc-900/30 border border-white/5 rounded-xl p-4"
+                className="bg-zinc-100/50 dark:bg-zinc-900/30 border border-zinc-200/50 dark:border-white/5 rounded-xl p-4"
               >
                 <div className="flex items-center gap-2 text-zinc-500 mb-2">
                   <FileText className="w-4 h-4" />
                   <span className="text-xs font-medium uppercase tracking-wider">Description</span>
                 </div>
-                <p className="text-zinc-300 leading-relaxed">{company.description}</p>
+                <p className="text-zinc-700 dark:text-zinc-300 leading-relaxed">{company.description}</p>
               </motion.div>
             )}
 
@@ -410,37 +410,37 @@ export default function AdminCompanyDetailsPage() {
                 {company.mission && (
                   <motion.div
                     variants={itemVariants}
-                    className="bg-zinc-900/30 border border-white/5 rounded-xl p-4"
+                    className="bg-zinc-100/50 dark:bg-zinc-900/30 border border-zinc-200/50 dark:border-white/5 rounded-xl p-4"
                   >
                     <div className="flex items-center gap-2 text-zinc-500 mb-2">
-                      <Target className="w-4 h-4 text-blue-400" />
+                      <Target className="w-4 h-4 text-blue-600 dark:text-blue-400" />
                       <span className="text-xs font-medium uppercase tracking-wider">Mission</span>
                     </div>
-                    <p className="text-zinc-300 text-sm">{company.mission}</p>
+                    <p className="text-zinc-700 dark:text-zinc-300 text-sm">{company.mission}</p>
                   </motion.div>
                 )}
                 {company.vision && (
                   <motion.div
                     variants={itemVariants}
-                    className="bg-zinc-900/30 border border-white/5 rounded-xl p-4"
+                    className="bg-zinc-100/50 dark:bg-zinc-900/30 border border-zinc-200/50 dark:border-white/5 rounded-xl p-4"
                   >
                     <div className="flex items-center gap-2 text-zinc-500 mb-2">
-                      <Eye className="w-4 h-4 text-purple-400" />
+                      <Eye className="w-4 h-4 text-purple-600 dark:text-purple-400" />
                       <span className="text-xs font-medium uppercase tracking-wider">Vision</span>
                     </div>
-                    <p className="text-zinc-300 text-sm">{company.vision}</p>
+                    <p className="text-zinc-700 dark:text-zinc-300 text-sm">{company.vision}</p>
                   </motion.div>
                 )}
                 {company.values && (
                   <motion.div
                     variants={itemVariants}
-                    className="bg-zinc-900/30 border border-white/5 rounded-xl p-4"
+                    className="bg-zinc-100/50 dark:bg-zinc-900/30 border border-zinc-200/50 dark:border-white/5 rounded-xl p-4"
                   >
                     <div className="flex items-center gap-2 text-zinc-500 mb-2">
-                      <Heart className="w-4 h-4 text-red-400" />
+                      <Heart className="w-4 h-4 text-red-600 dark:text-red-400" />
                       <span className="text-xs font-medium uppercase tracking-wider">Values</span>
                     </div>
-                    <p className="text-zinc-300 text-sm">{company.values}</p>
+                    <p className="text-zinc-700 dark:text-zinc-300 text-sm">{company.values}</p>
                   </motion.div>
                 )}
               </div>
@@ -450,7 +450,7 @@ export default function AdminCompanyDetailsPage() {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <motion.div
                 variants={itemVariants}
-                className="bg-zinc-900/30 border border-white/5 rounded-xl p-4"
+                className="bg-zinc-100/50 dark:bg-zinc-900/30 border border-zinc-200/50 dark:border-white/5 rounded-xl p-4"
               >
                 <div className="flex items-center gap-2 text-zinc-500 mb-3">
                   <Mail className="w-4 h-4" />
@@ -458,12 +458,12 @@ export default function AdminCompanyDetailsPage() {
                 </div>
                 <div className="space-y-2">
                   {company.email && (
-                    <p className="text-zinc-300 text-sm">
+                    <p className="text-zinc-700 dark:text-zinc-300 text-sm">
                       <span className="text-zinc-500">Email:</span> {company.email}
                     </p>
                   )}
                   {company.phone && (
-                    <p className="text-zinc-300 text-sm">
+                    <p className="text-zinc-700 dark:text-zinc-300 text-sm">
                       <span className="text-zinc-500">Phone:</span> {company.phone}
                     </p>
                   )}
@@ -475,7 +475,7 @@ export default function AdminCompanyDetailsPage() {
 
               <motion.div
                 variants={itemVariants}
-                className="bg-zinc-900/30 border border-white/5 rounded-xl p-4"
+                className="bg-zinc-100/50 dark:bg-zinc-900/30 border border-zinc-200/50 dark:border-white/5 rounded-xl p-4"
               >
                 <div className="flex items-center gap-2 text-zinc-500 mb-3">
                   <Globe className="w-4 h-4" />
@@ -483,22 +483,22 @@ export default function AdminCompanyDetailsPage() {
                 </div>
                 <div className="flex flex-wrap gap-2">
                   {company.twitter && (
-                    <a href={company.twitter} target="_blank" rel="noreferrer" className="p-2 bg-zinc-800/50 rounded-lg hover:bg-zinc-700/50 transition-all">
+                    <a href={company.twitter} target="_blank" rel="noreferrer" className="p-2 bg-zinc-200 dark:bg-zinc-800/50 rounded-lg hover:bg-zinc-300 dark:hover:bg-zinc-700/50 transition-all">
                       <FaTwitter className="w-4 h-4 text-blue-400" />
                     </a>
                   )}
                   {company.linkedin && (
-                    <a href={company.linkedin} target="_blank" rel="noreferrer" className="p-2 bg-zinc-800/50 rounded-lg hover:bg-zinc-700/50 transition-all">
+                    <a href={company.linkedin} target="_blank" rel="noreferrer" className="p-2 bg-zinc-200 dark:bg-zinc-800/50 rounded-lg hover:bg-zinc-300 dark:hover:bg-zinc-700/50 transition-all">
                       <FaLinkedin className="w-4 h-4 text-blue-600" />
                     </a>
                   )}
                   {company.instagram && (
-                    <a href={company.instagram} target="_blank" rel="noreferrer" className="p-2 bg-zinc-800/50 rounded-lg hover:bg-zinc-700/50 transition-all">
+                    <a href={company.instagram} target="_blank" rel="noreferrer" className="p-2 bg-zinc-200 dark:bg-zinc-800/50 rounded-lg hover:bg-zinc-300 dark:hover:bg-zinc-700/50 transition-all">
                       <FaInstagram className="w-4 h-4 text-pink-500" />
                     </a>
                   )}
                   {company.youtube && (
-                    <a href={company.youtube} target="_blank" rel="noreferrer" className="p-2 bg-zinc-800/50 rounded-lg hover:bg-zinc-700/50 transition-all">
+                    <a href={company.youtube} target="_blank" rel="noreferrer" className="p-2 bg-zinc-200 dark:bg-zinc-800/50 rounded-lg hover:bg-zinc-300 dark:hover:bg-zinc-700/50 transition-all">
                       <FaYoutube className="w-4 h-4 text-red-600" />
                     </a>
                   )}
@@ -512,27 +512,27 @@ export default function AdminCompanyDetailsPage() {
             {/* Recruiter Info */}
             <motion.div
               variants={itemVariants}
-              className="bg-zinc-900/30 border border-white/5 rounded-xl p-4"
+              className="bg-zinc-100/50 dark:bg-zinc-900/30 border border-zinc-200/50 dark:border-white/5 rounded-xl p-4"
             >
               <div className="flex items-center gap-2 text-zinc-500 mb-3">
                 <Users className="w-4 h-4" />
                 <span className="text-xs font-medium uppercase tracking-wider">Recruiter Information</span>
               </div>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
-                <p className="text-zinc-300 text-sm">
+                <p className="text-zinc-700 dark:text-zinc-300 text-sm">
                   <span className="text-zinc-500">Email:</span> {company.recruiterEmail || "Not provided"}
                 </p>
-                <p className="text-zinc-300 text-sm">
+                <p className="text-zinc-700 dark:text-zinc-300 text-sm">
                   <span className="text-zinc-500">Submitted:</span> {company.createdAt ? new Date(company.createdAt).toLocaleDateString() : "N/A"}
                 </p>
                 {company.reReviewRequestedAt && (
-                  <p className="text-zinc-300 text-sm col-span-2">
-                    <span className="text-yellow-400">🔄 Re-review requested:</span> {new Date(company.reReviewRequestedAt).toLocaleDateString()}
+                  <p className="text-zinc-700 dark:text-zinc-300 text-sm col-span-2">
+                    <span className="text-yellow-600 dark:text-yellow-400">🔄 Re-review requested:</span> {new Date(company.reReviewRequestedAt).toLocaleDateString()}
                   </p>
                 )}
                 {company.adminRejectionReason && (
-                  <p className="text-zinc-300 text-sm col-span-2">
-                    <span className="text-red-400">❌ Rejection reason:</span> {company.adminRejectionReason}
+                  <p className="text-zinc-700 dark:text-zinc-300 text-sm col-span-2">
+                    <span className="text-red-600 dark:text-red-400">❌ Rejection reason:</span> {company.adminRejectionReason}
                   </p>
                 )}
               </div>
@@ -548,29 +548,29 @@ export default function AdminCompanyDetailsPage() {
             initial={{ scale: 0.9, opacity: 0 }}
             animate={{ scale: 1, opacity: 1 }}
             exit={{ scale: 0.9, opacity: 0 }}
-            className="bg-[#111214] border border-red-500/20 rounded-2xl p-6 max-w-md w-full shadow-2xl"
+            className="bg-white dark:bg-[#111214] border border-red-200/50 dark:border-red-500/20 rounded-2xl p-6 max-w-md w-full shadow-2xl"
             onClick={(e) => e.stopPropagation()}
           >
             <div className="flex items-center gap-3 mb-4">
-              <div className="p-2 rounded-xl bg-red-500/10 text-red-400 border border-red-500/20">
+              <div className="p-2 rounded-xl bg-red-100 dark:bg-red-500/10 text-red-700 dark:text-red-400 border border-red-200/50 dark:border-red-500/20">
                 <XCircle className="w-5 h-5" />
               </div>
               <div>
-                <h3 className="text-lg font-semibold text-white">Reject Company</h3>
-                <p className="text-sm text-zinc-400">
-                  Provide a reason for rejecting <span className="text-white font-medium">{company?.name}</span>
+                <h3 className="text-lg font-semibold text-zinc-900 dark:text-white">Reject Company</h3>
+                <p className="text-sm text-zinc-600 dark:text-zinc-400">
+                  Provide a reason for rejecting <span className="text-zinc-900 dark:text-white font-medium">{company?.name}</span>
                 </p>
               </div>
             </div>
 
-            <div className="bg-zinc-800/30 rounded-xl p-4 mb-4 border border-red-500/10">
-              <p className="text-sm text-zinc-400 mb-2">Rejection Reason:</p>
+            <div className="bg-zinc-100/50 dark:bg-zinc-800/30 rounded-xl p-4 mb-4 border border-red-200/50 dark:border-red-500/10">
+              <p className="text-sm text-zinc-600 dark:text-zinc-400 mb-2">Rejection Reason:</p>
               <textarea
                 value={rejectReason}
                 onChange={(e) => setRejectReason(e.target.value)}
                 placeholder="Enter the reason for rejection..."
                 rows={4}
-                className="w-full bg-zinc-900/50 border border-white/5 rounded-lg p-3 text-sm text-white placeholder-zinc-500 focus:outline-none focus:border-red-500/30 focus:ring-1 focus:ring-red-500/20 transition-all duration-300 resize-none"
+                className="w-full bg-white dark:bg-zinc-900/50 border border-zinc-200/50 dark:border-white/5 rounded-lg p-3 text-sm text-zinc-900 dark:text-white placeholder-zinc-400 dark:placeholder-zinc-500 focus:outline-none focus:border-red-500/30 focus:ring-1 focus:ring-red-500/20 transition-all duration-300 resize-none"
               />
               <p className="text-xs text-zinc-500 mt-1">
                 This reason will be sent to the recruiter for review.
@@ -583,7 +583,7 @@ export default function AdminCompanyDetailsPage() {
                   setShowRejectModal(false);
                   setRejectReason("");
                 }}
-                className="flex-1 px-4 py-2.5 bg-zinc-800/50 hover:bg-zinc-700/50 text-white rounded-xl text-sm font-medium transition-all duration-300 border border-white/5"
+                className="flex-1 px-4 py-2.5 bg-zinc-200 dark:bg-zinc-800/50 hover:bg-zinc-300 dark:hover:bg-zinc-700/50 text-zinc-900 dark:text-white rounded-xl text-sm font-medium transition-all duration-300 border border-zinc-200/50 dark:border-white/5"
               >
                 Cancel
               </button>

@@ -5,12 +5,12 @@ import { useState, useEffect } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { motion } from "framer-motion";
-import { Lock, Eye, EyeOff, CheckCircle, AlertCircle, Key, Copy, Check } from "lucide-react";
+import { Lock, Eye, EyeOff, CheckCircle, AlertCircle } from "lucide-react";
 import { Card, Button, Input, Label } from "@heroui/react";
 import toast from "react-hot-toast";
 
 // ✅ Import your beautiful loading component
-import LoadingSpinner from "@/app/loading"; // Update path to your loading component
+import LoadingSpinner from "@/app/loading";
 
 const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL || "http://localhost:5000";
 
@@ -29,7 +29,6 @@ export default function ResetPasswordPage() {
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [error, setError] = useState("");
   const [isSuccess, setIsSuccess] = useState(false);
-  const [copied, setCopied] = useState(false);
 
   useEffect(() => {
     console.log("🔍 URL Token:", tokenFromUrl);
@@ -48,13 +47,6 @@ export default function ResetPasswordPage() {
       }
     }
   }, [tokenFromUrl]);
-
-  const copyToClipboard = (text) => {
-    navigator.clipboard.writeText(text);
-    setCopied(true);
-    toast.success("Copied to clipboard!");
-    setTimeout(() => setCopied(false), 3000);
-  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -85,7 +77,7 @@ export default function ResetPasswordPage() {
     }
 
     try {
-      console.log("🔄 Resetting password with token:", finalToken);
+      console.log("🔄 Resetting password with token");
 
       // ✅ Try different endpoint formats
       let response = null;
@@ -255,7 +247,7 @@ export default function ResetPasswordPage() {
     );
   }
 
-  // ✅ Loading State using your beautiful loading component
+  // ✅ Loading State
   if (isLoading) {
     return (
       <div className="min-h-screen bg-gradient-to-b from-zinc-950 via-black to-zinc-950 flex items-center justify-center">
@@ -334,50 +326,42 @@ export default function ResetPasswordPage() {
               Enter your new password below
             </motion.p>
 
-            {/* Show token status */}
-            {token ? (
-              <motion.div
-                initial={{ opacity: 0, scale: 0.95 }}
-                animate={{ opacity: 1, scale: 1 }}
-                transition={{ delay: 0.3 }}
-                className="mt-4 p-3 bg-emerald-500/10 border border-emerald-500/20 rounded-lg"
-              >
-                <p className="text-sm text-emerald-400 flex items-center gap-2">
-                  <CheckCircle className="w-4 h-4" />
-                  Token loaded from URL
-                </p>
-                <div className="flex items-center justify-between mt-1">
-                  <p className="text-xs text-zinc-400 font-mono break-all flex-1">
-                    {token}
-                  </p>
-                  <button
-                    onClick={() => copyToClipboard(token)}
-                    className="ml-2 p-1 hover:bg-zinc-700 rounded transition-colors shrink-0"
-                  >
-                    {copied ? (
-                      <Check className="w-3 h-3 text-emerald-400" />
-                    ) : (
-                      <Copy className="w-3 h-3 text-zinc-400" />
-                    )}
-                  </button>
-                </div>
-              </motion.div>
-            ) : (
-              <motion.div
-                initial={{ opacity: 0, scale: 0.95 }}
-                animate={{ opacity: 1, scale: 1 }}
-                transition={{ delay: 0.3 }}
-                className="mt-4 p-3 bg-amber-500/10 border border-amber-500/20 rounded-lg"
-              >
-                <p className="text-sm text-amber-400">
-                  ⚠️ No token found. Please enter your reset token manually.
-                </p>
-                <p className="text-xs text-zinc-500 mt-1">
-                  💡 Check your server logs for:{" "}
-                  <span className="text-blue-400">🔑 RESET TOKEN</span>
-                </p>
-              </motion.div>
-            )}
+            {/* Token Status - HIDDEN from view, only shows "verified" status */}
+            <motion.div
+              initial={{ opacity: 0, scale: 0.95 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ delay: 0.3 }}
+              className={`mt-4 p-3 rounded-lg border ${
+                token 
+                  ? "bg-emerald-500/10 border-emerald-500/20" 
+                  : "bg-amber-500/10 border-amber-500/20"
+              }`}
+            >
+              <p className={`text-sm flex items-center gap-2 ${
+                token ? "text-emerald-400" : "text-amber-400"
+              }`}>
+                {token ? (
+                  <>
+                    <CheckCircle className="w-4 h-4" />
+                    ✅ Reset token verified
+                  </>
+                ) : (
+                  <>
+                    <AlertCircle className="w-4 h-4" />
+                    ⚠️ No token found. Please request a new reset link.
+                  </>
+                )}
+              </p>
+              {!token && (
+                <Button
+                  onClick={handleResend}
+                  className="mt-2 text-xs text-blue-400 hover:text-blue-300"
+                  variant="light"
+                >
+                  Request New Reset Link →
+                </Button>
+              )}
+            </motion.div>
           </div>
 
           <motion.form
@@ -387,26 +371,7 @@ export default function ResetPasswordPage() {
             onSubmit={handleSubmit}
             className="space-y-4"
           >
-            {/* Token Input */}
-            <div className="space-y-1.5">
-              <Label className="text-xs font-medium text-zinc-400">
-                Reset Token
-              </Label>
-              <div className="relative">
-                <Key className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-500" />
-                <Input
-                  type="text"
-                  placeholder="Enter your reset token"
-                  value={token}
-                  onChange={(e) => setToken(e.target.value)}
-                  className="pl-9 pr-10 bg-zinc-950/60 border-zinc-800 text-white placeholder-zinc-600 text-sm w-full"
-                  required
-                />
-              </div>
-              <p className="text-[10px] text-zinc-500">
-                💡 Enter the token from your server logs or email
-              </p>
-            </div>
+            {/* Token Input - COMPLETELY REMOVED */}
 
             <div className="space-y-1.5">
               <Label className="text-xs font-medium text-zinc-400">

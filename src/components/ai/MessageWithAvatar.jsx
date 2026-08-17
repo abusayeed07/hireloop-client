@@ -34,7 +34,7 @@ const UserAvatar = ({ user, size = 32 }) => {
   return (
     <div className="relative flex-shrink-0">
       <div 
-        className="rounded-full overflow-hidden border-2 border-white/10"
+        className="rounded-full overflow-hidden border-2 border-zinc-200/50 dark:border-white/10"
         style={{ width: size, height: size }}
       >
         {hasImage ? (
@@ -46,8 +46,8 @@ const UserAvatar = ({ user, size = 32 }) => {
             className="object-cover w-full h-full"
           />
         ) : (
-          <div className="w-full h-full flex items-center justify-center bg-zinc-700">
-            <span className="text-white font-semibold" style={{ fontSize: size * 0.4 }}>
+          <div className="w-full h-full flex items-center justify-center bg-zinc-200 dark:bg-zinc-700">
+            <span className="text-zinc-700 dark:text-white font-semibold" style={{ fontSize: size * 0.4 }}>
               {initials}
             </span>
           </div>
@@ -119,8 +119,8 @@ const MessageWithAvatar = ({
         <div
           className={`rounded-2xl p-3 ${
             isUser
-              ? "bg-gradient-to-r from-blue-600 to-purple-600 text-white"
-              : "bg-zinc-800/50 border border-zinc-700/50 text-zinc-200"
+              ? "bg-gradient-to-r from-cyan-500 to-blue-600 text-white shadow-lg shadow-cyan-500/20"
+              : "bg-white dark:bg-zinc-800/50 border border-zinc-200/50 dark:border-zinc-700/50 text-zinc-800 dark:text-zinc-200"
           }`}
         >
           <div className="text-sm whitespace-pre-wrap leading-relaxed">
@@ -130,18 +130,15 @@ const MessageWithAvatar = ({
           {!isUser && message.action && (
             <button
               onClick={() => onActionClick?.(message.action)}
-              className="mt-2 px-3 py-1.5 bg-blue-500/20 hover:bg-blue-500/30 text-blue-400 rounded-lg text-xs font-medium transition-colors flex items-center gap-1"
+              className="mt-2 px-3 py-1.5 bg-blue-500/20 hover:bg-blue-500/30 text-blue-600 dark:text-blue-400 rounded-lg text-xs font-medium transition-colors flex items-center gap-1"
             >
               <Zap className="w-3 h-3" /> Go There
             </button>
           )}
           
-          {/* Timestamp - color depends on bubble background so it
-              stays readable: light/translucent white on the user's
-              blue-purple gradient, muted zinc on the bot's dark bubble. */}
           <p
             className={`text-[10px] mt-1.5 text-right ${
-              isUser ? "text-white/70" : "text-zinc-500"
+              isUser ? "text-white/70" : "text-zinc-500 dark:text-zinc-500"
             }`}
           >
             {formatTime(timestamp)}

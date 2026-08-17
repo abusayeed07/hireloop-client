@@ -76,11 +76,10 @@ export default function AdminSettingsPage() {
   });
 
   // ==========================================
-  // API HELPERS (FIXED PATHS)
+  // API HELPERS
   // ==========================================
   const fetchAdminLogs = useCallback(async () => {
     try {
-      // ✅ FIXED: Removed '/users/' to match backend route
       const response = await fetch(`${API_BASE_URL}/api/admin/activity-log`, {
         credentials: 'include',
         headers: { 'Content-Type': 'application/json' },
@@ -96,7 +95,6 @@ export default function AdminSettingsPage() {
 
   const fetchSettings = useCallback(async () => {
     try {
-      // ✅ Already correct
       const response = await fetch(`${API_BASE_URL}/api/admin/settings`, {
         credentials: 'include',
         headers: { 'Content-Type': 'application/json' },
@@ -128,7 +126,6 @@ export default function AdminSettingsPage() {
 
     setSaving(true);
     try {
-      // ✅ FIXED: Removed '/users/' to match backend route
       const response = await fetch(`${API_BASE_URL}/api/admin/invite`, {
         method: 'POST',
         credentials: 'include',
@@ -192,34 +189,34 @@ export default function AdminSettingsPage() {
   // Safety check: Stop non-admins from accessing this page
   if (user?.role !== 'admin') {
     return (
-      <div className="min-h-screen bg-[#090a0f] flex items-center justify-center p-4">
-        <div className="bg-red-500/10 border border-red-500/30 rounded-xl p-8 max-w-md text-center">
-          <Shield className="w-12 h-12 text-red-400 mx-auto mb-4" />
-          <h1 className="text-xl font-bold text-white mb-2">Access Denied</h1>
-          <p className="text-zinc-400 text-sm">You do not have permission to view this page.</p>
+      <div className="min-h-screen bg-zinc-50 dark:bg-[#090a0f] flex items-center justify-center p-4">
+        <div className="bg-red-100 dark:bg-red-500/10 border border-red-200/50 dark:border-red-500/30 rounded-xl p-8 max-w-md text-center">
+          <Shield className="w-12 h-12 text-red-600 dark:text-red-400 mx-auto mb-4" />
+          <h1 className="text-xl font-bold text-zinc-900 dark:text-white mb-2">Access Denied</h1>
+          <p className="text-zinc-600 dark:text-zinc-400 text-sm">You do not have permission to view this page.</p>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="relative min-h-screen bg-[#090a0f] text-zinc-300 p-4 md:p-8">
+    <div className="relative min-h-screen bg-zinc-50 dark:bg-[#090a0f] text-zinc-800 dark:text-zinc-300 p-4 md:p-8">
       <div className="max-w-[1600px] mx-auto space-y-6 pt-6 sm:pt-8">
         
         {/* Header */}
         <motion.div initial={{ opacity: 0, y: -20 }} animate={{ opacity: 1, y: 0 }} className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
           <div>
-            <h1 className="text-2xl font-bold text-white tracking-tight">Admin Settings</h1>
-            <p className="text-zinc-500 text-sm mt-1">Manage platform configuration, admin roles, and system preferences.</p>
+            <h1 className="text-2xl font-bold text-zinc-900 dark:text-white tracking-tight">Admin Settings</h1>
+            <p className="text-zinc-500 dark:text-zinc-500 text-sm mt-1">Manage platform configuration, admin roles, and system preferences.</p>
           </div>
-          <motion.button whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }} onClick={fetchData} className="flex items-center gap-2 px-4 py-2 bg-zinc-800/50 hover:bg-zinc-700/50 text-zinc-300 rounded-lg text-sm border border-white/5 transition-all">
+          <motion.button whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }} onClick={fetchData} className="flex items-center gap-2 px-4 py-2 bg-zinc-200 dark:bg-zinc-800/50 hover:bg-zinc-300 dark:hover:bg-zinc-700/50 text-zinc-700 dark:text-zinc-300 rounded-lg text-sm border border-zinc-200/50 dark:border-white/5 transition-all">
             <RefreshCw className="w-4 h-4" />
             <span>Refresh</span>
           </motion.button>
         </motion.div>
 
-        {/* Tabs - Mobile Responsive */}
-        <div className="flex gap-2 border-b border-white/5 pb-4 overflow-x-auto scrollbar-hide">
+        {/* Tabs */}
+        <div className="flex gap-2 border-b border-zinc-200/50 dark:border-white/5 pb-4 overflow-x-auto scrollbar-hide">
           {[
             { id: "admin", label: "Admin & Roles", icon: Shield },
             { id: "general", label: "General Config", icon: Globe },
@@ -229,8 +226,8 @@ export default function AdminSettingsPage() {
               onClick={() => setActiveTab(tab.id)}
               className={`flex items-center gap-2 px-4 py-2 text-sm font-medium rounded-lg transition-all duration-200 whitespace-nowrap ${
                 activeTab === tab.id
-                  ? "bg-zinc-800 text-white shadow-sm border border-zinc-700/50"
-                  : "text-zinc-400 hover:text-white hover:bg-zinc-800/30"
+                  ? "bg-zinc-200 dark:bg-zinc-800 text-zinc-900 dark:text-white shadow-sm border border-zinc-200/50 dark:border-zinc-700/50"
+                  : "text-zinc-500 dark:text-zinc-400 hover:text-zinc-700 dark:hover:text-white hover:bg-zinc-100 dark:hover:bg-zinc-800/30"
               }`}
             >
               <tab.icon className="w-4 h-4 shrink-0" />
@@ -240,9 +237,7 @@ export default function AdminSettingsPage() {
         </div>
 
         <AnimatePresence mode="wait">
-          {/* ==============================================
-              TAB 1: ADMIN & ROLE MANAGEMENT
-             ============================================== */}
+          {/* TAB 1: ADMIN & ROLE MANAGEMENT */}
           {activeTab === "admin" && (
             <motion.div
               key="admin"
@@ -253,27 +248,27 @@ export default function AdminSettingsPage() {
               className="grid grid-cols-1 xl:grid-cols-2 gap-6"
             >
               {/* Left: Admin Activity Log */}
-              <motion.div variants={itemVariants} className="bg-[#111214] border border-white/5 rounded-xl p-6 h-[500px] sm:h-[600px] flex flex-col">
+              <motion.div variants={itemVariants} className="bg-white/80 dark:bg-[#111214] border border-zinc-200/50 dark:border-white/5 rounded-xl p-6 h-[500px] sm:h-[600px] flex flex-col">
                 <div className="flex items-center justify-between mb-4">
-                  <h3 className="text-sm font-semibold text-white flex items-center gap-2">
-                    <Clock className="w-4 h-4 text-zinc-500" />
+                  <h3 className="text-sm font-semibold text-zinc-900 dark:text-white flex items-center gap-2">
+                    <Clock className="w-4 h-4 text-zinc-500 dark:text-zinc-500" />
                     Admin Activity Log
                   </h3>
                 </div>
                 <div className="flex-1 overflow-y-auto pr-2 space-y-3 custom-scrollbar">
                   {adminLogs.length === 0 ? (
-                    <p className="text-sm text-zinc-500 text-center py-10">No admin activity recorded yet.</p>
+                    <p className="text-sm text-zinc-500 dark:text-zinc-500 text-center py-10">No admin activity recorded yet.</p>
                   ) : (
                     adminLogs.map((log, idx) => (
-                      <div key={idx} className="bg-zinc-800/30 border border-white/5 rounded-lg p-3 flex items-start gap-3">
-                        <div className="p-1.5 rounded-full bg-zinc-700/50 shrink-0">
-                          <Users className="w-3 h-3 text-zinc-400" />
+                      <div key={idx} className="bg-zinc-100/50 dark:bg-zinc-800/30 border border-zinc-200/50 dark:border-white/5 rounded-lg p-3 flex items-start gap-3">
+                        <div className="p-1.5 rounded-full bg-zinc-200 dark:bg-zinc-700/50 shrink-0">
+                          <Users className="w-3 h-3 text-zinc-500 dark:text-zinc-400" />
                         </div>
                         <div className="flex-1 min-w-0">
-                          <p className="text-xs text-zinc-300 truncate">{log.action || "Unknown Action"}</p>
-                          <p className="text-[10px] text-zinc-500 mt-0.5">by {log.adminEmail || "Unknown Admin"}</p>
+                          <p className="text-xs text-zinc-700 dark:text-zinc-300 truncate">{log.action || "Unknown Action"}</p>
+                          <p className="text-[10px] text-zinc-500 dark:text-zinc-500 mt-0.5">by {log.adminEmail || "Unknown Admin"}</p>
                         </div>
-                        <span className="text-[10px] text-zinc-500 whitespace-nowrap mt-1">{formatTimeAgo(log.createdAt)}</span>
+                        <span className="text-[10px] text-zinc-500 dark:text-zinc-500 whitespace-nowrap mt-1">{formatTimeAgo(log.createdAt)}</span>
                       </div>
                     ))
                   )}
@@ -281,28 +276,28 @@ export default function AdminSettingsPage() {
               </motion.div>
 
               {/* Right: Invite New Admin */}
-              <motion.div variants={itemVariants} className="bg-[#111214] border border-white/5 rounded-xl p-6 h-[500px] sm:h-[600px] flex flex-col">
+              <motion.div variants={itemVariants} className="bg-white/80 dark:bg-[#111214] border border-zinc-200/50 dark:border-white/5 rounded-xl p-6 h-[500px] sm:h-[600px] flex flex-col">
                 <div className="flex items-center justify-between mb-4">
-                  <h3 className="text-sm font-semibold text-white flex items-center gap-2">
-                    <UserPlus className="w-4 h-4 text-zinc-500" />
+                  <h3 className="text-sm font-semibold text-zinc-900 dark:text-white flex items-center gap-2">
+                    <UserPlus className="w-4 h-4 text-zinc-500 dark:text-zinc-500" />
                     Invite New Admin
                   </h3>
                 </div>
-                <div className="bg-zinc-800/20 border border-white/5 rounded-lg p-5 mb-6">
-                  <p className="text-xs text-zinc-400 leading-relaxed">
-                    Enter the email of an existing platform user below to grant them full <span className="text-cyan-400 font-medium">Admin</span> permissions.
+                <div className="bg-zinc-100/50 dark:bg-zinc-800/20 border border-zinc-200/50 dark:border-white/5 rounded-lg p-5 mb-6">
+                  <p className="text-xs text-zinc-600 dark:text-zinc-400 leading-relaxed">
+                    Enter the email of an existing platform user below to grant them full <span className="text-cyan-600 dark:text-cyan-400 font-medium">Admin</span> permissions.
                   </p>
                 </div>
                 <form onSubmit={handleInviteAdmin} className="space-y-4 flex-1 flex flex-col">
                   <div className="relative">
-                    <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-500" />
+                    <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-400 dark:text-zinc-500" />
                     <input
                       type="email"
                       placeholder="admin@hireloop.com"
                       value={inviteEmail}
                       onChange={(e) => setInviteEmail(e.target.value)}
                       required
-                      className="w-full pl-10 pr-4 py-3 bg-zinc-800/50 border border-white/5 rounded-lg text-sm text-white placeholder-zinc-500 focus:outline-none focus:border-cyan-500/50 focus:ring-1 focus:ring-cyan-500/50 transition-all"
+                      className="w-full pl-10 pr-4 py-3 bg-white dark:bg-zinc-800/50 border border-zinc-200/50 dark:border-white/5 rounded-lg text-sm text-zinc-900 dark:text-white placeholder-zinc-400 dark:placeholder-zinc-500 focus:outline-none focus:border-cyan-500/50 focus:ring-1 focus:ring-cyan-500/50 transition-all"
                     />
                   </div>
                   <motion.button
@@ -320,9 +315,7 @@ export default function AdminSettingsPage() {
             </motion.div>
           )}
 
-          {/* ==============================================
-              TAB 2: GENERAL PLATFORM CONFIG
-             ============================================== */}
+          {/* TAB 2: GENERAL PLATFORM CONFIG */}
           {activeTab === "general" && (
             <motion.div
               key="general"
@@ -333,108 +326,108 @@ export default function AdminSettingsPage() {
               className="grid grid-cols-1 lg:grid-cols-3 gap-6"
             >
               {/* LEFT: Brand & General */}
-              <motion.div variants={itemVariants} className="lg:col-span-2 bg-[#111214] border border-white/5 rounded-xl p-6 space-y-6">
-                <h3 className="text-sm font-semibold text-white mb-4">Brand & General Settings</h3>
+              <motion.div variants={itemVariants} className="lg:col-span-2 bg-white/80 dark:bg-[#111214] border border-zinc-200/50 dark:border-white/5 rounded-xl p-6 space-y-6">
+                <h3 className="text-sm font-semibold text-zinc-900 dark:text-white mb-4">Brand & General Settings</h3>
                 
                 {/* Site Name */}
                 <div>
-                  <label className="block text-xs font-medium text-zinc-400 mb-1.5">Platform Name</label>
+                  <label className="block text-xs font-medium text-zinc-500 dark:text-zinc-400 mb-1.5">Platform Name</label>
                   <div className="relative">
-                    <Globe className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-500" />
+                    <Globe className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-400 dark:text-zinc-500" />
                     <input
                       type="text"
                       value={settings.siteName || "HireLoop"}
                       onChange={(e) => setSettings({ ...settings, siteName: e.target.value })}
-                      className="w-full pl-10 pr-4 py-2.5 bg-zinc-800/50 border border-white/5 rounded-lg text-sm text-white placeholder-zinc-500 focus:outline-none focus:border-cyan-500/50"
+                      className="w-full pl-10 pr-4 py-2.5 bg-white dark:bg-zinc-800/50 border border-zinc-200/50 dark:border-white/5 rounded-lg text-sm text-zinc-900 dark:text-white placeholder-zinc-400 dark:placeholder-zinc-500 focus:outline-none focus:border-cyan-500/50"
                     />
                   </div>
                 </div>
 
                 {/* Default Currency */}
                 <div>
-                  <label className="block text-xs font-medium text-zinc-400 mb-1.5">Default Currency</label>
+                  <label className="block text-xs font-medium text-zinc-500 dark:text-zinc-400 mb-1.5">Default Currency</label>
                   <div className="relative">
-                    <DollarSign className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-500" />
+                    <DollarSign className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-400 dark:text-zinc-500" />
                     <select
                       value={settings.currency || "USD"}
                       onChange={(e) => setSettings({ ...settings, currency: e.target.value })}
-                      className="w-full pl-10 pr-4 py-2.5 bg-zinc-800/50 border border-white/5 rounded-lg text-sm text-white focus:outline-none focus:border-cyan-500/50 appearance-none"
+                      className="w-full pl-10 pr-4 py-2.5 bg-white dark:bg-zinc-800/50 border border-zinc-200/50 dark:border-white/5 rounded-lg text-sm text-zinc-900 dark:text-white focus:outline-none focus:border-cyan-500/50 appearance-none"
                     >
                       <option value="USD">USD ($)</option>
                       <option value="BDT">BDT (৳)</option>
                       <option value="EUR">EUR (€)</option>
                       <option value="GBP">GBP (£)</option>
                     </select>
-                    <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-500 pointer-events-none" />
+                    <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-400 dark:text-zinc-500 pointer-events-none" />
                   </div>
                 </div>
 
                 {/* Logo Upload */}
                 <div>
-                  <label className="block text-xs font-medium text-zinc-400 mb-1.5">Platform Logo</label>
-                  <div className="flex items-center gap-4 p-4 bg-zinc-800/20 border border-white/5 border-dashed rounded-lg hover:bg-zinc-800/30 transition-colors cursor-pointer">
-                    <div className="w-12 h-12 rounded-lg bg-zinc-800 flex items-center justify-center border border-white/10">
+                  <label className="block text-xs font-medium text-zinc-500 dark:text-zinc-400 mb-1.5">Platform Logo</label>
+                  <div className="flex items-center gap-4 p-4 bg-zinc-100/50 dark:bg-zinc-800/20 border border-zinc-200/50 dark:border-white/5 border-dashed rounded-lg hover:bg-zinc-100 dark:hover:bg-zinc-800/30 transition-colors cursor-pointer">
+                    <div className="w-12 h-12 rounded-lg bg-zinc-200 dark:bg-zinc-800 flex items-center justify-center border border-zinc-200/50 dark:border-white/10">
                       {settings.siteLogo ? (
                         <Image src={settings.siteLogo} alt="Logo" width={48} height={48} className="rounded-lg object-contain" />
                       ) : (
-                        <ImageIcon className="w-6 h-6 text-zinc-500" />
+                        <ImageIcon className="w-6 h-6 text-zinc-400 dark:text-zinc-500" />
                       )}
                     </div>
                     <div className="flex-1">
-                      <p className="text-sm text-zinc-300 font-medium">Click to upload a new logo</p>
-                      <p className="text-[10px] text-zinc-500">Recommended size: 128x128px</p>
+                      <p className="text-sm text-zinc-700 dark:text-zinc-300 font-medium">Click to upload a new logo</p>
+                      <p className="text-[10px] text-zinc-500 dark:text-zinc-500">Recommended size: 128x128px</p>
                     </div>
                   </div>
                 </div>
               </motion.div>
 
-              {/* RIGHT: Limits & Controls - Full width on Mobile */}
-              <motion.div variants={itemVariants} className="lg:col-span-1 bg-[#111214] border border-white/5 rounded-xl p-6 space-y-6">
-                <h3 className="text-sm font-semibold text-white mb-4">Platform Limits & Controls</h3>
+              {/* RIGHT: Limits & Controls */}
+              <motion.div variants={itemVariants} className="lg:col-span-1 bg-white/80 dark:bg-[#111214] border border-zinc-200/50 dark:border-white/5 rounded-xl p-6 space-y-6">
+                <h3 className="text-sm font-semibold text-zinc-900 dark:text-white mb-4">Platform Limits & Controls</h3>
 
                 {/* Job Defaults */}
                 <div className="space-y-3">
                   <div>
-                    <label className="block text-xs font-medium text-zinc-400 mb-1.5">Max Active Jobs (Free Recruiter)</label>
+                    <label className="block text-xs font-medium text-zinc-500 dark:text-zinc-400 mb-1.5">Max Active Jobs (Free Recruiter)</label>
                     <div className="relative">
-                      <Briefcase className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-500" />
+                      <Briefcase className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-400 dark:text-zinc-500" />
                       <input
                         type="number"
                         value={settings.maxFreeJobs || 3}
                         onChange={(e) => setSettings({ ...settings, maxFreeJobs: parseInt(e.target.value) })}
-                        className="w-full pl-10 pr-4 py-2.5 bg-zinc-800/50 border border-white/5 rounded-lg text-sm text-white focus:outline-none focus:border-cyan-500/50"
+                        className="w-full pl-10 pr-4 py-2.5 bg-white dark:bg-zinc-800/50 border border-zinc-200/50 dark:border-white/5 rounded-lg text-sm text-zinc-900 dark:text-white focus:outline-none focus:border-cyan-500/50"
                       />
                     </div>
                   </div>
                   <div>
-                    <label className="block text-xs font-medium text-zinc-400 mb-1.5">Max Monthly Apps (Free Seeker)</label>
+                    <label className="block text-xs font-medium text-zinc-500 dark:text-zinc-400 mb-1.5">Max Monthly Apps (Free Seeker)</label>
                     <div className="relative">
-                      <Users className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-500" />
+                      <Users className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-400 dark:text-zinc-500" />
                       <input
                         type="number"
                         value={settings.maxFreeApplications || 10}
                         onChange={(e) => setSettings({ ...settings, maxFreeApplications: parseInt(e.target.value) })}
-                        className="w-full pl-10 pr-4 py-2.5 bg-zinc-800/50 border border-white/5 rounded-lg text-sm text-white focus:outline-none focus:border-cyan-500/50"
+                        className="w-full pl-10 pr-4 py-2.5 bg-white dark:bg-zinc-800/50 border border-zinc-200/50 dark:border-white/5 rounded-lg text-sm text-zinc-900 dark:text-white focus:outline-none focus:border-cyan-500/50"
                       />
                     </div>
                   </div>
                 </div>
 
                 {/* Maintenance Mode */}
-                <div className="pt-4 border-t border-white/5">
+                <div className="pt-4 border-t border-zinc-200/50 dark:border-white/5">
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-3">
-                      <div className={`p-2 rounded-lg ${settings.isMaintenanceMode ? 'bg-red-500/10 text-red-400' : 'bg-zinc-800 text-zinc-400'}`}>
+                      <div className={`p-2 rounded-lg ${settings.isMaintenanceMode ? 'bg-red-100 dark:bg-red-500/10 text-red-600 dark:text-red-400' : 'bg-zinc-200 dark:bg-zinc-800 text-zinc-500 dark:text-zinc-400'}`}>
                         <Power className="w-4 h-4" />
                       </div>
                       <div>
-                        <p className="text-sm font-medium text-white">Maintenance Mode</p>
-                        <p className="text-[10px] text-zinc-500">Blocks public access when enabled</p>
+                        <p className="text-sm font-medium text-zinc-900 dark:text-white">Maintenance Mode</p>
+                        <p className="text-[10px] text-zinc-500 dark:text-zinc-500">Blocks public access when enabled</p>
                       </div>
                     </div>
                     <button
                       onClick={() => setSettings({ ...settings, isMaintenanceMode: !settings.isMaintenanceMode })}
-                      className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none ${settings.isMaintenanceMode ? 'bg-red-500' : 'bg-zinc-700'}`}
+                      className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none ${settings.isMaintenanceMode ? 'bg-red-500' : 'bg-zinc-300 dark:bg-zinc-700'}`}
                     >
                       <span className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${settings.isMaintenanceMode ? 'translate-x-6' : 'translate-x-1'}`} />
                     </button>

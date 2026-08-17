@@ -4,7 +4,7 @@
 import { useState } from "react";
 import Link from "next/link";
 import { motion } from "framer-motion";
-import { Mail, ArrowLeft, CheckCircle, AlertCircle, Clock, Copy, Check, ExternalLink } from "lucide-react";
+import { Mail, ArrowLeft, CheckCircle, AlertCircle, Clock } from "lucide-react";
 import { Card, Button, Input, Label } from "@heroui/react";
 import toast from "react-hot-toast";
 
@@ -19,8 +19,6 @@ export default function ForgotPasswordPage() {
   const [lastEmailSent, setLastEmailSent] = useState("");
   const [resetToken, setResetToken] = useState("");
   const [resetUrl, setResetUrl] = useState("");
-  const [copiedToken, setCopiedToken] = useState(false);
-  const [copiedLink, setCopiedLink] = useState(false);
 
   const startCooldown = (seconds = 60) => {
     setResendCooldown(seconds);
@@ -33,19 +31,6 @@ export default function ForgotPasswordPage() {
         return prev - 1;
       });
     }, 1000);
-  };
-
-  const copyToClipboard = (text, type) => {
-    navigator.clipboard.writeText(text);
-    if (type === 'token') {
-      setCopiedToken(true);
-      toast.success("Token copied to clipboard!");
-      setTimeout(() => setCopiedToken(false), 3000);
-    } else {
-      setCopiedLink(true);
-      toast.success("Link copied to clipboard!");
-      setTimeout(() => setCopiedLink(false), 3000);
-    }
   };
 
   const handleSubmit = async (e) => {
@@ -220,7 +205,7 @@ export default function ForgotPasswordPage() {
     }
   };
 
-  // Success State with Animations
+  // Success State - Token HIDDEN
   if (isSuccess) {
     return (
       <div className="min-h-screen bg-gradient-to-b from-zinc-950 via-black to-zinc-950 flex items-center justify-center p-4 overflow-hidden">
@@ -308,67 +293,11 @@ export default function ForgotPasswordPage() {
                 transition={{ delay: 0.4 }}
                 className="space-y-4"
               >
-                {/* First Field: Token */}
-                <motion.div
-                  initial={{ opacity: 0, x: -20 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  transition={{ delay: 0.5 }}
-                >
-                  <Label className="text-xs font-medium text-zinc-400">🔑 Your Reset Token</Label>
-                  <div className="relative mt-1">
-                    <div className="bg-zinc-800/50 border border-zinc-700 rounded-lg p-3 pr-12">
-                      <code className="text-sm font-mono text-blue-400 break-all">{resetToken}</code>
-                    </div>
-                    <button
-                      onClick={() => copyToClipboard(resetToken, 'token')}
-                      className="absolute right-2 top-1/2 -translate-y-1/2 p-1.5 hover:bg-zinc-700 rounded transition-colors"
-                    >
-                      {copiedToken ? (
-                        <Check className="w-4 h-4 text-emerald-400" />
-                      ) : (
-                        <Copy className="w-4 h-4 text-zinc-400" />
-                      )}
-                    </button>
-                  </div>
-                </motion.div>
-
-                {/* Second Field: Reset Link */}
-                <motion.div
-                  initial={{ opacity: 0, x: -20 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  transition={{ delay: 0.6 }}
-                >
-                  <Label className="text-xs font-medium text-zinc-400">🔗 Reset Link (with token)</Label>
-                  <div className="relative mt-1">
-                    <div className="bg-zinc-800/50 border border-zinc-700 rounded-lg p-3 pr-24">
-                      <code className="text-xs font-mono text-blue-400 break-all">{resetUrl}</code>
-                    </div>
-                    <div className="absolute right-2 top-1/2 -translate-y-1/2 flex gap-1">
-                      <button
-                        onClick={() => copyToClipboard(resetUrl, 'link')}
-                        className="p-1.5 hover:bg-zinc-700 rounded transition-colors"
-                      >
-                        {copiedLink ? (
-                          <Check className="w-4 h-4 text-emerald-400" />
-                        ) : (
-                          <Copy className="w-4 h-4 text-zinc-400" />
-                        )}
-                      </button>
-                      <Link
-                        href={resetUrl}
-                        className="p-1.5 hover:bg-zinc-700 rounded transition-colors"
-                      >
-                        <ExternalLink className="w-4 h-4 text-blue-400" />
-                      </Link>
-                    </div>
-                  </div>
-                </motion.div>
-
-                {/* Action Buttons */}
+                {/* Action Buttons - Only the reset button, no token displayed */}
                 <motion.div
                   initial={{ opacity: 0, y: 10 }}
                   animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: 0.7 }}
+                  transition={{ delay: 0.5 }}
                   className="flex flex-col gap-3 pt-2"
                 >
                   <motion.div
@@ -458,7 +387,7 @@ export default function ForgotPasswordPage() {
     );
   }
 
-  // Forgot Password Form
+  // Forgot Password Form - UNCHANGED
   return (
     <div className="min-h-screen bg-gradient-to-b from-zinc-950 via-black to-zinc-950 flex items-center justify-center p-4 overflow-hidden">
       {/* Background Orbs */}

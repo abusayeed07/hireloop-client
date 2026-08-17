@@ -99,7 +99,6 @@ const timeAgo = (dateString) => {
 };
 
 // Helper: normalize any date to a "YYYY-MM-DD" key in local time
-// (avoids toLocaleDateString mismatches and timezone drift)
 const toDateKey = (date) => {
   const y = date.getFullYear();
   const m = String(date.getMonth() + 1).padStart(2, "0");
@@ -151,7 +150,7 @@ export default function PaymentPage() {
   });
 
   // Toggle State for Seeker / Recruiter plan distribution view
-  const [planViewMode, setPlanViewMode] = useState("seeker"); // 'seeker' | 'recruiter'
+  const [planViewMode, setPlanViewMode] = useState("seeker");
 
   // ==========================================
   // FETCH DATA
@@ -262,10 +261,9 @@ export default function PaymentPage() {
   }, [searchTerm, statusFilter, planFilter, pageSize]);
 
   // ==========================================
-  // CHART DATA — FIXED LAST 12 DAYS (always shows every day, even $0)
+  // CHART DATA — FIXED LAST 12 DAYS
   // ==========================================
   const dailyChartData = useMemo(() => {
-    // 1. Sum revenue per calendar day from actual transactions (paid/success only)
     const revenueByDateKey = {};
     transactions.forEach((txn) => {
       const rawDate = txn.createdAt;
@@ -280,8 +278,6 @@ export default function PaymentPage() {
       revenueByDateKey[key] = (revenueByDateKey[key] || 0) + Number(txn.amount || 0);
     });
 
-    // 2. Build a fixed trailing window of CHART_DAYS_RANGE days ending today,
-    //    so every day appears on the axis regardless of whether a transaction exists for it.
     const today = new Date();
     today.setHours(0, 0, 0, 0);
 
@@ -335,12 +331,11 @@ export default function PaymentPage() {
   // ==========================================
   const getStatusBadge = (status) => {
     const styles = {
-      paid: "bg-emerald-500/10 text-emerald-400 border border-emerald-500/20",
-      success:
-        "bg-emerald-500/10 text-emerald-400 border border-emerald-500/20",
-      failed: "bg-red-500/10 text-red-400 border border-red-500/20",
-      cancelled: "bg-red-500/10 text-red-400 border border-red-500/20",
-      pending: "bg-yellow-500/10 text-yellow-400 border border-yellow-500/20",
+      paid: "bg-emerald-100 dark:bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 border border-emerald-200/50 dark:border-emerald-500/20",
+      success: "bg-emerald-100 dark:bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 border border-emerald-200/50 dark:border-emerald-500/20",
+      failed: "bg-red-100 dark:bg-red-500/10 text-red-700 dark:text-red-400 border border-red-200/50 dark:border-red-500/20",
+      cancelled: "bg-red-100 dark:bg-red-500/10 text-red-700 dark:text-red-400 border border-red-200/50 dark:border-red-500/20",
+      pending: "bg-yellow-100 dark:bg-yellow-500/10 text-yellow-700 dark:text-yellow-400 border border-yellow-200/50 dark:border-yellow-500/20",
     };
     const icons = {
       paid: <CheckCircle className="w-3 h-3" />,
@@ -377,19 +372,19 @@ export default function PaymentPage() {
   }
 
   return (
-    <div className="relative min-h-screen bg-[#090a0f] overflow-hidden text-zinc-300">
+    <div className="relative min-h-screen bg-zinc-50 dark:bg-[#090a0f] overflow-hidden text-zinc-800 dark:text-zinc-300">
       {/* Background Lighting */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
         <motion.div
           variants={backgroundOrbVariants}
           animate="animate"
-          className="absolute -top-40 -right-40 w-96 h-96 bg-blue-600/20 rounded-full blur-3xl"
+          className="absolute -top-40 -right-40 w-96 h-96 bg-blue-600/10 dark:bg-blue-600/20 rounded-full blur-3xl"
         />
         <motion.div
           variants={backgroundOrbVariants}
           animate="animate"
           transition={{ delay: 1, duration: 6 }}
-          className="absolute -bottom-40 -left-40 w-96 h-96 bg-purple-600/15 rounded-full blur-3xl"
+          className="absolute -bottom-40 -left-40 w-96 h-96 bg-purple-600/10 dark:bg-purple-600/15 rounded-full blur-3xl"
         />
       </div>
 
@@ -398,10 +393,10 @@ export default function PaymentPage() {
           {/* Header */}
           <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
             <div>
-              <h1 className="text-2xl font-bold text-white tracking-tight">
+              <h1 className="text-2xl font-bold text-zinc-900 dark:text-white tracking-tight">
                 Payment Analytics
               </h1>
-              <p className="text-zinc-500 text-sm mt-1">
+              <p className="text-zinc-500 dark:text-zinc-500 text-sm mt-1">
                 Comprehensive overview of platform revenue and active
                 subscriptions.
               </p>
@@ -410,14 +405,14 @@ export default function PaymentPage() {
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
               onClick={fetchData}
-              className="flex items-center gap-2 px-4 py-2 bg-zinc-800/50 hover:bg-zinc-700/50 text-zinc-300 rounded-lg text-sm border border-white/5 transition-all"
+              className="flex items-center gap-2 px-4 py-2 bg-zinc-200 dark:bg-zinc-800/50 hover:bg-zinc-300 dark:hover:bg-zinc-700/50 text-zinc-700 dark:text-zinc-300 rounded-lg text-sm border border-zinc-200/50 dark:border-white/5 transition-all"
             >
               <RefreshCw className="w-4 h-4" />
               <span>Refresh</span>
             </motion.button>
           </div>
 
-          {/* Stats Grid - Mobile Responsive (1/2/4 Columns) */}
+          {/* Stats Grid */}
           <motion.div
             variants={containerVariants}
             initial="hidden"
@@ -426,88 +421,88 @@ export default function PaymentPage() {
           >
             <motion.div
               variants={statsVariants}
-              className="bg-[#111214] border border-white/5 rounded-xl p-5"
+              className="bg-white/80 dark:bg-[#111214] border border-zinc-200/50 dark:border-white/5 rounded-xl p-5"
             >
               <div className="flex items-center justify-between mb-2">
-                <h3 className="text-zinc-400 text-xs font-medium">
+                <h3 className="text-zinc-500 dark:text-zinc-400 text-xs font-medium">
                   Total Revenue
                 </h3>
-                <Wallet className="w-4 h-4 text-zinc-500" />
+                <Wallet className="w-4 h-4 text-zinc-400 dark:text-zinc-500" />
               </div>
-              <div className="text-2xl font-bold text-white mb-1">
+              <div className="text-2xl font-bold text-zinc-900 dark:text-white mb-1">
                 {formatCurrency(stats.totalRevenue)}
               </div>
-              <div className="text-xs text-emerald-400">
+              <div className="text-xs text-emerald-600 dark:text-emerald-400">
                 +12.4% <span className="text-zinc-500">vs last month</span>
               </div>
             </motion.div>
 
             <motion.div
               variants={statsVariants}
-              className="bg-[#111214] border border-white/5 rounded-xl p-5"
+              className="bg-white/80 dark:bg-[#111214] border border-zinc-200/50 dark:border-white/5 rounded-xl p-5"
             >
               <div className="flex items-center justify-between mb-2">
-                <h3 className="text-zinc-400 text-xs font-medium">
+                <h3 className="text-zinc-500 dark:text-zinc-400 text-xs font-medium">
                   Monthly Revenue
                 </h3>
-                <Calendar className="w-4 h-4 text-zinc-500" />
+                <Calendar className="w-4 h-4 text-zinc-400 dark:text-zinc-500" />
               </div>
-              <div className="text-2xl font-bold text-white mb-1">
+              <div className="text-2xl font-bold text-zinc-900 dark:text-white mb-1">
                 {formatCurrency(stats.monthlyRevenue)}
               </div>
-              <div className="text-xs text-emerald-400">
+              <div className="text-xs text-emerald-600 dark:text-emerald-400">
                 +8.1% <span className="text-zinc-500">this month</span>
               </div>
             </motion.div>
 
             <motion.div
               variants={statsVariants}
-              className="bg-[#111214] border border-white/5 rounded-xl p-5"
+              className="bg-white/80 dark:bg-[#111214] border border-zinc-200/50 dark:border-white/5 rounded-xl p-5"
             >
               <div className="flex items-center justify-between mb-2">
-                <h3 className="text-zinc-400 text-xs font-medium">
+                <h3 className="text-zinc-500 dark:text-zinc-400 text-xs font-medium">
                   Active Pro Users
                 </h3>
-                <Users className="w-4 h-4 text-zinc-500" />
+                <Users className="w-4 h-4 text-zinc-400 dark:text-zinc-500" />
               </div>
-              <div className="text-2xl font-bold text-white mb-1">
+              <div className="text-2xl font-bold text-zinc-900 dark:text-white mb-1">
                 {stats.activeProUsers}
               </div>
-              <div className="text-xs text-emerald-400">
+              <div className="text-xs text-emerald-600 dark:text-emerald-400">
                 +2.3% <span className="text-zinc-500">new signups</span>
               </div>
             </motion.div>
 
             <motion.div
               variants={statsVariants}
-              className="bg-[#111214] border border-white/5 rounded-xl p-5"
+              className="bg-white/80 dark:bg-[#111214] border border-zinc-200/50 dark:border-white/5 rounded-xl p-5"
             >
               <div className="flex items-center justify-between mb-2">
-                <h3 className="text-zinc-400 text-xs font-medium">
+                <h3 className="text-zinc-500 dark:text-zinc-400 text-xs font-medium">
                   Active Enterprise
                 </h3>
-                <Building2 className="w-4 h-4 text-zinc-500" />
+                <Building2 className="w-4 h-4 text-zinc-400 dark:text-zinc-500" />
               </div>
-              <div className="text-2xl font-bold text-white mb-1">
+              <div className="text-2xl font-bold text-zinc-900 dark:text-white mb-1">
                 {stats.activeEnterpriseUsers}
               </div>
-              <div className="text-xs text-emerald-400">
+              <div className="text-xs text-emerald-600 dark:text-emerald-400">
                 +15.7% <span className="text-zinc-500">growth</span>
               </div>
             </motion.div>
           </motion.div>
 
-          {/* Unified Filter Bar - Mobile responsive */}
-          <div className="bg-[#111214]/80 border border-white/5 rounded-xl p-3">
+          {/* Unified Filter Bar */}
+          <div className="bg-white/80 dark:bg-[#111214]/80 border border-zinc-200/50 dark:border-white/5 rounded-xl p-3">
             <div className="flex flex-col lg:flex-row items-stretch lg:items-center gap-3">
               <div className="flex-1 relative">
-                <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-500" />
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-400 dark:text-zinc-500" />
                 <input
                   type="text"
                   placeholder="Search transactions..."
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
-                  className="w-full pl-9 pr-3 py-2 bg-zinc-800/50 border border-white/5 rounded-lg text-sm text-white placeholder-zinc-500 focus:outline-none focus:ring-1 focus:ring-cyan-500/50"
+                  className="w-full pl-9 pr-3 py-2 bg-white dark:bg-zinc-800/50 border border-zinc-200/50 dark:border-white/5 rounded-lg text-sm text-zinc-900 dark:text-white placeholder-zinc-400 dark:placeholder-zinc-500 focus:outline-none focus:ring-1 focus:ring-cyan-500/50"
                 />
               </div>
 
@@ -515,7 +510,7 @@ export default function PaymentPage() {
                 <select
                   value={statusFilter}
                   onChange={(e) => setStatusFilter(e.target.value)}
-                  className="px-3 py-2 bg-zinc-800/50 border border-white/5 rounded-lg text-xs text-white focus:outline-none"
+                  className="px-3 py-2 bg-white dark:bg-zinc-800/50 border border-zinc-200/50 dark:border-white/5 rounded-lg text-xs text-zinc-900 dark:text-white focus:outline-none"
                 >
                   <option value="all">All Status</option>
                   <option value="paid">Paid</option>
@@ -527,7 +522,7 @@ export default function PaymentPage() {
                 <select
                   value={planFilter}
                   onChange={(e) => setPlanFilter(e.target.value)}
-                  className="px-3 py-2 bg-zinc-800/50 border border-white/5 rounded-lg text-xs text-white focus:outline-none"
+                  className="px-3 py-2 bg-white dark:bg-zinc-800/50 border border-zinc-200/50 dark:border-white/5 rounded-lg text-xs text-zinc-900 dark:text-white focus:outline-none"
                 >
                   <option value="all">All Plans</option>
                   {PLAN_FILTER_OPTIONS.map((item) => (
@@ -545,7 +540,7 @@ export default function PaymentPage() {
                       setPageSize(Number(e.target.value));
                       setCurrentPage(1);
                     }}
-                    className="px-3 py-2 bg-zinc-800/50 border border-white/5 rounded-lg text-xs text-white focus:outline-none"
+                    className="px-3 py-2 bg-white dark:bg-zinc-800/50 border border-zinc-200/50 dark:border-white/5 rounded-lg text-xs text-zinc-900 dark:text-white focus:outline-none"
                   >
                     <option value={5}>5</option>
                     <option value={10}>10</option>
@@ -557,11 +552,11 @@ export default function PaymentPage() {
             </div>
           </div>
 
-          {/* Transactions Table - Scrollable on Mobile */}
-          <div className="bg-[#111214] border border-white/5 rounded-xl overflow-hidden">
+          {/* Transactions Table */}
+          <div className="bg-white/80 dark:bg-[#111214] border border-zinc-200/50 dark:border-white/5 rounded-xl overflow-hidden">
             <div className="overflow-x-auto">
-              <table className="w-full text-left text-sm text-zinc-400">
-                <thead className="bg-[#16181c] border-b border-white/5 text-zinc-500 font-medium">
+              <table className="w-full text-left text-sm text-zinc-600 dark:text-zinc-400">
+                <thead className="bg-zinc-100/50 dark:bg-[#16181c] border-b border-zinc-200/50 dark:border-white/5 text-zinc-500 dark:text-zinc-500 font-medium">
                   <tr>
                     <th className="px-6 py-4">User Email</th>
                     <th className="px-6 py-4">Plan</th>
@@ -571,13 +566,13 @@ export default function PaymentPage() {
                     <th className="px-6 py-4">Status</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-white/5">
+                <tbody className="divide-y divide-zinc-200/50 dark:divide-white/5">
                   <AnimatePresence mode="popLayout">
                     {currentTxns.length === 0 ? (
                       <tr>
                         <td
                           colSpan={6}
-                          className="px-6 py-12 text-center text-zinc-500"
+                          className="px-6 py-12 text-center text-zinc-500 dark:text-zinc-500"
                         >
                           <div className="flex flex-col items-center gap-2">
                             <CreditCard className="w-10 h-10 opacity-30" />
@@ -596,22 +591,22 @@ export default function PaymentPage() {
                             animate={{ opacity: 1, y: 0 }}
                             exit={{ opacity: 0, y: -10 }}
                             transition={{ duration: 0.2 }}
-                            className="hover:bg-white/[0.02] transition-colors"
+                            className="hover:bg-zinc-100/50 dark:hover:bg-white/[0.02] transition-colors"
                           >
-                            <td className="px-6 py-4 text-zinc-300">
+                            <td className="px-6 py-4 text-zinc-700 dark:text-zinc-300">
                               {txn.userEmail}
                             </td>
                             <td className="px-6 py-4">
-                              <span className="px-2.5 py-1 bg-zinc-800/50 border border-zinc-700/60 rounded text-[10px] text-zinc-300">
+                              <span className="px-2.5 py-1 bg-zinc-200 dark:bg-zinc-800/50 border border-zinc-200/50 dark:border-zinc-700/60 rounded text-[10px] text-zinc-700 dark:text-zinc-300">
                                 {txn.plan}
                               </span>
                             </td>
-                            <td className="px-6 py-4 font-medium text-white">
+                            <td className="px-6 py-4 font-medium text-zinc-900 dark:text-white">
                               {formatCurrency(txn.amount)}
                             </td>
                             <td className="px-6 py-4">
                               <div className="flex flex-col">
-                                <span className="text-zinc-300">
+                                <span className="text-zinc-700 dark:text-zinc-300">
                                   {formatDate(txn.createdAt)}
                                 </span>
                                 <span className="text-[9px] text-zinc-500">
@@ -639,10 +634,10 @@ export default function PaymentPage() {
             </div>
 
             {/* Pagination */}
-            <div className="px-6 py-4 border-t border-white/5 flex flex-col sm:flex-row justify-between items-center gap-4">
-              <p className="text-xs text-zinc-500">
+            <div className="px-6 py-4 border-t border-zinc-200/50 dark:border-white/5 flex flex-col sm:flex-row justify-between items-center gap-4">
+              <p className="text-xs text-zinc-500 dark:text-zinc-500">
                 Showing{" "}
-                <span className="text-zinc-300">{currentTxns.length}</span> of{" "}
+                <span className="text-zinc-900 dark:text-zinc-300">{currentTxns.length}</span> of{" "}
                 {filteredTransactions.length} transactions
               </p>
               <Pagination
@@ -656,22 +651,20 @@ export default function PaymentPage() {
             </div>
           </div>
 
-          {/* ==========================================
-              BOTTOM ROW: CHART + PLAN DISTRIBUTION
-             ========================================== */}
+          {/* Bottom Row: Chart + Plan Distribution */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             {/* LEFT CARD: Grouped Date Revenue Curve */}
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
-              className="bg-[#111214] border border-white/5 rounded-xl p-6 flex flex-col justify-between"
+              className="bg-white/80 dark:bg-[#111214] border border-zinc-200/50 dark:border-white/5 rounded-xl p-6 flex flex-col justify-between"
             >
               <div className="flex items-center justify-between mb-4">
                 <div>
-                  <h3 className="text-sm font-semibold text-white">
+                  <h3 className="text-sm font-semibold text-zinc-900 dark:text-white">
                     Daily Revenue Trend
                   </h3>
-                  <p className="text-xs text-zinc-500 mt-0.5">
+                  <p className="text-xs text-zinc-500 dark:text-zinc-500 mt-0.5">
                     Last {CHART_DAYS_RANGE} days of revenue
                   </p>
                 </div>
@@ -708,7 +701,7 @@ export default function PaymentPage() {
 
                       <CartesianGrid
                         strokeDasharray="4 4"
-                        stroke="#1f2128"
+                        stroke="#e4e4e7 dark:#1f2128"
                         vertical={false}
                       />
 
@@ -734,12 +727,12 @@ export default function PaymentPage() {
                           strokeDasharray: "4 4",
                         }}
                         contentStyle={{
-                          backgroundColor: "#18181b",
-                          borderColor: "#27272a",
+                          backgroundColor: "#ffffff",
+                          borderColor: "#e4e4e7",
                           borderRadius: 8,
-                          color: "#fff",
+                          color: "#18181b",
                           fontSize: 12,
-                          boxShadow: "0 4px 12px rgba(0,0,0,0.5)",
+                          boxShadow: "0 4px 12px rgba(0,0,0,0.1)",
                         }}
                         formatter={(value) => [
                           `$${value.toLocaleString()}`,
@@ -766,28 +759,28 @@ export default function PaymentPage() {
               </div>
             </motion.div>
 
-            {/* RIGHT CARD: Plan Distribution with Seeker / Recruiter Toggle */}
+            {/* RIGHT CARD: Plan Distribution */}
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.1 }}
-              className="bg-[#111214] border border-white/5 rounded-xl p-6 flex flex-col justify-between"
+              className="bg-white/80 dark:bg-[#111214] border border-zinc-200/50 dark:border-white/5 rounded-xl p-6 flex flex-col justify-between"
             >
               <div>
                 {/* Header & Toggle Controls */}
                 <div className="flex items-center justify-between mb-6">
-                  <h3 className="text-sm font-semibold text-white">
+                  <h3 className="text-sm font-semibold text-zinc-900 dark:text-white">
                     Plan Distribution
                   </h3>
 
                   {/* Toggle Pill */}
-                  <div className="flex bg-zinc-900 border border-white/5 p-1 rounded-lg">
+                  <div className="flex bg-zinc-200 dark:bg-zinc-900 border border-zinc-200/50 dark:border-white/5 p-1 rounded-lg">
                     <button
                       onClick={() => setPlanViewMode("seeker")}
                       className={`px-3 py-1 text-xs font-medium rounded-md transition-all duration-200 ${
                         planViewMode === "seeker"
-                          ? "bg-zinc-700 text-white shadow"
-                          : "text-zinc-400 hover:text-white"
+                          ? "bg-white dark:bg-zinc-700 text-zinc-900 dark:text-white shadow"
+                          : "text-zinc-500 dark:text-zinc-400 hover:text-zinc-700 dark:hover:text-white"
                       }`}
                     >
                       Seeker
@@ -796,8 +789,8 @@ export default function PaymentPage() {
                       onClick={() => setPlanViewMode("recruiter")}
                       className={`px-3 py-1 text-xs font-medium rounded-md transition-all duration-200 ${
                         planViewMode === "recruiter"
-                          ? "bg-zinc-700 text-white shadow"
-                          : "text-zinc-400 hover:text-white"
+                          ? "bg-white dark:bg-zinc-700 text-zinc-900 dark:text-white shadow"
+                          : "text-zinc-500 dark:text-zinc-400 hover:text-zinc-700 dark:hover:text-white"
                       }`}
                     >
                       Recruiter
@@ -810,14 +803,14 @@ export default function PaymentPage() {
                   {planDistribution.map((item) => (
                     <div key={item.plan} className="space-y-1.5">
                       <div className="flex justify-between items-center text-xs">
-                        <span className="text-zinc-300 font-medium">
+                        <span className="text-zinc-700 dark:text-zinc-300 font-medium">
                           {item.plan}
                         </span>
-                        <span className="text-zinc-400 font-mono">
+                        <span className="text-zinc-500 dark:text-zinc-400 font-mono">
                           {item.percentage}%
                         </span>
                       </div>
-                      <div className="w-full h-2 bg-zinc-800/80 rounded-full overflow-hidden">
+                      <div className="w-full h-2 bg-zinc-200 dark:bg-zinc-800/80 rounded-full overflow-hidden">
                         <motion.div
                           initial={{ width: 0 }}
                           animate={{ width: `${item.percentage}%` }}
@@ -828,7 +821,7 @@ export default function PaymentPage() {
                               ? "bg-purple-500"
                               : item.plan === "Growth" || item.plan === "Pro"
                                 ? "bg-blue-500"
-                                : "bg-zinc-400"
+                                : "bg-zinc-400 dark:bg-zinc-400"
                           }`}
                         />
                       </div>
@@ -838,8 +831,8 @@ export default function PaymentPage() {
               </div>
 
               {/* Card Footer Link */}
-              <div className="mt-6 pt-4 border-t border-white/5 text-center">
-                <button className="text-xs text-zinc-400 hover:text-white transition-colors">
+              <div className="mt-6 pt-4 border-t border-zinc-200/50 dark:border-white/5 text-center">
+                <button className="text-xs text-zinc-500 dark:text-zinc-400 hover:text-zinc-700 dark:hover:text-white transition-colors">
                   View detailed report
                 </button>
               </div>

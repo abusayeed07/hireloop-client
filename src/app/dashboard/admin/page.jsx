@@ -104,7 +104,6 @@ const timeAgo = (dateString) => {
 };
 
 // Normalize any date to a "YYYY-MM-DD" key in local time
-// (avoids timezone drift and mismatches from ISO string splitting)
 const toDateKey = (date) => {
   const y = date.getFullYear();
   const m = String(date.getMonth() + 1).padStart(2, "0");
@@ -331,9 +330,8 @@ export default function AdminDashboardHomePage() {
   }, [searchTerm]);
 
   // ==========================================
-  // CHART DATA COMPUTATION (MATCHED STYLE)
+  // CHART DATA COMPUTATION
   // ==========================================
-  // Category Data for Bar Chart
   const categoryData = useMemo(() => {
     if (!jobs || jobs.length === 0) return [];
 
@@ -349,10 +347,7 @@ export default function AdminDashboardHomePage() {
       .map(([category, count]) => ({ category, count }));
   }, [jobs]);
 
-  // User Trend Data for Area Chart — FIXED LAST 12 DAYS
-  // (always shows every day in the window, even days with 0 signups)
   const userTrendData = useMemo(() => {
-    // 1. Count signups per calendar day from actual user records
     const countByDateKey = {};
     (users || []).forEach((user) => {
       const createdAt = new Date(user.createdAt);
@@ -362,8 +357,6 @@ export default function AdminDashboardHomePage() {
       countByDateKey[key] = (countByDateKey[key] || 0) + 1;
     });
 
-    // 2. Build a fixed trailing window of CHART_DAYS_RANGE days ending today,
-    //    so gaps between signups don't distort the axis/shape.
     const today = new Date();
     today.setHours(0, 0, 0, 0);
 
@@ -384,12 +377,11 @@ export default function AdminDashboardHomePage() {
 
   const getStatusBadge = (status) => {
     const styles = {
-      paid: "bg-emerald-500/10 text-emerald-400 border border-emerald-500/20",
-      success:
-        "bg-emerald-500/10 text-emerald-400 border border-emerald-500/20",
-      failed: "bg-red-500/10 text-red-400 border border-red-500/20",
-      cancelled: "bg-red-500/10 text-red-400 border border-red-500/20",
-      pending: "bg-yellow-500/10 text-yellow-400 border border-yellow-500/20",
+      paid: "bg-emerald-100 dark:bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 border border-emerald-200/50 dark:border-emerald-500/20",
+      success: "bg-emerald-100 dark:bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 border border-emerald-200/50 dark:border-emerald-500/20",
+      failed: "bg-red-100 dark:bg-red-500/10 text-red-700 dark:text-red-400 border border-red-200/50 dark:border-red-500/20",
+      cancelled: "bg-red-100 dark:bg-red-500/10 text-red-700 dark:text-red-400 border border-red-200/50 dark:border-red-500/20",
+      pending: "bg-yellow-100 dark:bg-yellow-500/10 text-yellow-700 dark:text-yellow-400 border border-yellow-200/50 dark:border-yellow-500/20",
     };
     const icons = {
       paid: <CheckCircle className="w-3 h-3" />,
@@ -422,51 +414,48 @@ export default function AdminDashboardHomePage() {
   }
 
   return (
-    <div className="relative min-h-screen bg-[#090a0f] overflow-hidden text-zinc-300 p-4 md:p-8 pt-6 sm:pt-8">
+    <div className="relative min-h-screen bg-zinc-50 dark:bg-[#090a0f] overflow-hidden text-zinc-800 dark:text-zinc-300 p-4 md:p-8 pt-6 sm:pt-8">
       {/* Background Lighting */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
         <motion.div
           variants={backgroundOrbVariants}
           animate="animate"
-          className="absolute -top-40 -right-40 w-96 h-96 bg-blue-600/20 rounded-full blur-3xl"
+          className="absolute -top-40 -right-40 w-96 h-96 bg-blue-600/10 dark:bg-blue-600/20 rounded-full blur-3xl"
         />
         <motion.div
           variants={backgroundOrbVariants}
           animate="animate"
           transition={{ delay: 1, duration: 6 }}
-          className="absolute -bottom-40 -left-40 w-96 h-96 bg-purple-600/15 rounded-full blur-3xl"
+          className="absolute -bottom-40 -left-40 w-96 h-96 bg-purple-600/10 dark:bg-purple-600/15 rounded-full blur-3xl"
         />
       </div>
 
       <div className="relative z-10 max-w-[1600px] mx-auto space-y-6">
-        {/* Header */}
+        {/* Header - Updated for theme */}
         <motion.div
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
           className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4"
         >
           <div>
-            <h1 className="text-2xl font-bold text-white tracking-tight">
+            <h1 className="text-2xl font-bold text-zinc-900 dark:text-white tracking-tight">
               Dashboard Overview
             </h1>
-            <p className="text-zinc-500 text-sm mt-1">
+            <p className="text-zinc-500 dark:text-zinc-500 text-sm mt-1">
               Real-time platform performance and growth metrics.
             </p>
           </div>
           <div className="flex flex-wrap items-center gap-3 w-full sm:w-auto">
-            <div className="flex items-center gap-2 px-3 py-2 bg-zinc-900 border border-zinc-800 rounded-lg text-xs text-zinc-300">
-              <Calendar className="w-4 h-4 text-zinc-500" />
+            <div className="flex items-center gap-2 px-3 py-2 bg-white dark:bg-zinc-900 border border-zinc-200/50 dark:border-zinc-800 rounded-lg text-xs text-zinc-700 dark:text-zinc-300">
+              <Calendar className="w-4 h-4 text-zinc-500 dark:text-zinc-500" />
               <span>Last 30 Days</span>
             </div>
-            <button className="flex items-center gap-2 px-4 py-2 bg-white text-black text-sm font-medium rounded-lg hover:bg-zinc-200 transition-colors shadow-lg shadow-white/5">
-              <Download className="w-4 h-4" />
-              Export Report
-            </button>
+            
             <motion.button
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
               onClick={fetchData}
-              className="flex items-center gap-2 px-4 py-2 bg-zinc-800/50 hover:bg-zinc-700/50 text-zinc-300 rounded-lg text-sm border border-white/5 transition-all"
+              className="flex items-center gap-2 px-4 py-2 bg-zinc-200 dark:bg-zinc-800/50 hover:bg-zinc-300 dark:hover:bg-zinc-700/50 text-zinc-700 dark:text-zinc-300 rounded-lg text-sm border border-zinc-200/50 dark:border-white/5 transition-all"
             >
               <RefreshCw className="w-4 h-4" />
               Refresh
@@ -474,7 +463,7 @@ export default function AdminDashboardHomePage() {
           </div>
         </motion.div>
 
-        {/* Stats Grid - 5 columns in one row */}
+        {/* Stats Grid - Updated for theme */}
         <motion.div
           variants={containerVariants}
           initial="hidden"
@@ -483,120 +472,120 @@ export default function AdminDashboardHomePage() {
         >
           <motion.div
             variants={statsVariants}
-            className="bg-[#111214] border border-white/5 rounded-xl p-4 lg:p-5"
+            className="bg-white/80 dark:bg-[#111214] border border-zinc-200/50 dark:border-white/5 rounded-xl p-4 lg:p-5"
           >
             <div className="flex items-center justify-between mb-2">
-              <h3 className="text-zinc-400 text-[10px] sm:text-xs font-medium uppercase tracking-wider">
+              <h3 className="text-zinc-500 dark:text-zinc-400 text-[10px] sm:text-xs font-medium uppercase tracking-wider">
                 Total Users
               </h3>
-              <Users className="w-4 h-4 text-zinc-500" />
+              <Users className="w-4 h-4 text-zinc-400 dark:text-zinc-500" />
             </div>
-            <div className="text-lg sm:text-xl lg:text-2xl font-bold text-white mb-1">
+            <div className="text-lg sm:text-xl lg:text-2xl font-bold text-zinc-900 dark:text-white mb-1">
               {stats.totalUsers.toLocaleString()}
             </div>
             <div className="flex items-center gap-2 text-[10px] sm:text-xs">
-              <span className="text-emerald-400">+12%</span>
+              <span className="text-emerald-600 dark:text-emerald-400">+12%</span>
               <span className="text-zinc-500">vs last month</span>
             </div>
           </motion.div>
 
           <motion.div
             variants={statsVariants}
-            className="bg-[#111214] border border-white/5 rounded-xl p-4 lg:p-5"
+            className="bg-white/80 dark:bg-[#111214] border border-zinc-200/50 dark:border-white/5 rounded-xl p-4 lg:p-5"
           >
             <div className="flex items-center justify-between mb-2">
-              <h3 className="text-zinc-400 text-[10px] sm:text-xs font-medium uppercase tracking-wider">
+              <h3 className="text-zinc-500 dark:text-zinc-400 text-[10px] sm:text-xs font-medium uppercase tracking-wider">
                 Recruiters
               </h3>
-              <Building2 className="w-4 h-4 text-zinc-500" />
+              <Building2 className="w-4 h-4 text-zinc-400 dark:text-zinc-500" />
             </div>
-            <div className="text-lg sm:text-xl lg:text-2xl font-bold text-white mb-1">
+            <div className="text-lg sm:text-xl lg:text-2xl font-bold text-zinc-900 dark:text-white mb-1">
               {stats.totalRecruiters.toLocaleString()}
             </div>
             <div className="flex items-center gap-2 text-[10px] sm:text-xs">
-              <span className="text-emerald-400">+5%</span>
+              <span className="text-emerald-600 dark:text-emerald-400">+5%</span>
               <span className="text-zinc-500">vs last month</span>
             </div>
           </motion.div>
 
           <motion.div
             variants={statsVariants}
-            className="bg-[#111214] border border-white/5 rounded-xl p-4 lg:p-5"
+            className="bg-white/80 dark:bg-[#111214] border border-zinc-200/50 dark:border-white/5 rounded-xl p-4 lg:p-5"
           >
             <div className="flex items-center justify-between mb-2">
-              <h3 className="text-zinc-400 text-[10px] sm:text-xs font-medium uppercase tracking-wider">
+              <h3 className="text-zinc-500 dark:text-zinc-400 text-[10px] sm:text-xs font-medium uppercase tracking-wider">
                 Companies
               </h3>
-              <Building2 className="w-4 h-4 text-zinc-500" />
+              <Building2 className="w-4 h-4 text-zinc-400 dark:text-zinc-500" />
             </div>
-            <div className="text-lg sm:text-xl lg:text-2xl font-bold text-white mb-1">
+            <div className="text-lg sm:text-xl lg:text-2xl font-bold text-zinc-900 dark:text-white mb-1">
               {stats.totalCompanies.toLocaleString()}
             </div>
             <div className="flex items-center gap-2 text-[10px] sm:text-xs">
-              <span className="text-emerald-400">+4%</span>
+              <span className="text-emerald-600 dark:text-emerald-400">+4%</span>
               <span className="text-zinc-500">vs last month</span>
             </div>
           </motion.div>
 
           <motion.div
             variants={statsVariants}
-            className="bg-[#111214] border border-white/5 rounded-xl p-4 lg:p-5"
+            className="bg-white/80 dark:bg-[#111214] border border-zinc-200/50 dark:border-white/5 rounded-xl p-4 lg:p-5"
           >
             <div className="flex items-center justify-between mb-2">
-              <h3 className="text-zinc-400 text-[10px] sm:text-xs font-medium uppercase tracking-wider">
+              <h3 className="text-zinc-500 dark:text-zinc-400 text-[10px] sm:text-xs font-medium uppercase tracking-wider">
                 Total Jobs
               </h3>
-              <Briefcase className="w-4 h-4 text-zinc-500" />
+              <Briefcase className="w-4 h-4 text-zinc-400 dark:text-zinc-500" />
             </div>
-            <div className="text-lg sm:text-xl lg:text-2xl font-bold text-white mb-1">
+            <div className="text-lg sm:text-xl lg:text-2xl font-bold text-zinc-900 dark:text-white mb-1">
               {stats.totalJobs.toLocaleString()}
             </div>
             <div className="flex items-center gap-2 text-[10px] sm:text-xs">
-              <span className="text-emerald-400">+12%</span>
+              <span className="text-emerald-600 dark:text-emerald-400">+12%</span>
               <span className="text-zinc-500">vs last month</span>
             </div>
           </motion.div>
 
           <motion.div
             variants={statsVariants}
-            className="bg-[#111214] border border-white/5 rounded-xl p-4 lg:p-5"
+            className="bg-white/80 dark:bg-[#111214] border border-zinc-200/50 dark:border-white/5 rounded-xl p-4 lg:p-5"
           >
             <div className="flex items-center justify-between mb-2">
-              <h3 className="text-zinc-400 text-[10px] sm:text-xs font-medium uppercase tracking-wider">
+              <h3 className="text-zinc-500 dark:text-zinc-400 text-[10px] sm:text-xs font-medium uppercase tracking-wider">
                 Revenue
               </h3>
-              <TrendingUp className="w-4 h-4 text-zinc-500" />
+              <TrendingUp className="w-4 h-4 text-zinc-400 dark:text-zinc-500" />
             </div>
-            <div className="text-lg sm:text-xl lg:text-2xl font-bold text-white mb-1">
+            <div className="text-lg sm:text-xl lg:text-2xl font-bold text-zinc-900 dark:text-white mb-1">
               {formatCurrency(stats.platformRevenue)}
             </div>
             <div className="flex items-center gap-2 text-[10px] sm:text-xs">
-              <span className="text-emerald-400">+19.4%</span>
+              <span className="text-emerald-600 dark:text-emerald-400">+19.4%</span>
               <span className="text-zinc-500">vs last month</span>
             </div>
           </motion.div>
         </motion.div>
 
         {/* ==========================================
-            MIDDLE ROW: CHARTS (MATCHED PAYMENT STYLING)
+            MIDDLE ROW: CHARTS - Updated for theme
            ========================================== */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           {/* Chart 1: Job Posts by Category Bar Chart */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            className="bg-[#111214] border border-white/5 rounded-xl p-6 flex flex-col justify-between"
+            className="bg-white/80 dark:bg-[#111214] border border-zinc-200/50 dark:border-white/5 rounded-xl p-6 flex flex-col justify-between"
           >
             <div className="flex items-center justify-between mb-4">
               <div>
-                <h3 className="text-sm font-semibold text-white">
+                <h3 className="text-sm font-semibold text-zinc-900 dark:text-white">
                   Job Posts by Category
                 </h3>
-                <p className="text-xs text-zinc-500 mt-0.5">
+                <p className="text-xs text-zinc-500 dark:text-zinc-500 mt-0.5">
                   Distribution across all active job categories
                 </p>
               </div>
-              <span className="text-xs font-mono text-zinc-500">
+              <span className="text-xs font-mono text-zinc-500 dark:text-zinc-500">
                 {stats.totalJobs} total
               </span>
             </div>
@@ -610,7 +599,7 @@ export default function AdminDashboardHomePage() {
                   >
                     <CartesianGrid
                       strokeDasharray="4 4"
-                      stroke="#1f2128"
+                      stroke="#e4e4e7 dark:#1f2128"
                       vertical={false}
                     />
                     <XAxis
@@ -627,14 +616,14 @@ export default function AdminDashboardHomePage() {
                       width={40}
                     />
                     <Tooltip
-                      cursor={{ fill: "rgba(255, 255, 255, 0.03)" }}
+                      cursor={{ fill: "rgba(0,0,0,0.03)" }}
                       contentStyle={{
-                        backgroundColor: "#18181b",
-                        borderColor: "#27272a",
+                        backgroundColor: "#ffffff",
+                        borderColor: "#e4e4e7",
                         borderRadius: 8,
-                        color: "#fff",
+                        color: "#18181b",
                         fontSize: 12,
-                        boxShadow: "0 4px 12px rgba(0,0,0,0.5)",
+                        boxShadow: "0 4px 12px rgba(0,0,0,0.1)",
                       }}
                       formatter={(value) => [`${value} jobs`, "Jobs"]}
                     />
@@ -659,18 +648,18 @@ export default function AdminDashboardHomePage() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.1 }}
-            className="bg-[#111214] border border-white/5 rounded-xl p-6 flex flex-col justify-between"
+            className="bg-white/80 dark:bg-[#111214] border border-zinc-200/50 dark:border-white/5 rounded-xl p-6 flex flex-col justify-between"
           >
             <div className="flex items-center justify-between mb-4">
               <div>
-                <h3 className="text-sm font-semibold text-white">
+                <h3 className="text-sm font-semibold text-zinc-900 dark:text-white">
                   New Users Trend ({CHART_DAYS_RANGE}d)
                 </h3>
-                <p className="text-xs text-zinc-500 mt-0.5">
+                <p className="text-xs text-zinc-500 dark:text-zinc-500 mt-0.5">
                   Account registrations over the last {CHART_DAYS_RANGE} days
                 </p>
               </div>
-              <span className="text-xs font-mono text-emerald-400">
+              <span className="text-xs font-mono text-emerald-600 dark:text-emerald-400">
                 +{stats.totalUsers} accounts
               </span>
             </div>
@@ -705,7 +694,7 @@ export default function AdminDashboardHomePage() {
 
                     <CartesianGrid
                       strokeDasharray="4 4"
-                      stroke="#1f2128"
+                      stroke="#e4e4e7 dark:#1f2128"
                       vertical={false}
                     />
 
@@ -731,12 +720,12 @@ export default function AdminDashboardHomePage() {
                         strokeDasharray: "4 4",
                       }}
                       contentStyle={{
-                        backgroundColor: "#18181b",
-                        borderColor: "#27272a",
+                        backgroundColor: "#ffffff",
+                        borderColor: "#e4e4e7",
                         borderRadius: 8,
-                        color: "#fff",
+                        color: "#18181b",
                         fontSize: 12,
-                        boxShadow: "0 4px 12px rgba(0,0,0,0.5)",
+                        boxShadow: "0 4px 12px rgba(0,0,0,0.1)",
                       }}
                       formatter={(value) => [`${value} users`, "Signups"]}
                     />
@@ -761,63 +750,63 @@ export default function AdminDashboardHomePage() {
           </motion.div>
         </div>
 
-        {/* Recent Subscription Transactions Table */}
+        {/* Recent Subscription Transactions Table - Updated for theme */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.2 }}
-          className="bg-[#111214] border border-white/5 rounded-xl overflow-hidden"
+          className="bg-white/80 dark:bg-[#111214] border border-zinc-200/50 dark:border-white/5 rounded-xl overflow-hidden"
         >
-          <div className="p-4 border-b border-white/5 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-            <h3 className="text-sm font-semibold text-white">
+          <div className="p-4 border-b border-zinc-200/50 dark:border-white/5 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+            <h3 className="text-sm font-semibold text-zinc-900 dark:text-white">
               Recent Subscription Transactions
             </h3>
             <div className="flex flex-wrap items-center gap-3 w-full sm:w-auto">
               <div className="relative flex-1 sm:w-64">
-                <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-500" />
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-400 dark:text-zinc-500" />
                 <input
                   type="text"
                   placeholder="Search transactions..."
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
-                  className="w-full pl-9 pr-3 py-2 bg-zinc-800/50 border border-white/5 rounded-lg text-xs text-white placeholder-zinc-500 focus:outline-none focus:ring-1 focus:ring-cyan-500/50"
+                  className="w-full pl-9 pr-3 py-2 bg-white dark:bg-zinc-800/50 border border-zinc-200/50 dark:border-white/5 rounded-lg text-xs text-zinc-900 dark:text-white placeholder-zinc-400 dark:placeholder-zinc-500 focus:outline-none focus:ring-1 focus:ring-cyan-500/50"
                 />
               </div>
-              <button className="text-xs text-zinc-400 hover:text-white transition-colors">
+              <button className="text-xs text-zinc-500 dark:text-zinc-400 hover:text-zinc-700 dark:hover:text-white transition-colors">
                 View All Activity
               </button>
             </div>
           </div>
 
           <div className="overflow-x-auto">
-            <table className="w-full text-left text-xs text-zinc-400">
-              <thead className="bg-zinc-900/30 border-b border-white/5">
+            <table className="w-full text-left text-xs text-zinc-600 dark:text-zinc-400">
+              <thead className="bg-zinc-100/50 dark:bg-zinc-900/30 border-b border-zinc-200/50 dark:border-white/5">
                 <tr>
-                  <th className="px-6 py-3 font-medium text-zinc-500">
+                  <th className="px-6 py-3 font-medium text-zinc-500 dark:text-zinc-500">
                     User / Recruiter
                   </th>
-                  <th className="px-6 py-3 font-medium text-zinc-500">
+                  <th className="px-6 py-3 font-medium text-zinc-500 dark:text-zinc-500">
                     Plan Type
                   </th>
-                  <th className="px-6 py-3 font-medium text-zinc-500">
+                  <th className="px-6 py-3 font-medium text-zinc-500 dark:text-zinc-500">
                     Transaction ID
                   </th>
-                  <th className="px-6 py-3 font-medium text-zinc-500">
+                  <th className="px-6 py-3 font-medium text-zinc-500 dark:text-zinc-500">
                     Amount
                   </th>
-                  <th className="px-6 py-3 font-medium text-zinc-500">Date</th>
-                  <th className="px-6 py-3 font-medium text-zinc-500">
+                  <th className="px-6 py-3 font-medium text-zinc-500 dark:text-zinc-500">Date</th>
+                  <th className="px-6 py-3 font-medium text-zinc-500 dark:text-zinc-500">
                     Status
                   </th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-white/5">
+              <tbody className="divide-y divide-zinc-200/50 dark:divide-white/5">
                 <AnimatePresence mode="popLayout">
                   {currentTxns.length === 0 ? (
                     <tr>
                       <td
                         colSpan={6}
-                        className="px-6 py-12 text-center text-zinc-500"
+                        className="px-6 py-12 text-center text-zinc-500 dark:text-zinc-500"
                       >
                         <div className="flex flex-col items-center gap-2">
                           <CreditCard className="w-10 h-10 opacity-30" />
@@ -831,35 +820,35 @@ export default function AdminDashboardHomePage() {
                       return (
                         <tr
                           key={txn.id || `txn-${Math.random()}`}
-                          className="hover:bg-white/[0.02] transition-colors"
+                          className="hover:bg-zinc-100/50 dark:hover:bg-white/[0.02] transition-colors"
                         >
                           <td className="px-6 py-4">
                             <div className="flex flex-col">
-                              <span className="text-zinc-300 font-medium">
+                              <span className="text-zinc-800 dark:text-zinc-300 font-medium">
                                 {txn.userEmail}
                               </span>
-                              <span className="text-[10px] text-zinc-500">
+                              <span className="text-[10px] text-zinc-500 dark:text-zinc-500">
                                 {txn.description || "New Subscription"}
                               </span>
                             </div>
                           </td>
                           <td className="px-6 py-4">
-                            <span className="px-2 py-1 bg-zinc-800/50 border border-zinc-700/60 rounded text-[10px] text-zinc-300">
+                            <span className="px-2 py-1 bg-zinc-200 dark:bg-zinc-800/50 border border-zinc-200/50 dark:border-zinc-700/60 rounded text-[10px] text-zinc-700 dark:text-zinc-300">
                               {txn.plan}
                             </span>
                           </td>
-                          <td className="px-6 py-4 font-mono text-zinc-500 text-[10px]">
+                          <td className="px-6 py-4 font-mono text-zinc-500 dark:text-zinc-500 text-[10px]">
                             {txn.transactionId}
                           </td>
-                          <td className="px-6 py-4 font-medium text-white">
+                          <td className="px-6 py-4 font-medium text-zinc-900 dark:text-white">
                             {formatCurrency(txn.amount)}
                           </td>
                           <td className="px-6 py-4">
                             <div className="flex flex-col">
-                              <span className="text-zinc-300">
+                              <span className="text-zinc-700 dark:text-zinc-300">
                                 {formatDate(txn.createdAt)}
                               </span>
-                              <span className="text-[9px] text-zinc-500">
+                              <span className="text-[9px] text-zinc-500 dark:text-zinc-500">
                                 {timeAgo(txn.createdAt)}
                               </span>
                             </div>
@@ -881,10 +870,10 @@ export default function AdminDashboardHomePage() {
           </div>
 
           {/* Pagination */}
-          <div className="px-6 py-4 border-t border-white/5 flex flex-col sm:flex-row justify-between items-center gap-4">
-            <p className="text-xs text-zinc-500">
+          <div className="px-6 py-4 border-t border-zinc-200/50 dark:border-white/5 flex flex-col sm:flex-row justify-between items-center gap-4">
+            <p className="text-xs text-zinc-500 dark:text-zinc-500">
               Showing{" "}
-              <span className="text-zinc-300">{currentTxns.length}</span> of{" "}
+              <span className="text-zinc-900 dark:text-zinc-300">{currentTxns.length}</span> of{" "}
               {filteredTransactions.length} transactions
             </p>
             <Pagination

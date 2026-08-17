@@ -71,17 +71,17 @@ const CATEGORY_COLORS = {
 const APPROVAL_STATUS = {
     pending: { 
         label: 'Pending Approval', 
-        className: 'bg-yellow-500/10 text-yellow-400 border-yellow-500/20',
+        className: 'bg-yellow-100 dark:bg-yellow-500/10 text-yellow-700 dark:text-yellow-400 border-yellow-200/50 dark:border-yellow-500/20',
         icon: <Clock className="w-3 h-3" />
     },
     approved: { 
         label: 'Approved', 
-        className: 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20',
+        className: 'bg-emerald-100 dark:bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 border-emerald-200/50 dark:border-emerald-500/20',
         icon: <CheckCircle className="w-3 h-3" />
     },
     rejected: { 
         label: 'Rejected', 
-        className: 'bg-red-500/10 text-red-400 border-red-500/20',
+        className: 'bg-red-100 dark:bg-red-500/10 text-red-700 dark:text-red-400 border-red-200/50 dark:border-red-500/20',
         icon: <XCircle className="w-3 h-3" />
     },
 };
@@ -173,7 +173,7 @@ export default function JobsPage() {
     };
 
     fetchJobs();
-  }, []); // ✅ Empty dependency array - only fetch on mount
+  }, []);
 
   // ==========================================
   // LOGIC
@@ -310,7 +310,7 @@ export default function JobsPage() {
     }
     setSelectedJob(job);
     setActionType(action);
-    setRejectReason(""); // Reset reason when opening modal
+    setRejectReason("");
     setShowConfirmModal(true);
   }, [jobs, showConfirmModal, updating]);
 
@@ -338,11 +338,11 @@ export default function JobsPage() {
   // HELPERS
   // ==========================================
   const getStatusConfig = (job) => {
-    // ✅ OVERRIDE: If Admin Approval is rejected, we MUST show Rejected, regardless of what "status" says
+    // ✅ OVERRIDE: If Admin Approval is rejected, we MUST show Rejected
     if (job.adminApproval === 'rejected') {
       return { 
         label: "Rejected", 
-        className: "bg-red-500/10 text-red-400 border border-red-500/20",
+        className: "bg-red-100 dark:bg-red-500/10 text-red-700 dark:text-red-400 border border-red-200/50 dark:border-red-500/20",
         icon: <XCircle className="w-3 h-3" />
       };
     }
@@ -351,27 +351,27 @@ export default function JobsPage() {
     if (job.status === "active") {
       return { 
         label: "Active", 
-        className: "bg-emerald-500/10 text-emerald-400 border border-emerald-500/20",
+        className: "bg-emerald-100 dark:bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 border border-emerald-200/50 dark:border-emerald-500/20",
         icon: <CheckCircle className="w-3 h-3" />
       };
     }
     if (job.status === "pending") {
       return { 
         label: "Pending", 
-        className: "bg-yellow-500/10 text-yellow-400 border border-yellow-500/20",
+        className: "bg-yellow-100 dark:bg-yellow-500/10 text-yellow-700 dark:text-yellow-400 border border-yellow-200/50 dark:border-yellow-500/20",
         icon: <Clock className="w-3 h-3" />
       };
     }
     if (job.status === "rejected") {
       return { 
         label: "Rejected", 
-        className: "bg-red-500/10 text-red-400 border border-red-500/20",
+        className: "bg-red-100 dark:bg-red-500/10 text-red-700 dark:text-red-400 border border-red-200/50 dark:border-red-500/20",
         icon: <XCircle className="w-3 h-3" />
       };
     }
     return { 
       label: "Pending", 
-      className: "bg-zinc-800/50 text-yellow-400 border border-zinc-700/60",
+      className: "bg-zinc-200/50 dark:bg-zinc-800/50 text-yellow-700 dark:text-yellow-400 border border-zinc-200/50 dark:border-zinc-700/60",
       icon: <XCircle className="w-3 h-3" />
     };
   };
@@ -391,7 +391,7 @@ export default function JobsPage() {
   };
 
   // ==========================================
-  // CATEGORY DROPDOWN
+  // CATEGORY DROPDOWN - Updated for theme
   // ==========================================
   const CategoryDropdown = ({ value, onChange }) => {
     const [isOpen, setIsOpen] = useState(false);
@@ -409,14 +409,14 @@ export default function JobsPage() {
 
     const selectedCategory = value === 'all' ? 'All Categories' : value;
     const selectedIcon = value !== 'all' ? CATEGORY_ICONS[value] : null;
-    const selectedColor = value !== 'all' ? CATEGORY_COLORS[value] : 'text-zinc-300';
+    const selectedColor = value !== 'all' ? CATEGORY_COLORS[value] : 'text-zinc-300 dark:text-zinc-300';
 
     return (
       <div className="relative w-full sm:w-auto" ref={dropdownRef}>
         <button
           type="button"
           onClick={() => setIsOpen(!isOpen)}
-          className="w-full flex items-center justify-between gap-2 px-3 py-2 lg:px-3 lg:py-2.5 bg-zinc-800 border border-white/10 rounded-lg lg:rounded-xl text-xs lg:text-sm text-white focus:outline-none focus:border-cyan-500/50 cursor-pointer transition-all duration-300 hover:bg-zinc-700"
+          className="w-full flex items-center justify-between gap-2 px-3 py-2 lg:px-3 lg:py-2.5 bg-white dark:bg-zinc-800 border border-zinc-200/50 dark:border-white/10 rounded-lg lg:rounded-xl text-xs lg:text-sm text-zinc-900 dark:text-white focus:outline-none focus:border-cyan-500/50 cursor-pointer transition-all duration-300 hover:bg-zinc-100 dark:hover:bg-zinc-700"
         >
           <div className="flex items-center gap-2 truncate">
             {selectedIcon && <span className={selectedColor}>{selectedIcon}</span>}
@@ -432,11 +432,11 @@ export default function JobsPage() {
               animate={{ opacity: 1, y: 0, scale: 1 }}
               exit={{ opacity: 0, y: -10, scale: 0.95 }}
               transition={{ duration: 0.15 }}
-              className="absolute z-50 mt-2 w-full min-w-[180px] bg-zinc-800 border border-white/10 rounded-lg shadow-xl overflow-hidden py-1"
+              className="absolute z-50 mt-2 w-full min-w-[180px] bg-white dark:bg-zinc-800 border border-zinc-200/50 dark:border-white/10 rounded-lg shadow-xl overflow-hidden py-1"
             >
               <button
                 onClick={() => { onChange('all'); setIsOpen(false); }}
-                className={`w-full flex items-center gap-3 px-4 py-2.5 text-xs text-left transition-colors ${value === 'all' ? 'bg-cyan-600/20 text-cyan-400' : 'text-zinc-300 hover:bg-zinc-700'}`}
+                className={`w-full flex items-center gap-3 px-4 py-2.5 text-xs text-left transition-colors ${value === 'all' ? 'bg-cyan-100 dark:bg-cyan-600/20 text-cyan-700 dark:text-cyan-400' : 'text-zinc-700 dark:text-zinc-300 hover:bg-zinc-100 dark:hover:bg-zinc-700'}`}
               >
                 All Categories
               </button>
@@ -444,7 +444,7 @@ export default function JobsPage() {
                 <button
                   key={cat}
                   onClick={() => { onChange(cat); setIsOpen(false); }}
-                  className={`w-full flex items-center gap-3 px-4 py-2.5 text-xs text-left transition-colors ${value === cat ? 'bg-cyan-600/20 text-cyan-400' : 'text-zinc-300 hover:bg-zinc-700'}`}
+                  className={`w-full flex items-center gap-3 px-4 py-2.5 text-xs text-left transition-colors ${value === cat ? 'bg-cyan-100 dark:bg-cyan-600/20 text-cyan-700 dark:text-cyan-400' : 'text-zinc-700 dark:text-zinc-300 hover:bg-zinc-100 dark:hover:bg-zinc-700'}`}
                 >
                   <span className={CATEGORY_COLORS[cat] || 'text-zinc-400'}>
                     {CATEGORY_ICONS[cat] || <Briefcase className="w-4 h-4" />}
@@ -478,7 +478,7 @@ export default function JobsPage() {
   }
 
   return (
-    <div className="min-h-screen bg-[#090a0f] text-zinc-100 p-4 md:p-8">
+    <div className="min-h-screen bg-zinc-50 dark:bg-[#090a0f] text-zinc-900 dark:text-zinc-100 p-4 md:p-8">
       <div className="max-w-[1600px] mx-auto">
         
         {/* Header */}
@@ -489,8 +489,8 @@ export default function JobsPage() {
           className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 gap-4"
         >
           <div>
-            <h1 className="text-2xl font-bold text-white tracking-tight">Manage Jobs</h1>
-            <p className="text-zinc-500 text-sm mt-1">
+            <h1 className="text-2xl font-bold text-zinc-900 dark:text-white tracking-tight">Manage Jobs</h1>
+            <p className="text-zinc-500 dark:text-zinc-500 text-sm mt-1">
               Oversee all active listings, pending approvals, and historical job posts across the platform.
             </p>
           </div>
@@ -499,7 +499,7 @@ export default function JobsPage() {
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
               onClick={() => window.location.reload()}
-              className="flex items-center gap-2 px-4 py-2 bg-zinc-800/50 hover:bg-zinc-700/50 text-zinc-300 rounded-lg text-sm transition-all duration-300 border border-white/5 hover:border-white/10"
+              className="flex items-center gap-2 px-4 py-2 bg-zinc-200 dark:bg-zinc-800/50 hover:bg-zinc-300 dark:hover:bg-zinc-700/50 text-zinc-700 dark:text-zinc-300 rounded-lg text-sm transition-all duration-300 border border-zinc-200/50 dark:border-white/5 hover:border-zinc-300/50 dark:hover:border-white/10"
             >
               <RefreshCw className="w-4 h-4" />
               <span className="hidden sm:inline">Refresh</span>
@@ -509,49 +509,49 @@ export default function JobsPage() {
 
         {/* Top Stat Cards */}
         <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-5 gap-4 mb-6">
-          <div className="bg-[#111214] border border-white/5 rounded-xl p-5">
+          <div className="bg-white/80 dark:bg-[#111214] border border-zinc-200/50 dark:border-white/5 rounded-xl p-5">
             <div className="flex items-center justify-between mb-1">
-              <h3 className="text-zinc-400 text-xs font-medium">Total Jobs</h3>
-              <Briefcase className="w-3.5 h-3.5 text-zinc-500" />
+              <h3 className="text-zinc-500 dark:text-zinc-400 text-xs font-medium">Total Jobs</h3>
+              <Briefcase className="w-3.5 h-3.5 text-zinc-400 dark:text-zinc-500" />
             </div>
-            <div className="text-2xl font-bold text-white mb-0.5">{stats.totalJobs || 0}</div>
-            <div className="text-[10px] text-zinc-500">All time listings</div>
+            <div className="text-2xl font-bold text-zinc-900 dark:text-white mb-0.5">{stats.totalJobs || 0}</div>
+            <div className="text-[10px] text-zinc-500 dark:text-zinc-500">All time listings</div>
           </div>
 
-          <div className="bg-[#111214] border border-white/5 rounded-xl p-5">
+          <div className="bg-white/80 dark:bg-[#111214] border border-zinc-200/50 dark:border-white/5 rounded-xl p-5">
             <div className="flex items-center justify-between mb-1">
-              <h3 className="text-zinc-400 text-xs font-medium">New (3 Days)</h3>
-              <Plus className="w-3.5 h-3.5 text-zinc-500" />
+              <h3 className="text-zinc-500 dark:text-zinc-400 text-xs font-medium">New (3 Days)</h3>
+              <Plus className="w-3.5 h-3.5 text-zinc-400 dark:text-zinc-500" />
             </div>
-            <div className="text-2xl font-bold text-emerald-400 mb-0.5">{stats.newJobs3Days || 0}</div>
-            <div className="text-[10px] text-zinc-500">Posted recently</div>
+            <div className="text-2xl font-bold text-emerald-600 dark:text-emerald-400 mb-0.5">{stats.newJobs3Days || 0}</div>
+            <div className="text-[10px] text-zinc-500 dark:text-zinc-500">Posted recently</div>
           </div>
 
-          <div className="bg-[#111214] border border-white/5 rounded-xl p-5">
+          <div className="bg-white/80 dark:bg-[#111214] border border-zinc-200/50 dark:border-white/5 rounded-xl p-5">
             <div className="flex items-center justify-between mb-1">
-              <h3 className="text-zinc-400 text-xs font-medium">Active Jobs</h3>
+              <h3 className="text-zinc-500 dark:text-zinc-400 text-xs font-medium">Active Jobs</h3>
               <CheckCircle className="w-3.5 h-3.5 text-emerald-500" />
             </div>
-            <div className="text-2xl font-bold text-emerald-400 mb-0.5">{stats.activeJobs || 0}</div>
-            <div className="text-[10px] text-zinc-500">Currently open</div>
+            <div className="text-2xl font-bold text-emerald-600 dark:text-emerald-400 mb-0.5">{stats.activeJobs || 0}</div>
+            <div className="text-[10px] text-zinc-500 dark:text-zinc-500">Currently open</div>
           </div>
 
-          <div className="bg-[#111214] border border-white/5 rounded-xl p-5">
+          <div className="bg-white/80 dark:bg-[#111214] border border-zinc-200/50 dark:border-white/5 rounded-xl p-5">
             <div className="flex items-center justify-between mb-1">
-              <h3 className="text-zinc-400 text-xs font-medium">Pending</h3>
+              <h3 className="text-zinc-500 dark:text-zinc-400 text-xs font-medium">Pending</h3>
               <Clock className="w-3.5 h-3.5 text-yellow-500" />
             </div>
-            <div className="text-2xl font-bold text-yellow-400 mb-0.5">{stats.pendingApproval || 0}</div>
-            <div className="text-[10px] text-zinc-500">Awaiting approval</div>
+            <div className="text-2xl font-bold text-yellow-600 dark:text-yellow-400 mb-0.5">{stats.pendingApproval || 0}</div>
+            <div className="text-[10px] text-zinc-500 dark:text-zinc-500">Awaiting approval</div>
           </div>
 
-          <div className="bg-[#111214] border border-white/5 rounded-xl p-5">
+          <div className="bg-white/80 dark:bg-[#111214] border border-zinc-200/50 dark:border-white/5 rounded-xl p-5">
             <div className="flex items-center justify-between mb-1">
-              <h3 className="text-zinc-400 text-xs font-medium">Rejected</h3>
+              <h3 className="text-zinc-500 dark:text-zinc-400 text-xs font-medium">Rejected</h3>
               <XCircle className="w-3.5 h-3.5 text-red-500" />
             </div>
-            <div className="text-2xl font-bold text-red-400 mb-0.5">{stats.rejectedJobs || 0}</div>
-            <div className="text-[10px] text-zinc-500">Not approved</div>
+            <div className="text-2xl font-bold text-red-600 dark:text-red-400 mb-0.5">{stats.rejectedJobs || 0}</div>
+            <div className="text-[10px] text-zinc-500 dark:text-zinc-500">Not approved</div>
           </div>
         </div>
 
@@ -560,17 +560,17 @@ export default function JobsPage() {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.3 }}
-          className="bg-[#111214]/80 backdrop-blur-sm border border-white/5 rounded-xl p-3 mb-6 hover:border-white/10 transition-all duration-300"
+          className="bg-white/80 dark:bg-[#111214]/80 backdrop-blur-sm border border-zinc-200/50 dark:border-white/5 rounded-xl p-3 mb-6 hover:border-zinc-300/50 dark:hover:border-white/10 transition-all duration-300"
         >
           <div className="flex flex-col lg:flex-row flex-wrap items-stretch lg:items-center gap-3 lg:gap-4">
             <div className="flex-1 min-w-[150px] lg:min-w-[200px] relative">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-500" />
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-400 dark:text-zinc-500" />
               <input
                 type="text"
                 placeholder="Search jobs..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className="w-full pl-9 pr-3 py-2 lg:py-2.5 bg-zinc-800/50 border border-white/5 rounded-lg lg:rounded-xl text-sm text-white placeholder-zinc-500 focus:outline-none focus:border-cyan-500/50 focus:ring-1 focus:ring-cyan-500/50 transition-all duration-300"
+                className="w-full pl-9 pr-3 py-2 lg:py-2.5 bg-white dark:bg-zinc-800/50 border border-zinc-200/50 dark:border-white/5 rounded-lg lg:rounded-xl text-sm text-zinc-900 dark:text-white placeholder-zinc-400 dark:placeholder-zinc-500 focus:outline-none focus:border-cyan-500/50 focus:ring-1 focus:ring-cyan-500/50 transition-all duration-300"
               />
             </div>
 
@@ -578,7 +578,7 @@ export default function JobsPage() {
               <select
                 value={approvalFilter}
                 onChange={(e) => setApprovalFilter(e.target.value)}
-                className="px-3 py-2 lg:px-3 lg:py-2.5 bg-zinc-800 border border-white/10 rounded-lg lg:rounded-xl text-xs lg:text-sm text-white focus:outline-none focus:border-cyan-500/50 cursor-pointer transition-all duration-300 hover:bg-zinc-700"
+                className="px-3 py-2 lg:px-3 lg:py-2.5 bg-white dark:bg-zinc-800 border border-zinc-200/50 dark:border-white/10 rounded-lg lg:rounded-xl text-xs lg:text-sm text-zinc-900 dark:text-white focus:outline-none focus:border-cyan-500/50 cursor-pointer transition-all duration-300 hover:bg-zinc-100 dark:hover:bg-zinc-700"
               >
                 <option value="all">All Jobs</option>
                 <option value="pending">Pending Approval</option>
@@ -589,7 +589,7 @@ export default function JobsPage() {
               <select
                 value={statusFilter}
                 onChange={(e) => setStatusFilter(e.target.value)}
-                className="px-3 py-2 lg:px-3 lg:py-2.5 bg-zinc-800 border border-white/10 rounded-lg lg:rounded-xl text-xs lg:text-sm text-white focus:outline-none focus:border-cyan-500/50 cursor-pointer transition-all duration-300 hover:bg-zinc-700"
+                className="px-3 py-2 lg:px-3 lg:py-2.5 bg-white dark:bg-zinc-800 border border-zinc-200/50 dark:border-white/10 rounded-lg lg:rounded-xl text-xs lg:text-sm text-zinc-900 dark:text-white focus:outline-none focus:border-cyan-500/50 cursor-pointer transition-all duration-300 hover:bg-zinc-100 dark:hover:bg-zinc-700"
               >
                 <option value="all">All Status</option>
                 <option value="active">Active</option>
@@ -601,14 +601,14 @@ export default function JobsPage() {
               <CategoryDropdown value={categoryFilter} onChange={setCategoryFilter} />
 
               <div className="flex items-center gap-2 ml-auto lg:ml-2">
-                <label className="text-[10px] lg:text-xs text-zinc-500 whitespace-nowrap">Show:</label>
+                <label className="text-[10px] lg:text-xs text-zinc-500 dark:text-zinc-500 whitespace-nowrap">Show:</label>
                 <select
                   value={pageSize}
                   onChange={(e) => {
                     setPageSize(Number(e.target.value));
                     setCurrentPage(1);
                   }}
-                  className="px-3 py-2 lg:px-3 lg:py-2.5 bg-zinc-800 border border-white/10 rounded-lg lg:rounded-xl text-xs lg:text-sm text-white focus:outline-none focus:border-cyan-500/50 cursor-pointer transition-all duration-300 hover:bg-zinc-700"
+                  className="px-3 py-2 lg:px-3 lg:py-2.5 bg-white dark:bg-zinc-800 border border-zinc-200/50 dark:border-white/10 rounded-lg lg:rounded-xl text-xs lg:text-sm text-zinc-900 dark:text-white focus:outline-none focus:border-cyan-500/50 cursor-pointer transition-all duration-300 hover:bg-zinc-100 dark:hover:bg-zinc-700"
                 >
                   <option value={5}>5</option>
                   <option value={10}>10</option>
@@ -626,27 +626,27 @@ export default function JobsPage() {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.4 }}
-          className="bg-[#111214] border border-white/5 rounded-xl overflow-hidden"
+          className="bg-white/80 dark:bg-[#111214] border border-zinc-200/50 dark:border-white/5 rounded-xl overflow-hidden"
         >
           <div className="overflow-x-auto">
-            <table className="w-full text-left text-sm text-zinc-400">
-              <thead className="bg-[#16181c] border-b border-white/5">
+            <table className="w-full text-left text-sm text-zinc-600 dark:text-zinc-400">
+              <thead className="bg-zinc-100/50 dark:bg-[#16181c] border-b border-zinc-200/50 dark:border-white/5">
                 <tr>
-                  <th className="px-6 py-4 font-medium text-zinc-500">Title</th>
-                  <th className="px-6 py-4 font-medium text-zinc-500">Company</th>
-                  <th className="px-6 py-4 font-medium text-zinc-500">Category</th>
-                  <th className="px-6 py-4 font-medium text-zinc-500">Type</th>
-                  <th className="px-6 py-4 font-medium text-zinc-500">Date Posted</th>
-                  <th className="px-6 py-4 font-medium text-zinc-500">Approval</th>
-                  <th className="px-6 py-4 font-medium text-zinc-500">Status</th>
-                  <th className="px-6 py-4 font-medium text-zinc-500 text-right">Actions</th>
+                  <th className="px-6 py-4 font-medium text-zinc-500 dark:text-zinc-500">Title</th>
+                  <th className="px-6 py-4 font-medium text-zinc-500 dark:text-zinc-500">Company</th>
+                  <th className="px-6 py-4 font-medium text-zinc-500 dark:text-zinc-500">Category</th>
+                  <th className="px-6 py-4 font-medium text-zinc-500 dark:text-zinc-500">Type</th>
+                  <th className="px-6 py-4 font-medium text-zinc-500 dark:text-zinc-500">Date Posted</th>
+                  <th className="px-6 py-4 font-medium text-zinc-500 dark:text-zinc-500">Approval</th>
+                  <th className="px-6 py-4 font-medium text-zinc-500 dark:text-zinc-500">Status</th>
+                  <th className="px-6 py-4 font-medium text-zinc-500 dark:text-zinc-500 text-right">Actions</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-white/5">
+              <tbody className="divide-y divide-zinc-200/50 dark:divide-white/5">
                 <AnimatePresence mode="wait">
                   {currentJobs.length === 0 ? (
                     <tr>
-                      <td colSpan={8} className="px-6 py-12 text-center text-zinc-500">
+                      <td colSpan={8} className="px-6 py-12 text-center text-zinc-500 dark:text-zinc-500">
                         <div className="flex flex-col items-center gap-2">
                           <Briefcase className="w-10 h-10 opacity-30" />
                           <p>No jobs found matching your filters</p>
@@ -655,7 +655,6 @@ export default function JobsPage() {
                     </tr>
                   ) : (
                     currentJobs.map((job) => {
-                      // ✅ Pass the entire job object to getStatusConfig
                       const status = getStatusConfig(job);
                       const approval = getApprovalStatus(job.adminApproval);
                       return (
@@ -665,12 +664,12 @@ export default function JobsPage() {
                           animate={{ opacity: 1, y: 0 }}
                           exit={{ opacity: 0, y: -5 }}
                           transition={{ duration: 0.2 }}
-                          className="hover:bg-white/[0.02] transition-colors"
+                          className="hover:bg-zinc-100/50 dark:hover:bg-white/[0.02] transition-colors"
                         >
                           <td className="px-6 py-4">
                             <div className="flex flex-col">
-                              <span className="font-medium text-white">{job.jobTitle}</span>
-                              <span className="text-[10px] text-zinc-500 font-mono">Ref: {job.id}</span>
+                              <span className="font-medium text-zinc-900 dark:text-white">{job.jobTitle}</span>
+                              <span className="text-[10px] text-zinc-500 dark:text-zinc-500 font-mono">Ref: {job.id}</span>
                             </div>
                           </td>
                           
@@ -682,21 +681,21 @@ export default function JobsPage() {
                                   alt={job.company}
                                   width={24}
                                   height={24}
-                                  className="w-6 h-6 rounded-md object-contain border border-white/10 bg-zinc-900"
+                                  className="w-6 h-6 rounded-md object-contain border border-zinc-200/50 dark:border-white/10 bg-zinc-100 dark:bg-zinc-900"
                                   onError={(e) => { e.target.style.display = 'none'; }}
                                 />
                               ) : (
-                                <div className="w-6 h-6 rounded-md bg-zinc-800 flex items-center justify-center text-[10px] font-bold text-zinc-300 shrink-0">
+                                <div className="w-6 h-6 rounded-md bg-zinc-200 dark:bg-zinc-800 flex items-center justify-center text-[10px] font-bold text-zinc-600 dark:text-zinc-300 shrink-0">
                                   {getCompanyInitials(job.company)}
                                 </div>
                               )}
-                              <span className="text-zinc-300">{job.company}</span>
+                              <span className="text-zinc-700 dark:text-zinc-300">{job.company}</span>
                             </div>
                           </td>
 
-                          <td className="px-6 py-4">{job.category}</td>
-                          <td className="px-6 py-4">{job.jobType}</td>
-                          <td className="px-6 py-4">{formatDate(job.datePosted)}</td>
+                          <td className="px-6 py-4 text-zinc-700 dark:text-zinc-300">{job.category}</td>
+                          <td className="px-6 py-4 text-zinc-700 dark:text-zinc-300">{job.jobType}</td>
+                          <td className="px-6 py-4 text-zinc-700 dark:text-zinc-300">{formatDate(job.datePosted)}</td>
                           
                           <td className="px-6 py-4">
                             <span className={`inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[10px] font-medium ${approval.className}`}>
@@ -704,7 +703,7 @@ export default function JobsPage() {
                               {approval.label}
                             </span>
                             {job.adminRejectionReason && (
-                              <p className="text-[10px] text-red-400 mt-1 truncate max-w-[120px] flex items-center gap-1">
+                              <p className="text-[10px] text-red-600 dark:text-red-400 mt-1 truncate max-w-[120px] flex items-center gap-1">
                                 <AlertCircle className="w-3 h-3 shrink-0" />
                                 {job.adminRejectionReason}
                               </p>
@@ -720,16 +719,13 @@ export default function JobsPage() {
 
                           <td className="px-6 py-4 text-right">
                             <div className="flex items-center justify-end gap-2 flex-wrap">
-                              
-                              {/* ✅ RULES FOR ACTION BUTTONS */}
                               {job.adminApproval === 'pending' && (
-                                // 1. If PENDING: Show both Approve and Reject
                                 <>
                                   <motion.button
                                     whileHover={{ scale: 1.05 }}
                                     whileTap={{ scale: 0.95 }}
                                     onClick={() => handleJobAction(job.id, 'approve')}
-                                    className="px-2.5 py-1 bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-400 rounded-lg text-xs transition-all border border-emerald-500/20 flex items-center gap-1"
+                                    className="px-2.5 py-1 bg-emerald-100 dark:bg-emerald-500/10 hover:bg-emerald-200 dark:hover:bg-emerald-500/20 text-emerald-700 dark:text-emerald-400 rounded-lg text-xs transition-all border border-emerald-200/50 dark:border-emerald-500/20 flex items-center gap-1"
                                   >
                                     <CheckCircle className="w-3 h-3" />
                                     Approve
@@ -739,7 +735,7 @@ export default function JobsPage() {
                                     whileHover={{ scale: 1.05 }}
                                     whileTap={{ scale: 0.95 }}
                                     onClick={() => handleJobAction(job.id, 'reject')}
-                                    className="px-2.5 py-1 bg-red-500/10 hover:bg-red-500/20 text-red-400 rounded-lg text-xs transition-all border border-red-500/20 flex items-center gap-1"
+                                    className="px-2.5 py-1 bg-red-100 dark:bg-red-500/10 hover:bg-red-200 dark:hover:bg-red-500/20 text-red-700 dark:text-red-400 rounded-lg text-xs transition-all border border-red-200/50 dark:border-red-500/20 flex items-center gap-1"
                                   >
                                     <XCircle className="w-3 h-3" />
                                     Reject
@@ -748,21 +744,19 @@ export default function JobsPage() {
                               )}
 
                               {job.adminApproval === 'rejected' && (
-                                // 2. If REJECTED: Show ONLY Approve (for re-review)
                                 <motion.button
                                   whileHover={{ scale: 1.05 }}
                                   whileTap={{ scale: 0.95 }}
                                   onClick={() => handleJobAction(job.id, 'approve')}
-                                  className="px-2.5 py-1 bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-400 rounded-lg text-xs transition-all border border-emerald-500/20 flex items-center gap-1"
+                                  className="px-2.5 py-1 bg-emerald-100 dark:bg-emerald-500/10 hover:bg-emerald-200 dark:hover:bg-emerald-500/20 text-emerald-700 dark:text-emerald-400 rounded-lg text-xs transition-all border border-emerald-200/50 dark:border-emerald-500/20 flex items-center gap-1"
                                 >
                                   <CheckCircle className="w-3 h-3" />
                                   Approve
                                 </motion.button>
                               )}
 
-                              {/* 3. If APPROVED: Show only Published badge */}
                               {job.adminApproval === 'approved' && (
-                                <span className="px-2.5 py-1 bg-zinc-800/40 text-zinc-500 rounded-lg text-xs border border-white/5 flex items-center gap-1">
+                                <span className="px-2.5 py-1 bg-zinc-200/50 dark:bg-zinc-800/40 text-zinc-500 dark:text-zinc-500 rounded-lg text-xs border border-zinc-200/50 dark:border-white/5 flex items-center gap-1">
                                   <CheckCircle className="w-3 h-3" />
                                   Published
                                 </span>
@@ -772,7 +766,7 @@ export default function JobsPage() {
                                 whileHover={{ scale: 1.1 }} 
                                 whileTap={{ scale: 0.9 }} 
                                 onClick={() => router.push(`/browse-jobs/${job.id}`)}
-                                className="p-1.5 text-zinc-500 hover:text-white transition-colors rounded-lg hover:bg-zinc-800/50"
+                                className="p-1.5 text-zinc-500 dark:text-zinc-500 hover:text-zinc-900 dark:hover:text-white transition-colors rounded-lg hover:bg-zinc-200/50 dark:hover:bg-zinc-800/50"
                               >
                                 <Eye className="w-4 h-4" />
                               </motion.button>
@@ -781,7 +775,7 @@ export default function JobsPage() {
                                 whileHover={{ scale: 1.1 }} 
                                 whileTap={{ scale: 0.9 }} 
                                 onClick={() => handleJobAction(job.id, 'delete')}
-                                className="p-1.5 text-zinc-500 hover:text-red-400 transition-colors rounded-lg hover:bg-zinc-800/50"
+                                className="p-1.5 text-zinc-500 dark:text-zinc-500 hover:text-red-600 dark:hover:text-red-400 transition-colors rounded-lg hover:bg-zinc-200/50 dark:hover:bg-zinc-800/50"
                               >
                                 <Trash2 className="w-4 h-4" />
                               </motion.button>
@@ -796,9 +790,9 @@ export default function JobsPage() {
             </table>
           </div>
 
-          <div className="px-6 py-4 border-t border-white/5 flex flex-col sm:flex-row justify-between items-center gap-4">
-            <p className="text-xs text-zinc-500">
-              Showing <span className="text-zinc-300">{currentJobs.length}</span> of {filteredJobs.length} results
+          <div className="px-6 py-4 border-t border-zinc-200/50 dark:border-white/5 flex flex-col sm:flex-row justify-between items-center gap-4">
+            <p className="text-xs text-zinc-500 dark:text-zinc-500">
+              Showing <span className="text-zinc-900 dark:text-zinc-300">{currentJobs.length}</span> of {filteredJobs.length} results
             </p>
             <Pagination
               currentPage={currentPage}
@@ -812,53 +806,52 @@ export default function JobsPage() {
         </motion.div>
       </div>
 
-      {/* ✅ Confirmation Modal - Adapted for Approve/Reject with Reason */}
+      {/* ✅ Confirmation Modal - Updated for theme */}
       <AnimatePresence>
         {showConfirmModal && selectedJob && (
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 bg-black/80 backdrop-blur-md z-50 flex items-center justify-center p-3 sm:p-4"
+            className="fixed inset-0 bg-black/60 dark:bg-black/80 backdrop-blur-md z-50 flex items-center justify-center p-3 sm:p-4"
             onClick={closeModal}
           >
             <motion.div
               initial={{ scale: 0.9, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
               exit={{ scale: 0.9, opacity: 0 }}
-              className="bg-[#111214] border border-white/5 rounded-xl sm:rounded-2xl p-4 sm:p-6 max-w-md w-full shadow-2xl shadow-cyan-500/5 mx-2"
+              className="bg-white dark:bg-[#111214] border border-zinc-200/50 dark:border-white/5 rounded-xl sm:rounded-2xl p-4 sm:p-6 max-w-md w-full shadow-2xl shadow-cyan-500/5 mx-2"
               onClick={(e) => e.stopPropagation()}
             >
               {actionType === 'reject' ? (
-                // ✅ REJECT MODAL WITH REASON INPUT
                 <>
                   <div className="flex items-center gap-3 mb-4">
-                    <div className="p-2 rounded-xl bg-red-500/10 text-red-400 border border-red-500/20 shrink-0">
+                    <div className="p-2 rounded-xl bg-red-100 dark:bg-red-500/10 text-red-700 dark:text-red-400 border border-red-200/50 dark:border-red-500/20 shrink-0">
                       <AlertCircle className="w-5 h-5 sm:w-6 sm:h-6" />
                     </div>
                     <div>
-                      <h3 className="text-base sm:text-lg font-semibold text-white">Reject Job Post</h3>
-                      <p className="text-xs sm:text-sm text-zinc-400">
+                      <h3 className="text-base sm:text-lg font-semibold text-zinc-900 dark:text-white">Reject Job Post</h3>
+                      <p className="text-xs sm:text-sm text-zinc-600 dark:text-zinc-400">
                         Provide a reason why this job is being rejected. This will be sent to the recruiter.
                       </p>
                     </div>
                   </div>
 
-                  <div className="bg-zinc-800/30 rounded-xl p-3 sm:p-4 mb-4 border border-white/5">
-                    <p className="text-xs sm:text-sm text-zinc-400">Job Details:</p>
-                    <p className="text-sm sm:text-base text-white font-medium">{selectedJob.jobTitle}</p>
-                    <p className="text-xs sm:text-sm text-zinc-500">{selectedJob.company}</p>
+                  <div className="bg-zinc-100/50 dark:bg-zinc-800/30 rounded-xl p-3 sm:p-4 mb-4 border border-zinc-200/50 dark:border-white/5">
+                    <p className="text-xs sm:text-sm text-zinc-500 dark:text-zinc-400">Job Details:</p>
+                    <p className="text-sm sm:text-base text-zinc-900 dark:text-white font-medium">{selectedJob.jobTitle}</p>
+                    <p className="text-xs sm:text-sm text-zinc-500 dark:text-zinc-500">{selectedJob.company}</p>
                   </div>
 
                   <div className="mb-4">
-                    <label className="text-xs text-zinc-400 block mb-1.5">Rejection Reason *</label>
+                    <label className="text-xs text-zinc-500 dark:text-zinc-400 block mb-1.5">Rejection Reason *</label>
                     <textarea
                       value={rejectReason}
                       onChange={(e) => setRejectReason(e.target.value)}
                       placeholder="Example: Missing specific job requirements, incomplete company details..."
-                      className="w-full px-3 py-2 bg-zinc-900/50 border border-zinc-800 rounded-lg text-white text-sm placeholder:text-zinc-500 focus:outline-none focus:border-red-500/50 transition-all resize-none min-h-[80px]"
+                      className="w-full px-3 py-2 bg-white dark:bg-zinc-900/50 border border-zinc-200/50 dark:border-zinc-800 rounded-lg text-zinc-900 dark:text-white text-sm placeholder:text-zinc-400 dark:placeholder:text-zinc-500 focus:outline-none focus:border-red-500/50 transition-all resize-none min-h-[80px]"
                     />
-                    <p className="text-[10px] text-zinc-500 mt-1.5">
+                    <p className="text-[10px] text-zinc-500 dark:text-zinc-500 mt-1.5">
                       The recruiter will see this message on their dashboard.
                     </p>
                   </div>
@@ -869,7 +862,7 @@ export default function JobsPage() {
                       whileTap={{ scale: 0.98 }}
                       onClick={closeModal}
                       disabled={updating}
-                      className="flex-1 px-4 py-2.5 bg-zinc-800/50 hover:bg-zinc-700/50 text-white rounded-xl text-sm font-medium transition-all duration-300 border border-white/5 order-2 sm:order-1"
+                      className="flex-1 px-4 py-2.5 bg-zinc-200 dark:bg-zinc-800/50 hover:bg-zinc-300 dark:hover:bg-zinc-700/50 text-zinc-900 dark:text-white rounded-xl text-sm font-medium transition-all duration-300 border border-zinc-200/50 dark:border-white/5 order-2 sm:order-1"
                     >
                       Cancel
                     </motion.button>
@@ -892,24 +885,23 @@ export default function JobsPage() {
                   </div>
                 </>
               ) : actionType === 'approve' ? (
-                // ✅ APPROVE MODAL
                 <>
                   <div className="flex items-center gap-3 mb-4">
-                    <div className="p-2 rounded-xl bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 shrink-0">
+                    <div className="p-2 rounded-xl bg-emerald-100 dark:bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 border border-emerald-200/50 dark:border-emerald-500/20 shrink-0">
                       <CheckCircle className="w-5 h-5 sm:w-6 sm:h-6" />
                     </div>
                     <div>
-                      <h3 className="text-base sm:text-lg font-semibold text-white">Approve & Publish</h3>
-                      <p className="text-xs sm:text-sm text-zinc-400">
+                      <h3 className="text-base sm:text-lg font-semibold text-zinc-900 dark:text-white">Approve & Publish</h3>
+                      <p className="text-xs sm:text-sm text-zinc-600 dark:text-zinc-400">
                         This job will be published immediately and visible to all job seekers on the Browse Jobs page.
                       </p>
                     </div>
                   </div>
 
-                  <div className="bg-zinc-800/30 rounded-xl p-3 sm:p-4 mb-4 border border-white/5">
-                    <p className="text-xs sm:text-sm text-zinc-400">Job Details:</p>
-                    <p className="text-sm sm:text-base text-white font-medium">{selectedJob.jobTitle}</p>
-                    <p className="text-xs sm:text-sm text-zinc-500">{selectedJob.company}</p>
+                  <div className="bg-zinc-100/50 dark:bg-zinc-800/30 rounded-xl p-3 sm:p-4 mb-4 border border-zinc-200/50 dark:border-white/5">
+                    <p className="text-xs sm:text-sm text-zinc-500 dark:text-zinc-400">Job Details:</p>
+                    <p className="text-sm sm:text-base text-zinc-900 dark:text-white font-medium">{selectedJob.jobTitle}</p>
+                    <p className="text-xs sm:text-sm text-zinc-500 dark:text-zinc-500">{selectedJob.company}</p>
                   </div>
 
                   <div className="flex flex-col sm:flex-row gap-3">
@@ -918,7 +910,7 @@ export default function JobsPage() {
                       whileTap={{ scale: 0.98 }}
                       onClick={closeModal}
                       disabled={updating}
-                      className="flex-1 px-4 py-2.5 bg-zinc-800/50 hover:bg-zinc-700/50 text-white rounded-xl text-sm font-medium transition-all duration-300 border border-white/5 order-2 sm:order-1"
+                      className="flex-1 px-4 py-2.5 bg-zinc-200 dark:bg-zinc-800/50 hover:bg-zinc-300 dark:hover:bg-zinc-700/50 text-zinc-900 dark:text-white rounded-xl text-sm font-medium transition-all duration-300 border border-zinc-200/50 dark:border-white/5 order-2 sm:order-1"
                     >
                       Cancel
                     </motion.button>
@@ -941,24 +933,23 @@ export default function JobsPage() {
                   </div>
                 </>
               ) : (
-                // ✅ DELETE MODAL
                 <>
                   <div className="flex items-center gap-3 mb-4">
-                    <div className="p-2 rounded-xl bg-red-500/10 text-red-400 border border-red-500/20 shrink-0">
+                    <div className="p-2 rounded-xl bg-red-100 dark:bg-red-500/10 text-red-700 dark:text-red-400 border border-red-200/50 dark:border-red-500/20 shrink-0">
                       <AlertCircle className="w-5 h-5 sm:w-6 sm:h-6" />
                     </div>
                     <div>
-                      <h3 className="text-base sm:text-lg font-semibold text-white">Delete Job</h3>
-                      <p className="text-xs sm:text-sm text-zinc-400">
+                      <h3 className="text-base sm:text-lg font-semibold text-zinc-900 dark:text-white">Delete Job</h3>
+                      <p className="text-xs sm:text-sm text-zinc-600 dark:text-zinc-400">
                         Are you sure you want to permanently delete this job? This action cannot be undone.
                       </p>
                     </div>
                   </div>
 
-                  <div className="bg-zinc-800/30 rounded-xl p-3 sm:p-4 mb-4 border border-white/5">
-                    <p className="text-xs sm:text-sm text-zinc-400">Job Details:</p>
-                    <p className="text-sm sm:text-base text-white font-medium">{selectedJob.jobTitle}</p>
-                    <p className="text-xs sm:text-sm text-zinc-500">{selectedJob.company}</p>
+                  <div className="bg-zinc-100/50 dark:bg-zinc-800/30 rounded-xl p-3 sm:p-4 mb-4 border border-zinc-200/50 dark:border-white/5">
+                    <p className="text-xs sm:text-sm text-zinc-500 dark:text-zinc-400">Job Details:</p>
+                    <p className="text-sm sm:text-base text-zinc-900 dark:text-white font-medium">{selectedJob.jobTitle}</p>
+                    <p className="text-xs sm:text-sm text-zinc-500 dark:text-zinc-500">{selectedJob.company}</p>
                   </div>
 
                   <div className="flex flex-col sm:flex-row gap-3">
@@ -967,7 +958,7 @@ export default function JobsPage() {
                       whileTap={{ scale: 0.98 }}
                       onClick={closeModal}
                       disabled={updating}
-                      className="flex-1 px-4 py-2.5 bg-zinc-800/50 hover:bg-zinc-700/50 text-white rounded-xl text-sm font-medium transition-all duration-300 border border-white/5 order-2 sm:order-1"
+                      className="flex-1 px-4 py-2.5 bg-zinc-200 dark:bg-zinc-800/50 hover:bg-zinc-300 dark:hover:bg-zinc-700/50 text-zinc-900 dark:text-white rounded-xl text-sm font-medium transition-all duration-300 border border-zinc-200/50 dark:border-white/5 order-2 sm:order-1"
                     >
                       Cancel
                     </motion.button>

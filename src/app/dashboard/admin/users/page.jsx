@@ -393,12 +393,12 @@ const UsersPage = () => {
     }
   };
 
-  // Get role badge styles
+  // Get role badge styles - Updated for theme
   const getRoleBadge = (role) => {
     const styles = {
-      seeker: "bg-emerald-500/10 text-emerald-400 border-emerald-500/30",
-      recruiter: "bg-blue-500/10 text-blue-400 border-blue-500/30",
-      admin: "bg-purple-500/10 text-purple-400 border-purple-500/30",
+      seeker: "bg-emerald-100 dark:bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 border-emerald-200/50 dark:border-emerald-500/30",
+      recruiter: "bg-blue-100 dark:bg-blue-500/10 text-blue-700 dark:text-blue-400 border-blue-200/50 dark:border-blue-500/30",
+      admin: "bg-purple-100 dark:bg-purple-500/10 text-purple-700 dark:text-purple-400 border-purple-200/50 dark:border-purple-500/30",
     };
     const labels = {
       seeker: "Seeker",
@@ -414,10 +414,10 @@ const UsersPage = () => {
 
   const getStatusBadge = (status) => {
     const styles = {
-      active: "bg-emerald-500/10 text-emerald-400 border-emerald-500/30",
-      suspended: "bg-red-500/10 text-red-400 border-red-500/30",
-      pending: "bg-yellow-500/10 text-yellow-400 border-yellow-500/30",
-      inactive: "bg-red-500/10 text-red-400 border-red-500/30",
+      active: "bg-emerald-100 dark:bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 border-emerald-200/50 dark:border-emerald-500/30",
+      suspended: "bg-red-100 dark:bg-red-500/10 text-red-700 dark:text-red-400 border-red-200/50 dark:border-red-500/30",
+      pending: "bg-yellow-100 dark:bg-yellow-500/10 text-yellow-700 dark:text-yellow-400 border-yellow-200/50 dark:border-yellow-500/30",
+      inactive: "bg-red-100 dark:bg-red-500/10 text-red-700 dark:text-red-400 border-red-200/50 dark:border-red-500/30",
     };
     const icons = {
       active: <CheckCircle className="w-3 h-3" />,
@@ -499,7 +499,7 @@ const UsersPage = () => {
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       transition={{ duration: 0.5 }}
-      className="min-h-screen bg-[#090a0f] text-white p-3 sm:p-4 md:p-6"
+      className="min-h-screen bg-zinc-50 dark:bg-[#090a0f] text-zinc-900 dark:text-white p-3 sm:p-4 md:p-6"
     >
       <div className="max-w-7xl mx-auto">
         {/* Header */}
@@ -515,7 +515,7 @@ const UsersPage = () => {
                 initial={{ opacity: 0, x: -20 }}
                 animate={{ opacity: 1, x: 0 }}
                 transition={{ delay: 0.1 }}
-                className="text-xl sm:text-2xl font-bold text-white flex items-center gap-3"
+                className="text-xl sm:text-2xl font-bold text-zinc-900 dark:text-white flex items-center gap-3"
               >
                 <div className="p-2 bg-gradient-to-br from-cyan-500 to-blue-500 rounded-xl shadow-lg shadow-cyan-500/20">
                   <Users className="w-5 h-5 sm:w-6 sm:h-6 text-white" />
@@ -526,7 +526,7 @@ const UsersPage = () => {
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 transition={{ delay: 0.2 }}
-                className="text-zinc-400 text-xs sm:text-sm mt-1"
+                className="text-zinc-500 dark:text-zinc-400 text-xs sm:text-sm mt-1"
               >
                 Review, filter, and manage platform access for all users.
               </motion.p>
@@ -536,7 +536,7 @@ const UsersPage = () => {
               animate={{ opacity: 1, scale: 1 }}
               transition={{ delay: 0.3 }}
               onClick={() => { fetchUsers(); fetchStats(); }}
-              className="w-full sm:w-auto px-4 py-2 bg-zinc-800/50 hover:bg-zinc-700/50 text-zinc-300 rounded-xl text-sm transition-all duration-300 flex items-center justify-center gap-2 border border-white/5 hover:border-white/10 hover:shadow-lg hover:shadow-cyan-500/10"
+              className="w-full sm:w-auto px-4 py-2 bg-zinc-200 dark:bg-zinc-800/50 hover:bg-zinc-300 dark:hover:bg-zinc-700/50 text-zinc-700 dark:text-zinc-300 rounded-xl text-sm transition-all duration-300 flex items-center justify-center gap-2 border border-zinc-200/50 dark:border-white/5 hover:border-zinc-300/50 dark:hover:border-white/10 hover:shadow-lg hover:shadow-cyan-500/10"
             >
               <RefreshCw className="w-4 h-4" />
               Refresh
@@ -544,7 +544,7 @@ const UsersPage = () => {
           </div>
         </motion.div>
 
-        {/* Stats Grid */}
+        {/* Stats Grid - Updated for theme */}
         <motion.div
           variants={containerVariants}
           initial="hidden"
@@ -557,9 +557,9 @@ const UsersPage = () => {
               value: stats.totalUsers || 0,
               icon: <Users className="w-4 h-4 sm:w-5 sm:h-5" />,
               color: "from-purple-500 to-pink-500",
-              bg: "bg-purple-500/10",
-              border: "border-purple-500/20",
-              text: "text-purple-400",
+              bg: "bg-purple-100 dark:bg-purple-500/10",
+              border: "border-purple-200/50 dark:border-purple-500/20",
+              text: "text-purple-700 dark:text-purple-400",
               change: "All users",
             },
             {
@@ -567,9 +567,9 @@ const UsersPage = () => {
               value: stats.totalActive || 0,
               icon: <UserCheck className="w-4 h-4 sm:w-5 sm:h-5" />,
               color: "from-emerald-500 to-teal-500",
-              bg: "bg-emerald-500/10",
-              border: "border-emerald-500/20",
-              text: "text-emerald-400",
+              bg: "bg-emerald-100 dark:bg-emerald-500/10",
+              border: "border-emerald-200/50 dark:border-emerald-500/20",
+              text: "text-emerald-700 dark:text-emerald-400",
               change: "Active users",
             },
             {
@@ -577,9 +577,9 @@ const UsersPage = () => {
               value: stats.seekerCount || 0,
               icon: <User className="w-4 h-4 sm:w-5 sm:h-5" />,
               color: "from-emerald-500 to-cyan-500",
-              bg: "bg-emerald-500/10",
-              border: "border-emerald-500/20",
-              text: "text-emerald-400",
+              bg: "bg-emerald-100 dark:bg-emerald-500/10",
+              border: "border-emerald-200/50 dark:border-emerald-500/20",
+              text: "text-emerald-700 dark:text-emerald-400",
               change: "Job seekers",
             },
             {
@@ -587,9 +587,9 @@ const UsersPage = () => {
               value: stats.recruiterGrowth || 0,
               icon: <Building2 className="w-4 h-4 sm:w-5 sm:h-5" />,
               color: "from-blue-500 to-cyan-500",
-              bg: "bg-blue-500/10",
-              border: "border-blue-500/20",
-              text: "text-blue-400",
+              bg: "bg-blue-100 dark:bg-blue-500/10",
+              border: "border-blue-200/50 dark:border-blue-500/20",
+              text: "text-blue-700 dark:text-blue-400",
               change: "Hiring companies",
             },
             {
@@ -597,9 +597,9 @@ const UsersPage = () => {
               value: stats.suspended || 0,
               icon: <Ban className="w-4 h-4 sm:w-5 sm:h-5" />,
               color: "from-red-500 to-orange-500",
-              bg: "bg-red-500/10",
-              border: "border-red-500/20",
-              text: "text-red-400",
+              bg: "bg-red-100 dark:bg-red-500/10",
+              border: "border-red-200/50 dark:border-red-500/20",
+              text: "text-red-700 dark:text-red-400",
               change: "Suspended accounts",
             },
           ].map((stat, idx) => (
@@ -608,25 +608,24 @@ const UsersPage = () => {
               variants={statsVariants}
               whileHover={{ 
                 y: -4, 
-                borderColor: "rgba(255,255,255,0.15)",
-                boxShadow: "0 20px 40px -12px rgba(0,0,0,0.5)"
+                borderColor: "rgba(0,0,0,0.1)",
               }}
-              className="bg-[#111214] border border-white/5 rounded-xl sm:rounded-2xl p-3 sm:p-4 transition-all duration-300 hover:bg-[#16181c]"
+              className="bg-white/80 dark:bg-[#111214] border border-zinc-200/50 dark:border-white/5 rounded-xl sm:rounded-2xl p-3 sm:p-4 transition-all duration-300 hover:bg-zinc-100 dark:hover:bg-[#16181c]"
             >
               <div className="flex items-start justify-between">
                 <div className="min-w-0 flex-1">
-                  <p className="text-[8px] sm:text-[10px] text-zinc-500 font-medium uppercase tracking-wider truncate">
+                  <p className="text-[8px] sm:text-[10px] text-zinc-500 dark:text-zinc-500 font-medium uppercase tracking-wider truncate">
                     {stat.label}
                   </p>
                   <motion.p 
                     key={stat.value}
                     initial={{ scale: 0.8 }}
                     animate={{ scale: 1 }}
-                    className="text-lg sm:text-2xl font-bold text-white mt-0.5 sm:mt-1"
+                    className="text-lg sm:text-2xl font-bold text-zinc-900 dark:text-white mt-0.5 sm:mt-1"
                   >
                     {stat.value}
                   </motion.p>
-                  <p className="text-[8px] sm:text-[10px] text-zinc-500 mt-0.5 truncate">{stat.change}</p>
+                  <p className="text-[8px] sm:text-[10px] text-zinc-500 dark:text-zinc-500 mt-0.5 truncate">{stat.change}</p>
                 </div>
                 <div className={`p-1.5 sm:p-2 ${stat.bg} rounded-lg sm:rounded-xl border ${stat.border} shrink-0 ml-2`}>
                   <span className={stat.text}>{stat.icon}</span>
@@ -646,32 +645,32 @@ const UsersPage = () => {
           ))}
         </motion.div>
 
-        {/* Filters */}
+        {/* Filters - Updated for theme */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.3 }}
-          className="bg-[#111214] border border-white/5 rounded-xl sm:rounded-2xl p-3 sm:p-4 mb-4 sm:mb-6 hover:border-white/10 transition-all duration-300"
+          className="bg-white/80 dark:bg-[#111214] border border-zinc-200/50 dark:border-white/5 rounded-xl sm:rounded-2xl p-3 sm:p-4 mb-4 sm:mb-6 hover:border-zinc-300/50 dark:hover:border-white/10 transition-all duration-300"
         >
           <div className="flex flex-col sm:flex-row flex-wrap items-stretch sm:items-center gap-3 sm:gap-4">
             <div className="flex-1 min-w-[150px] sm:min-w-[200px] relative">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-500" />
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-400 dark:text-zinc-500" />
               <input
                 type="text"
                 placeholder="Search users..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className="w-full pl-9 pr-3 py-2 sm:py-2.5 bg-zinc-800/50 border border-white/5 rounded-lg sm:rounded-xl text-sm text-white placeholder-zinc-500 focus:outline-none focus:border-cyan-500/50 focus:ring-1 focus:ring-cyan-500/50 transition-all duration-300"
+                className="w-full pl-9 pr-3 py-2 sm:py-2.5 bg-white dark:bg-zinc-800/50 border border-zinc-200/50 dark:border-white/5 rounded-lg sm:rounded-xl text-sm text-zinc-900 dark:text-white placeholder-zinc-400 dark:placeholder-zinc-500 focus:outline-none focus:border-cyan-500/50 focus:ring-1 focus:ring-cyan-500/50 transition-all duration-300"
               />
             </div>
 
             <div className="flex flex-wrap items-center gap-2 sm:gap-3">
               <div className="flex items-center gap-1 sm:gap-2">
-                <Filter className="w-3 h-3 sm:w-4 sm:h-4 text-zinc-500" />
+                <Filter className="w-3 h-3 sm:w-4 sm:h-4 text-zinc-400 dark:text-zinc-500" />
                 <select
                   value={roleFilter}
                   onChange={(e) => setRoleFilter(e.target.value)}
-                  className="px-2 py-1.5 sm:px-3 sm:py-2.5 bg-zinc-800/50 border border-white/5 rounded-lg sm:rounded-xl text-xs sm:text-sm text-white focus:outline-none focus:border-cyan-500/50 cursor-pointer transition-all duration-300 hover:border-white/10"
+                  className="px-2 py-1.5 sm:px-3 sm:py-2.5 bg-white dark:bg-zinc-800/50 border border-zinc-200/50 dark:border-white/5 rounded-lg sm:rounded-xl text-xs sm:text-sm text-zinc-900 dark:text-white focus:outline-none focus:border-cyan-500/50 cursor-pointer transition-all duration-300 hover:border-zinc-300/50 dark:hover:border-white/10"
                 >
                   <option value="all">All Roles</option>
                   <option value="seeker">Seekers</option>
@@ -683,7 +682,7 @@ const UsersPage = () => {
               <select
                 value={statusFilter}
                 onChange={(e) => setStatusFilter(e.target.value)}
-                className="px-2 py-1.5 sm:px-3 sm:py-2.5 bg-zinc-800/50 border border-white/5 rounded-lg sm:rounded-xl text-xs sm:text-sm text-white focus:outline-none focus:border-cyan-500/50 cursor-pointer transition-all duration-300 hover:border-white/10"
+                className="px-2 py-1.5 sm:px-3 sm:py-2.5 bg-white dark:bg-zinc-800/50 border border-zinc-200/50 dark:border-white/5 rounded-lg sm:rounded-xl text-xs sm:text-sm text-zinc-900 dark:text-white focus:outline-none focus:border-cyan-500/50 cursor-pointer transition-all duration-300 hover:border-zinc-300/50 dark:hover:border-white/10"
               >
                 <option value="all">All Status</option>
                 <option value="active">Active</option>
@@ -692,11 +691,11 @@ const UsersPage = () => {
             </div>
 
             <div className="flex items-center gap-2 sm:ml-auto">
-              <label className="text-[10px] sm:text-xs text-zinc-500">Show:</label>
+              <label className="text-[10px] sm:text-xs text-zinc-500 dark:text-zinc-500">Show:</label>
               <select
                 value={pageSize}
                 onChange={handlePageSizeChange}
-                className="px-2 py-1.5 sm:px-3 sm:py-2.5 bg-zinc-800/50 border border-white/5 rounded-lg sm:rounded-xl text-xs sm:text-sm text-white focus:outline-none focus:border-cyan-500/50 cursor-pointer transition-all duration-300 hover:border-white/10"
+                className="px-2 py-1.5 sm:px-3 sm:py-2.5 bg-white dark:bg-zinc-800/50 border border-zinc-200/50 dark:border-white/5 rounded-lg sm:rounded-xl text-xs sm:text-sm text-zinc-900 dark:text-white focus:outline-none focus:border-cyan-500/50 cursor-pointer transition-all duration-300 hover:border-zinc-300/50 dark:hover:border-white/10"
               >
                 <option value={5}>5</option>
                 <option value={10}>10</option>
@@ -708,18 +707,17 @@ const UsersPage = () => {
           </div>
         </motion.div>
 
-        {/* Users Table */}
+        {/* Users Table - Updated for theme */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.4 }}
-          className="bg-[#111214] border border-white/5 rounded-xl sm:rounded-2xl overflow-hidden hover:border-white/10 transition-all duration-300"
+          className="bg-white/80 dark:bg-[#111214] border border-zinc-200/50 dark:border-white/5 rounded-xl sm:rounded-2xl overflow-hidden hover:border-zinc-300/50 dark:hover:border-white/10 transition-all duration-300"
         >
-          {/* Desktop Table View */}
           <div className="hidden md:block overflow-x-auto">
             <table className="w-full">
-              <thead className="border-b border-white/5 bg-zinc-900/30">
-                <tr className="text-left text-xs text-zinc-500 uppercase tracking-wider">
+              <thead className="border-b border-zinc-200/50 dark:border-white/5 bg-zinc-100/50 dark:bg-zinc-900/30">
+                <tr className="text-left text-xs text-zinc-500 dark:text-zinc-500 uppercase tracking-wider">
                   <th className="px-4 sm:px-6 py-3 sm:py-4 font-medium">User</th>
                   <th className="px-4 sm:px-6 py-3 sm:py-4 font-medium">Email</th>
                   <th className="px-4 sm:px-6 py-3 sm:py-4 font-medium">Role</th>
@@ -738,9 +736,9 @@ const UsersPage = () => {
                     >
                       <td colSpan={6} className="px-6 py-12 text-center">
                         <div className="flex flex-col items-center gap-2">
-                          <Users className="w-12 h-12 text-zinc-600" />
-                          <p className="text-zinc-400">No users found</p>
-                          <p className="text-xs text-zinc-500">
+                          <Users className="w-12 h-12 text-zinc-300 dark:text-zinc-600" />
+                          <p className="text-zinc-500 dark:text-zinc-400">No users found</p>
+                          <p className="text-xs text-zinc-400 dark:text-zinc-500">
                             Try adjusting your filters
                           </p>
                         </div>
@@ -763,8 +761,8 @@ const UsersPage = () => {
                           initial={{ opacity: 0, x: -20 }}
                           animate={{ opacity: 1, x: 0 }}
                           transition={{ delay: idx * 0.05 }}
-                          whileHover={{ backgroundColor: "rgba(255,255,255,0.03)" }}
-                          className="border-b border-white/5 transition-colors duration-200"
+                          whileHover={{ backgroundColor: "rgba(0,0,0,0.02)" }}
+                          className="border-b border-zinc-200/50 dark:border-white/5 transition-colors duration-200"
                         >
                           <td className="px-4 sm:px-6 py-3 sm:py-4">
                             <div className="flex items-center gap-2 sm:gap-3">
@@ -774,7 +772,7 @@ const UsersPage = () => {
                                   alt={user.name || "User"}
                                   width={32}
                                   height={32}
-                                  className="w-8 h-8 rounded-full object-cover border border-white/10"
+                                  className="w-8 h-8 rounded-full object-cover border border-zinc-200/50 dark:border-white/10"
                                   onError={(e) => {
                                     e.target.style.display = 'none';
                                   }}
@@ -784,10 +782,10 @@ const UsersPage = () => {
                                   {(user.name || user.email || 'U').charAt(0).toUpperCase()}
                                 </div>
                               )}
-                              <span className="text-sm font-medium text-white truncate max-w-[100px] sm:max-w-none">
+                              <span className="text-sm font-medium text-zinc-900 dark:text-white truncate max-w-[100px] sm:max-w-none">
                                 {user.name || "Unnamed User"}
                                 {isAdmin && (
-                                  <span className="ml-2 text-[10px] bg-purple-500/20 text-purple-400 px-1.5 py-0.5 rounded-full border border-purple-500/30">
+                                  <span className="ml-2 text-[10px] bg-purple-100 dark:bg-purple-500/20 text-purple-700 dark:text-purple-400 px-1.5 py-0.5 rounded-full border border-purple-200/50 dark:border-purple-500/30">
                                     {isCurrentAdmin ? "You (Admin)" : "Admin"}
                                   </span>
                                 )}
@@ -796,8 +794,8 @@ const UsersPage = () => {
                           </td>
                           <td className="px-4 sm:px-6 py-3 sm:py-4">
                             <div className="flex items-center gap-2">
-                              <Mail className="w-3 h-3 text-zinc-500 hidden sm:block" />
-                              <span className="text-xs sm:text-sm text-zinc-300 truncate max-w-[120px] sm:max-w-none">
+                              <Mail className="w-3 h-3 text-zinc-400 dark:text-zinc-500 hidden sm:block" />
+                              <span className="text-xs sm:text-sm text-zinc-700 dark:text-zinc-300 truncate max-w-[120px] sm:max-w-none">
                                 {user.email || "No email"}
                               </span>
                             </div>
@@ -814,8 +812,8 @@ const UsersPage = () => {
                           </td>
                           <td className="px-4 sm:px-6 py-3 sm:py-4">
                             <div className="flex items-center gap-2">
-                              <Calendar className="w-3 h-3 text-zinc-500 hidden sm:block" />
-                              <span className="text-xs sm:text-sm text-zinc-300">
+                              <Calendar className="w-3 h-3 text-zinc-400 dark:text-zinc-500 hidden sm:block" />
+                              <span className="text-xs sm:text-sm text-zinc-700 dark:text-zinc-300">
                                 {formatDate(user.createdAt || user.joinDate || user.created_at)}
                               </span>
                             </div>
@@ -830,7 +828,7 @@ const UsersPage = () => {
                           </td>
                           <td className="px-4 sm:px-6 py-3 sm:py-4">
                             <div className="flex items-center justify-end gap-1 sm:gap-2 flex-wrap">
-                              {/* ✅ Role buttons - Disabled for other admins */}
+                              {/* Role buttons - Disabled for other admins */}
                               {(user.role || '').toLowerCase() !== "seeker" && (
                                 <motion.button
                                   whileHover={{ scale: 1.05 }}
@@ -839,8 +837,8 @@ const UsersPage = () => {
                                   disabled={roleChangeDisabled}
                                   className={`px-1.5 py-1 sm:px-2.5 sm:py-1.5 text-[8px] sm:text-[10px] rounded-lg transition-all duration-300 border whitespace-nowrap ${
                                     roleChangeDisabled
-                                      ? "bg-zinc-700/30 text-zinc-500 cursor-not-allowed border-zinc-700/30"
-                                      : "bg-emerald-500/10 text-emerald-400 hover:bg-emerald-500/20 border-emerald-500/20 hover:border-emerald-500/40"
+                                      ? "bg-zinc-200/50 dark:bg-zinc-700/30 text-zinc-400 dark:text-zinc-500 cursor-not-allowed border-zinc-200/50 dark:border-zinc-700/30"
+                                      : "bg-emerald-100 dark:bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 hover:bg-emerald-200 dark:hover:bg-emerald-500/20 border-emerald-200/50 dark:border-emerald-500/20 hover:border-emerald-300/50 dark:hover:border-emerald-500/40"
                                   }`}
                                   title={roleChangeDisabled ? "Cannot change another admin's role" : ""}
                                 >
@@ -855,8 +853,8 @@ const UsersPage = () => {
                                   disabled={roleChangeDisabled}
                                   className={`px-1.5 py-1 sm:px-2.5 sm:py-1.5 text-[8px] sm:text-[10px] rounded-lg transition-all duration-300 border whitespace-nowrap ${
                                     roleChangeDisabled
-                                      ? "bg-zinc-700/30 text-zinc-500 cursor-not-allowed border-zinc-700/30"
-                                      : "bg-blue-500/10 text-blue-400 hover:bg-blue-500/20 border-blue-500/20 hover:border-blue-500/40"
+                                      ? "bg-zinc-200/50 dark:bg-zinc-700/30 text-zinc-400 dark:text-zinc-500 cursor-not-allowed border-zinc-200/50 dark:border-zinc-700/30"
+                                      : "bg-blue-100 dark:bg-blue-500/10 text-blue-700 dark:text-blue-400 hover:bg-blue-200 dark:hover:bg-blue-500/20 border-blue-200/50 dark:border-blue-500/20 hover:border-blue-300/50 dark:hover:border-blue-500/40"
                                   }`}
                                   title={roleChangeDisabled ? "Cannot change another admin's role" : ""}
                                 >
@@ -868,13 +866,13 @@ const UsersPage = () => {
                                   whileHover={{ scale: 1.05 }}
                                   whileTap={{ scale: 0.95 }}
                                   onClick={() => handleUserAction(userId, "make_admin")}
-                                  className="px-1.5 py-1 sm:px-2.5 sm:py-1.5 text-[8px] sm:text-[10px] bg-purple-500/10 text-purple-400 hover:bg-purple-500/20 rounded-lg transition-all duration-300 border border-purple-500/20 hover:border-purple-500/40 whitespace-nowrap"
+                                  className="px-1.5 py-1 sm:px-2.5 sm:py-1.5 text-[8px] sm:text-[10px] bg-purple-100 dark:bg-purple-500/10 text-purple-700 dark:text-purple-400 hover:bg-purple-200 dark:hover:bg-purple-500/20 rounded-lg transition-all duration-300 border border-purple-200/50 dark:border-purple-500/20 hover:border-purple-300/50 dark:hover:border-purple-500/40 whitespace-nowrap"
                                 >
                                   Make Admin
                                 </motion.button>
                               )}
                               
-                              {/* ✅ Suspend/Activate - Disabled for other admins */}
+                              {/* Suspend/Activate - Disabled for other admins */}
                               {(user.status || '').toLowerCase() === "active" ? (
                                 <motion.button
                                   whileHover={{ scale: 1.1, rotate: 5 }}
@@ -883,8 +881,8 @@ const UsersPage = () => {
                                   disabled={actionsDisabled}
                                   className={`p-1 sm:p-1.5 rounded-lg transition-all duration-300 ${
                                     actionsDisabled
-                                      ? "text-zinc-600 cursor-not-allowed"
-                                      : "hover:bg-red-500/10 text-red-400 hover:text-red-300"
+                                      ? "text-zinc-400 dark:text-zinc-600 cursor-not-allowed"
+                                      : "hover:bg-red-100 dark:hover:bg-red-500/10 text-red-600 dark:text-red-400 hover:text-red-700 dark:hover:text-red-300"
                                   }`}
                                   title={actionsDisabled ? "Cannot suspend another admin" : "Suspend User"}
                                 >
@@ -898,8 +896,8 @@ const UsersPage = () => {
                                   disabled={actionsDisabled}
                                   className={`p-1 sm:p-1.5 rounded-lg transition-all duration-300 ${
                                     actionsDisabled
-                                      ? "text-zinc-600 cursor-not-allowed"
-                                      : "hover:bg-emerald-500/10 text-emerald-400 hover:text-emerald-300"
+                                      ? "text-zinc-400 dark:text-zinc-600 cursor-not-allowed"
+                                      : "hover:bg-emerald-100 dark:hover:bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 hover:text-emerald-700 dark:hover:text-emerald-300"
                                   }`}
                                   title={actionsDisabled ? "Cannot activate another admin" : "Activate User"}
                                 >
@@ -917,13 +915,13 @@ const UsersPage = () => {
             </table>
           </div>
 
-          {/* Mobile Card View */}
-          <div className="md:hidden divide-y divide-white/5">
+          {/* Mobile Card View - Updated for theme */}
+          <div className="md:hidden divide-y divide-zinc-200/50 dark:divide-white/5">
             {currentUsers.length === 0 ? (
               <div className="py-12 text-center">
-                <Users className="w-12 h-12 text-zinc-600 mx-auto mb-3" />
-                <p className="text-zinc-400">No users found</p>
-                <p className="text-xs text-zinc-500 mt-1">Try adjusting your filters</p>
+                <Users className="w-12 h-12 text-zinc-300 dark:text-zinc-600 mx-auto mb-3" />
+                <p className="text-zinc-500 dark:text-zinc-400">No users found</p>
+                <p className="text-xs text-zinc-400 dark:text-zinc-500 mt-1">Try adjusting your filters</p>
               </div>
             ) : (
               currentUsers.map((user, idx) => {
@@ -944,7 +942,6 @@ const UsersPage = () => {
                     transition={{ delay: idx * 0.05 }}
                     className="p-4 space-y-3"
                   >
-                    {/* User Header */}
                     <div className="flex items-center gap-3">
                       {avatar ? (
                         <Image
@@ -952,7 +949,7 @@ const UsersPage = () => {
                           alt={user.name || "User"}
                           width={40}
                           height={40}
-                          className="w-10 h-10 rounded-full object-cover border border-white/10"
+                          className="w-10 h-10 rounded-full object-cover border border-zinc-200/50 dark:border-white/10"
                           onError={(e) => {
                             e.target.style.display = 'none';
                           }}
@@ -963,15 +960,15 @@ const UsersPage = () => {
                         </div>
                       )}
                       <div className="flex-1 min-w-0">
-                        <p className="text-sm font-medium text-white truncate">
+                        <p className="text-sm font-medium text-zinc-900 dark:text-white truncate">
                           {user.name || "Unnamed User"}
                           {isAdmin && (
-                            <span className="ml-2 text-[10px] bg-purple-500/20 text-purple-400 px-1.5 py-0.5 rounded-full border border-purple-500/30">
+                            <span className="ml-2 text-[10px] bg-purple-100 dark:bg-purple-500/20 text-purple-700 dark:text-purple-400 px-1.5 py-0.5 rounded-full border border-purple-200/50 dark:border-purple-500/30">
                               {isCurrentAdmin ? "You (Admin)" : "Admin"}
                             </span>
                           )}
                         </p>
-                        <p className="text-xs text-zinc-500 truncate">
+                        <p className="text-xs text-zinc-500 dark:text-zinc-500 truncate">
                           {user.email || "No email"}
                         </p>
                       </div>
@@ -986,11 +983,10 @@ const UsersPage = () => {
                       </div>
                     </div>
 
-                    {/* User Details */}
                     <div className="grid grid-cols-2 gap-2 text-xs">
                       <div>
-                        <p className="text-zinc-500">Join Date</p>
-                        <p className="text-zinc-300">{formatDate(user.createdAt || user.joinDate || user.created_at)}</p>
+                        <p className="text-zinc-500 dark:text-zinc-500">Join Date</p>
+                        <p className="text-zinc-700 dark:text-zinc-300">{formatDate(user.createdAt || user.joinDate || user.created_at)}</p>
                       </div>
                       <div className="flex flex-wrap items-center justify-end gap-1">
                         {(user.role || '').toLowerCase() !== "seeker" && (
@@ -999,8 +995,8 @@ const UsersPage = () => {
                             disabled={roleChangeDisabled}
                             className={`px-2 py-1 text-[8px] rounded-lg transition-all duration-300 border whitespace-nowrap ${
                               roleChangeDisabled
-                                ? "bg-zinc-700/30 text-zinc-500 cursor-not-allowed border-zinc-700/30"
-                                : "bg-emerald-500/10 text-emerald-400 hover:bg-emerald-500/20 border-emerald-500/20 hover:border-emerald-500/40"
+                                ? "bg-zinc-200/50 dark:bg-zinc-700/30 text-zinc-400 dark:text-zinc-500 cursor-not-allowed border-zinc-200/50 dark:border-zinc-700/30"
+                                : "bg-emerald-100 dark:bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 hover:bg-emerald-200 dark:hover:bg-emerald-500/20 border-emerald-200/50 dark:border-emerald-500/20 hover:border-emerald-300/50 dark:hover:border-emerald-500/40"
                             }`}
                             title={roleChangeDisabled ? "Cannot change another admin's role" : ""}
                           >
@@ -1013,8 +1009,8 @@ const UsersPage = () => {
                             disabled={roleChangeDisabled}
                             className={`px-2 py-1 text-[8px] rounded-lg transition-all duration-300 border whitespace-nowrap ${
                               roleChangeDisabled
-                                ? "bg-zinc-700/30 text-zinc-500 cursor-not-allowed border-zinc-700/30"
-                                : "bg-blue-500/10 text-blue-400 hover:bg-blue-500/20 border-blue-500/20 hover:border-blue-500/40"
+                                ? "bg-zinc-200/50 dark:bg-zinc-700/30 text-zinc-400 dark:text-zinc-500 cursor-not-allowed border-zinc-200/50 dark:border-zinc-700/30"
+                                : "bg-blue-100 dark:bg-blue-500/10 text-blue-700 dark:text-blue-400 hover:bg-blue-200 dark:hover:bg-blue-500/20 border-blue-200/50 dark:border-blue-500/20 hover:border-blue-300/50 dark:hover:border-blue-500/40"
                             }`}
                             title={roleChangeDisabled ? "Cannot change another admin's role" : ""}
                           >
@@ -1024,7 +1020,7 @@ const UsersPage = () => {
                         {(user.role || '').toLowerCase() !== "admin" && !isAdmin && (
                           <button
                             onClick={() => handleUserAction(userId, "make_admin")}
-                            className="px-2 py-1 text-[8px] bg-purple-500/10 text-purple-400 hover:bg-purple-500/20 rounded-lg transition-all duration-300 border border-purple-500/20 hover:border-purple-500/40 whitespace-nowrap"
+                            className="px-2 py-1 text-[8px] bg-purple-100 dark:bg-purple-500/10 text-purple-700 dark:text-purple-400 hover:bg-purple-200 dark:hover:bg-purple-500/20 rounded-lg transition-all duration-300 border border-purple-200/50 dark:border-purple-500/20 hover:border-purple-300/50 dark:hover:border-purple-500/40 whitespace-nowrap"
                           >
                             Make Admin
                           </button>
@@ -1035,8 +1031,8 @@ const UsersPage = () => {
                             disabled={actionsDisabled}
                             className={`p-1 rounded-lg transition-all duration-300 ${
                               actionsDisabled
-                                ? "text-zinc-600 cursor-not-allowed"
-                                : "hover:bg-red-500/10 text-red-400 hover:text-red-300"
+                                ? "text-zinc-400 dark:text-zinc-600 cursor-not-allowed"
+                                : "hover:bg-red-100 dark:hover:bg-red-500/10 text-red-600 dark:text-red-400 hover:text-red-700 dark:hover:text-red-300"
                             }`}
                             title={actionsDisabled ? "Cannot suspend another admin" : "Suspend User"}
                           >
@@ -1048,8 +1044,8 @@ const UsersPage = () => {
                             disabled={actionsDisabled}
                             className={`p-1 rounded-lg transition-all duration-300 ${
                               actionsDisabled
-                                ? "text-zinc-600 cursor-not-allowed"
-                                : "hover:bg-emerald-500/10 text-emerald-400 hover:text-emerald-300"
+                                ? "text-zinc-400 dark:text-zinc-600 cursor-not-allowed"
+                                : "hover:bg-emerald-100 dark:hover:bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 hover:text-emerald-700 dark:hover:text-emerald-300"
                             }`}
                             title={actionsDisabled ? "Cannot activate another admin" : "Activate User"}
                           >
@@ -1064,14 +1060,14 @@ const UsersPage = () => {
             )}
           </div>
 
-          {/* ✅ Pagination */}
+          {/* Pagination - Updated for theme */}
           <motion.div 
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ delay: 0.5 }}
-            className="px-3 sm:px-6 py-3 sm:py-4 border-t border-white/5 flex flex-col sm:flex-row items-center justify-between gap-3 bg-zinc-900/20"
+            className="px-3 sm:px-6 py-3 sm:py-4 border-t border-zinc-200/50 dark:border-white/5 flex flex-col sm:flex-row items-center justify-between gap-3 bg-zinc-100/50 dark:bg-zinc-900/20"
           >
-            <p className="text-xs sm:text-sm text-zinc-500 text-center sm:text-left">
+            <p className="text-xs sm:text-sm text-zinc-500 dark:text-zinc-500 text-center sm:text-left">
               Showing {currentUsers.length === 0 ? 0 : start} to {end} of {filteredUsers.length} users
             </p>
             <Pagination
@@ -1086,30 +1082,30 @@ const UsersPage = () => {
         </motion.div>
       </div>
 
-      {/* Confirmation Modal */}
+      {/* Confirmation Modal - Updated for theme */}
       <AnimatePresence>
         {showConfirmModal && selectedUser && (
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 bg-black/80 backdrop-blur-md z-50 flex items-center justify-center p-3 sm:p-4"
+            className="fixed inset-0 bg-black/60 dark:bg-black/80 backdrop-blur-md z-50 flex items-center justify-center p-3 sm:p-4"
             onClick={() => setShowConfirmModal(false)}
           >
             <motion.div
               initial={{ scale: 0.9, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
               exit={{ scale: 0.9, opacity: 0 }}
-              className="bg-[#111214] border border-white/5 rounded-xl sm:rounded-2xl p-4 sm:p-6 max-w-md w-full shadow-2xl shadow-cyan-500/5 mx-2"
+              className="bg-white dark:bg-[#111214] border border-zinc-200/50 dark:border-white/5 rounded-xl sm:rounded-2xl p-4 sm:p-6 max-w-md w-full shadow-2xl shadow-cyan-500/5 mx-2"
               onClick={(e) => e.stopPropagation()}
             >
               <div className="flex items-center gap-3 mb-4">
-                <div className="p-2 rounded-xl bg-yellow-500/10 text-yellow-400 border border-yellow-500/20 shrink-0">
+                <div className="p-2 rounded-xl bg-yellow-100 dark:bg-yellow-500/10 text-yellow-700 dark:text-yellow-400 border border-yellow-200/50 dark:border-yellow-500/20 shrink-0">
                   <AlertCircle className="w-5 h-5 sm:w-6 sm:h-6" />
                 </div>
                 <div>
-                  <h3 className="text-base sm:text-lg font-semibold text-white">Confirm Action</h3>
-                  <p className="text-xs sm:text-sm text-zinc-400">
+                  <h3 className="text-base sm:text-lg font-semibold text-zinc-900 dark:text-white">Confirm Action</h3>
+                  <p className="text-xs sm:text-sm text-zinc-600 dark:text-zinc-400">
                     {selectedUser.role === 'admin' && !isCurrentAdminUser(selectedUser) && 
                       (actionType === 'make_seeker' || actionType === 'make_recruiter' || actionType === 'make_admin' || 
                        actionType === 'suspend' || actionType === 'activate')
@@ -1120,11 +1116,11 @@ const UsersPage = () => {
                 </div>
               </div>
 
-              <div className="bg-zinc-800/30 rounded-xl p-3 sm:p-4 mb-4 sm:mb-6 border border-white/5">
-                <p className="text-xs sm:text-sm text-zinc-400">User Details:</p>
-                <p className="text-sm sm:text-base text-white font-medium">{selectedUser.name || "Unnamed User"}</p>
-                <p className="text-xs sm:text-sm text-zinc-500">{selectedUser.email || "No email"}</p>
-                <p className="text-[10px] sm:text-xs text-zinc-500 mt-1">
+              <div className="bg-zinc-100/50 dark:bg-zinc-800/30 rounded-xl p-3 sm:p-4 mb-4 sm:mb-6 border border-zinc-200/50 dark:border-white/5">
+                <p className="text-xs sm:text-sm text-zinc-500 dark:text-zinc-400">User Details:</p>
+                <p className="text-sm sm:text-base text-zinc-900 dark:text-white font-medium">{selectedUser.name || "Unnamed User"}</p>
+                <p className="text-xs sm:text-sm text-zinc-500 dark:text-zinc-500">{selectedUser.email || "No email"}</p>
+                <p className="text-[10px] sm:text-xs text-zinc-500 dark:text-zinc-500 mt-1">
                   Current Role: {getRoleBadge(selectedUser.role).label} • Status:{" "}
                   {getStatusBadge(selectedUser.status).label}
                 </p>
@@ -1135,7 +1131,7 @@ const UsersPage = () => {
                   whileHover={{ scale: 1.02 }}
                   whileTap={{ scale: 0.98 }}
                   onClick={() => setShowConfirmModal(false)}
-                  className="flex-1 px-4 py-2.5 bg-zinc-800/50 hover:bg-zinc-700/50 text-white rounded-xl text-sm font-medium transition-all duration-300 border border-white/5 order-2 sm:order-1"
+                  className="flex-1 px-4 py-2.5 bg-zinc-200 dark:bg-zinc-800/50 hover:bg-zinc-300 dark:hover:bg-zinc-700/50 text-zinc-900 dark:text-white rounded-xl text-sm font-medium transition-all duration-300 border border-zinc-200/50 dark:border-white/5 order-2 sm:order-1"
                 >
                   Cancel
                 </motion.button>

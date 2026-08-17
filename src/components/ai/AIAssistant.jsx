@@ -27,15 +27,90 @@ import {
   Compass,
   Moon,
   Sun,
+  Home,
+  BookOpen,
+  Award,
+  MessageSquare,
+  Settings,
+  Bell,
 } from "lucide-react";
 
-import { useRouter } from "next/navigation";
+import { useRouter, usePathname } from "next/navigation";
 import { useTheme } from "next-themes";
 
 import { authClient } from "@/lib/auth-client";
-import AIAssistantFloatingButton from "./AIAssistantFloatingButton";
 import BlobWrapper from "./BlobWrapper";
 import { MessageWithAvatar, getBotTheme } from "./MessageWithAvatar";
+
+// ============================================================
+// JOB CATEGORIES - MOVED UP BEFORE FAQ_RESPONSES
+// ============================================================
+
+const JOB_CATEGORIES = {
+  design: [
+    "design", "ui", "ux", "graphic", "creative", "product design",
+    "visual", "ui/ux", "web design", "app design", "art",
+    "illustrator", "photoshop", "figma", "sketch", "adobe",
+  ],
+  technology: [
+    "technology", "tech", "software", "developer", "engineer",
+    "programming", "coding", "it", "devops", "data science", "ai",
+    "machine learning", "frontend", "backend", "full stack", "cloud",
+    "aws", "azure", "python", "java", "javascript", "react", "node",
+    "docker", "kubernetes", "sql", "database", "security", "c++",
+    "c#", "ruby", "php", "html", "css",
+  ],
+  marketing: [
+    "marketing", "seo", "social media", "content marketing",
+    "digital marketing", "brand", "branding", "advertising",
+    "campaign", "growth", "email marketing", "public relations", "pr",
+  ],
+  finance: [
+    "finance", "accounting", "investment", "banking", "financial",
+    "audit", "tax", "insurance", "underwriting", "claims",
+    "accountant", "budget", "forecasting",
+  ],
+  healthcare: [
+    "healthcare", "health", "medical", "nursing", "wellness",
+    "hospital", "doctor", "clinic", "patient", "laboratory", "medicine",
+  ],
+  manufacturing: [
+    "manufacturing", "production", "quality", "mechanical",
+    "electrical", "industrial", "supply chain", "textile", "steel",
+    "maintenance", "safety", "operations", "plant", "factory", "warehouse",
+  ],
+  "human resources": [
+    "human resources", "human resource", "hr", "recruitment",
+    "recruiter", "talent acquisition", "training", "employee relations",
+    "employee", "hiring", "benefits", "compensation", "onboarding",
+  ],
+  sales: [
+    "sales", "sales representative", "sales manager", "b2b", "b2c",
+    "account management", "business development", "retail", "store",
+    "client", "customer", "lead generation", "territory",
+  ],
+  education: [
+    "education", "educational", "teacher", "teaching", "tutor",
+    "tutoring", "lecturer", "professor", "instructor", "academic",
+    "school", "college", "university", "training", "curriculum",
+  ],
+};
+
+// ============================================================
+// CATEGORY DISPLAY NAMES - MOVED UP BEFORE FAQ_RESPONSES
+// ============================================================
+
+const CATEGORY_DISPLAY_NAMES = {
+  design: "Design",
+  technology: "Technology",
+  marketing: "Marketing",
+  finance: "Finance",
+  healthcare: "Healthcare",
+  manufacturing: "Manufacturing",
+  "human resources": "Human Resources",
+  sales: "Sales",
+  education: "Education",
+};
 
 // ============================================================
 // SESSION - Removed chat history storage
@@ -106,9 +181,70 @@ const FAQ_RESPONSES = {
     action: null,
   },
 
+  "go to browse jobs": {
+    response: "🔍 Taking you to the Browse Jobs page where you can find all available job opportunities!",
+    action: "/browse-jobs",
+  },
+
+  "go to dashboard": {
+    response: "📊 Taking you to your Dashboard where you can manage everything!",
+    action: "/dashboard",
+  },
+
+  "go to pricing": {
+    response: "💰 Taking you to our Pricing page to see all available plans!",
+    action: "/pricing",
+  },
+
+  "go to companies": {
+    response: "🏢 Taking you to the Companies page to explore all registered companies!",
+    action: "/companies",
+  },
+
+  "go to profile": {
+    response: "👤 Taking you to your Profile page!",
+    action: "/profile",
+  },
+
+  "go to homepage": {
+    response: "🏠 Taking you to the Homepage!",
+    action: "/",
+  },
+
+  "what can you do": {
+    response: "🤖 I'm HireLoop's AI Assistant!\n\nHere's what I can do:\n\n🔍 **Find Jobs** - Search for jobs by category\n📝 **Explain How To** - Guide you through applying, posting jobs, etc.\n📍 **Navigate** - Take you to different pages\n💡 **Give Tips** - Career advice, interview tips, resume help\n🌓 **Theme Control** - Switch between dark and light mode\n\nTry saying:\n• 'Show me design jobs'\n• 'How to apply?'\n• 'Go to Dashboard'\n• 'Help me with my resume'\n• 'Dark mode'",
+    action: null,
+  },
+
+  "tell me about hireloop": {
+    response: "🏢 **About HireLoop**\n\nHireLoop is a modern job platform that connects:\n\n**For Job Seekers:**\n🎯 AI-powered job matching\n📝 Easy application process\n📊 Track your applications\n💡 Career resources and tips\n\n**For Recruiters:**\n👥 Find top talent\n🤖 Smart candidate filtering\n⚡ Faster hiring process\n📈 Analytics and insights\n\n🚀 Join HireLoop today and take your career to the next level!",
+    action: null,
+  },
+
+  "find me a job": {
+    response: "🔍 I'd love to help you find a job!\n\nHere are the job categories available:\n\n" +
+    Object.values(CATEGORY_DISPLAY_NAMES).map(cat => `• ${cat}`).join('\n') +
+    "\n\nJust say \"Show me [category] jobs\" and I'll find them for you!\n\nFor example:\n• 'Show me technology jobs'\n• 'Find design jobs'\n• 'Give me marketing jobs'",
+    action: null,
+    showCategories: true,
+  },
+
+  "i need a job": {
+    response: "🎯 Looking for a job? I can help!\n\nStart by telling me what kind of job you're looking for:\n\n" +
+    Object.values(CATEGORY_DISPLAY_NAMES).map(cat => `• ${cat}`).join('\n') +
+    "\n\nTry saying:\n• 'Show me technology jobs'\n• 'Find design jobs'\n• 'Give me marketing jobs'",
+    action: null,
+    showCategories: true,
+  },
+
+  "how does hireloop work": {
+    response: "🚀 **How HireLoop Works**\n\n**For Job Seekers:**\n1️⃣ Create your profile\n2️⃣ Browse jobs by category\n3️⃣ Apply with one click\n4️⃣ Track your applications\n5️⃣ Get hired!\n\n**For Recruiters:**\n1️⃣ Create company profile\n2️⃣ Post job openings\n3️⃣ Review applications\n4️⃣ Find the perfect candidate\n5️⃣ Make an offer!\n\nReady to get started? 🎉",
+    action: null,
+  },
+
   default: {
     response:
-      "🤔 I'm not sure about that specific question.\n\nI can help with:\n• Finding jobs\n• Job categories\n• Applying for jobs\n• Posting jobs\n• Application status\n• Company profiles\n• Pricing\n\nTry something like:\n\n\"Show me education jobs\"",
+      "🤔 I'm not sure about that specific question.\n\nI can help with:\n• Finding jobs\n• Job categories\n• Applying for jobs\n• Posting jobs\n• Application status\n• Company profiles\n• Pricing\n\nTry something like:\n\n\"Show me education jobs\"\n\"How to apply?\"\n\"Tell me about HireLoop\"",
     action: null,
   },
 };
@@ -196,13 +332,23 @@ You can moderate:
 - Practice common questions
 - Prepare your own questions
 - Be confident!`,
+
+      "my applications": `📊 **Your Applications**
+
+To view your applications:
+
+1. Go to your Dashboard
+2. Click 'My Applications'
+3. See all your applications and their status
+
+I'll take you there:`,
     };
 
     for (const [key, value] of Object.entries(seekerResponses)) {
       if (lowerQuery.includes(key)) {
         return {
           response: value,
-          action: null,
+          action: key === "my applications" ? "/dashboard/applications" : null,
         };
       }
     }
@@ -231,13 +377,23 @@ You can moderate:
 2. Shortlist candidates
 3. Schedule interviews
 4. Make offers`,
+
+      "my jobs": `💼 **Your Job Postings**
+
+To view your posted jobs:
+
+1. Go to your Dashboard
+2. Click 'My Jobs'
+3. See all your active and closed job postings
+
+I'll take you there:`,
     };
 
     for (const [key, value] of Object.entries(recruiterResponses)) {
       if (lowerQuery.includes(key)) {
         return {
           response: value,
-          action: null,
+          action: key === "my jobs" ? "/dashboard/recruiter/jobs" : null,
         };
       }
     }
@@ -269,89 +425,28 @@ You can moderate:
 1. Click 'Sign In'
 2. Enter your email and password
 3. Or use Google/GitHub`,
+
+      "sign up": `📝 **Create an account:**
+
+1. Click 'Sign Up'
+2. Choose your role (Seeker or Recruiter)
+3. Fill in your details
+4. Start your journey!
+
+I'll take you to the sign up page:`,
     };
 
     for (const [key, value] of Object.entries(guestResponses)) {
       if (lowerQuery.includes(key)) {
         return {
-          response: value,
-          action: null,
+          response: value.response || value,
+          action: value.action || null,
         };
       }
     }
   }
 
   return null;
-};
-
-// ============================================================
-// JOB CATEGORIES
-// ============================================================
-
-const JOB_CATEGORIES = {
-  design: [
-    "design", "ui", "ux", "graphic", "creative", "product design",
-    "visual", "ui/ux", "web design", "app design", "art",
-    "illustrator", "photoshop", "figma", "sketch", "adobe",
-  ],
-  technology: [
-    "technology", "tech", "software", "developer", "engineer",
-    "programming", "coding", "it", "devops", "data science", "ai",
-    "machine learning", "frontend", "backend", "full stack", "cloud",
-    "aws", "azure", "python", "java", "javascript", "react", "node",
-    "docker", "kubernetes", "sql", "database", "security", "c++",
-    "c#", "ruby", "php", "html", "css",
-  ],
-  marketing: [
-    "marketing", "seo", "social media", "content marketing",
-    "digital marketing", "brand", "branding", "advertising",
-    "campaign", "growth", "email marketing", "public relations", "pr",
-  ],
-  finance: [
-    "finance", "accounting", "investment", "banking", "financial",
-    "audit", "tax", "insurance", "underwriting", "claims",
-    "accountant", "budget", "forecasting",
-  ],
-  healthcare: [
-    "healthcare", "health", "medical", "nursing", "wellness",
-    "hospital", "doctor", "clinic", "patient", "laboratory", "medicine",
-  ],
-  manufacturing: [
-    "manufacturing", "production", "quality", "mechanical",
-    "electrical", "industrial", "supply chain", "textile", "steel",
-    "maintenance", "safety", "operations", "plant", "factory", "warehouse",
-  ],
-  "human resources": [
-    "human resources", "human resource", "hr", "recruitment",
-    "recruiter", "talent acquisition", "training", "employee relations",
-    "employee", "hiring", "benefits", "compensation", "onboarding",
-  ],
-  sales: [
-    "sales", "sales representative", "sales manager", "b2b", "b2c",
-    "account management", "business development", "retail", "store",
-    "client", "customer", "lead generation", "territory",
-  ],
-  education: [
-    "education", "educational", "teacher", "teaching", "tutor",
-    "tutoring", "lecturer", "professor", "instructor", "academic",
-    "school", "college", "university", "training", "curriculum",
-  ],
-};
-
-// ============================================================
-// CATEGORY DISPLAY NAMES
-// ============================================================
-
-const CATEGORY_DISPLAY_NAMES = {
-  design: "Design",
-  technology: "Technology",
-  marketing: "Marketing",
-  finance: "Finance",
-  healthcare: "Healthcare",
-  manufacturing: "Manufacturing",
-  "human resources": "Human Resources",
-  sales: "Sales",
-  education: "Education",
 };
 
 // ============================================================
@@ -468,6 +563,24 @@ const GENERIC_JOBS_REGEX =
   /\b(jobs?|categor(?:y|ies)|positions?|openings?|opportunit(?:y|ies)|roles?)\b/i;
 
 // ============================================================
+// NAVIGATION COMMANDS
+// ============================================================
+
+const NAVIGATION_COMMANDS = {
+  "homepage": "/",
+  "home": "/",
+  "browse jobs": "/browse-jobs",
+  "companies": "/companies",
+  "pricing": "/pricing",
+  "dashboard": "/dashboard",
+  "profile": "/profile",
+  "post a job": "/dashboard/recruiter/jobs/new",
+  "contact": "/contact",
+  "sign up": "/signup",
+  "sign in": "/signin",
+};
+
+// ============================================================
 // POKE LINES
 // ============================================================
 
@@ -497,12 +610,29 @@ const SLEEP_AFTER_MS = 150000;
 const SPEECH_VISIBLE_MS = 4000;
 const POKE_SPEECH_VISIBLE_MS = 3000;
 
+// Pixels the pointer must move before a gesture counts as a drag
+// (rather than a click that should open the chat window).
+const DRAG_CLICK_THRESHOLD = 5;
+
+// ============================================================
+// SUGGESTION BUTTON CLASSES
+// ============================================================
+
+const SUGGESTION_BUTTON_CLASSES =
+  "inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs " +
+  "border transition-colors cursor-pointer " +
+  "bg-zinc-200/70 border-zinc-300/60 text-zinc-700 " +
+  "hover:bg-zinc-300/70 hover:text-zinc-900 " +
+  "dark:bg-zinc-800/50 dark:border-zinc-700/50 dark:text-zinc-300 " +
+  "dark:hover:bg-zinc-700/60 dark:hover:text-white";
+
 // ============================================================
 // MAIN COMPONENT
 // ============================================================
 
 const AIAssistant = () => {
   const router = useRouter();
+  const pathname = usePathname();
   const { theme, setTheme } = useTheme();
   const { data: session } = authClient.useSession();
   const user = session?.user;
@@ -517,6 +647,7 @@ const AIAssistant = () => {
   const [isMounted, setIsMounted] = useState(false);
   const [blobMood, setBlobMood] = useState("neutral");
   const [blobGaze, setBlobGaze] = useState({ x: 0, y: 0 });
+  const [hasUserInteracted, setHasUserInteracted] = useState(false);
 
   const messagesEndRef = useRef(null);
   const inputRef = useRef(null);
@@ -533,12 +664,43 @@ const AIAssistant = () => {
   const [isSleeping, setIsSleeping] = useState(false);
 
   // ==========================================================
-  // INITIAL MESSAGE
+  // CHECK IF ON AUTH PAGES - HIDE FLOATING BUTTON
+  // ==========================================================
+
+  const isAuthPage = pathname?.includes('/signin') || 
+                     pathname?.includes('/signup') || 
+                     pathname?.includes('/forgot-password') || 
+                     pathname?.includes('/forget-password') || 
+                     pathname?.includes('/reset-password');
+
+  // ==========================================================
+  // DRAG-TO-MOVE (floating launcher button only)
+  // ==========================================================
+
+  const dragBoundsRef = useRef(null);
+  const dragStartPointRef = useRef({ x: 0, y: 0 });
+  const hasDraggedRef = useRef(false);
+
+  const handleLauncherDragStart = useCallback((event, info) => {
+    dragStartPointRef.current = { x: info.point.x, y: info.point.y };
+    hasDraggedRef.current = false;
+  }, []);
+
+  const handleLauncherDrag = useCallback((event, info) => {
+    const dx = Math.abs(info.point.x - dragStartPointRef.current.x);
+    const dy = Math.abs(info.point.y - dragStartPointRef.current.y);
+    if (dx > DRAG_CLICK_THRESHOLD || dy > DRAG_CLICK_THRESHOLD) {
+      hasDraggedRef.current = true;
+    }
+  }, []);
+
+  // ==========================================================
+  // INITIAL MESSAGE - Role based
   // ==========================================================
 
   const getInitialMessage = useCallback(() => {
-    const themeText = theme === 'dark' ? '🌙 Dark mode is active' : '☀️ Light mode is active';
-    
+    const themeText = user ? (theme === 'dark' ? '🌙 Dark mode is active' : '☀️ Light mode is active') : '';
+
     if (userRole === "admin") {
       return {
         id: 1,
@@ -553,7 +715,6 @@ I can help you:
 - 📋 Generate reports
 - 🛡️ Moderate content
 - 🔍 Find jobs by category
-- 🌓 Switch theme (say "dark mode" or "light mode")
 
 ${themeText}
 
@@ -576,14 +737,15 @@ I can help you:
 - 📊 Track applications
 - 💡 Get career advice
 - 🔎 Search jobs by category
-- 🌓 Switch theme (say "dark mode" or "light mode")
+- 📁 Manage your applications
 
 ${themeText}
 
 Try:
 "Show me education jobs"
 "Find marketing jobs"
-"Give me sales jobs"`,
+"Give me sales jobs"
+"My applications"`,
         timestamp: new Date(),
       };
     }
@@ -602,13 +764,19 @@ I can help you:
 - 📊 Review applications
 - 🤝 Manage hiring
 - 🔍 Search candidates by skills
-- 🌓 Switch theme (say "dark mode" or "light mode")
+- 💼 Manage your job postings
 
-${themeText}`,
+${themeText}
+
+Try:
+"Post a job"
+"Find talent"
+"My jobs"`,
         timestamp: new Date(),
       };
     }
 
+    // Guest / Non-user - NO theme mention
     return {
       id: 1,
       type: "bot",
@@ -622,27 +790,34 @@ I can help you:
 - 💼 Discover recruiter features
 - 🔑 Get started with an account
 - 🔎 Find jobs by category
-- 🌓 Switch theme (say "dark mode" or "light mode")
-
-${themeText}
+- 📖 Learn about HireLoop
 
 Try:
 "Show me education jobs"
 "Find marketing jobs"
-"Give me sales jobs"`,
+"Tell me about HireLoop"
+"How does HireLoop work?"`,
       timestamp: new Date(),
     };
   }, [userRole, user, theme]);
 
   // ==========================================================
-  // LOAD CHAT - No storage, always starts fresh
+  // LOAD CHAT - Reset only on logout
   // ==========================================================
 
   useEffect(() => {
     setIsMounted(true);
-    // Always start with fresh initial message
     setMessages([getInitialMessage()]);
+    setHasUserInteracted(false);
   }, [getInitialMessage]);
+
+  // Reset messages when user logs out
+  useEffect(() => {
+    if (!user) {
+      setMessages([getInitialMessage()]);
+      setHasUserInteracted(false);
+    }
+  }, [user, getInitialMessage]);
 
   // Scroll to bottom when messages change
   useEffect(() => {
@@ -653,7 +828,6 @@ Try:
     if (isOpen && !isMinimized) {
       const timer = setTimeout(() => {
         inputRef.current?.focus();
-        // Scroll to bottom when opened
         messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
       }, 300);
       return () => clearTimeout(timer);
@@ -692,14 +866,14 @@ Try:
   }, []);
 
   // ==========================================================
-  // FIND RESPONSE - Added theme switching
+  // FIND RESPONSE - Theme switching works for ALL users
   // ==========================================================
 
   const findBestResponse = useCallback(
     (query) => {
       const lowerQuery = normalizeText(query);
 
-      // ✅ THEME SWITCHING COMMANDS
+      // ✅ THEME SWITCHING - Works for ALL users (even guests)
       if (lowerQuery.includes("dark mode") || lowerQuery.includes("dark theme")) {
         setTheme("dark");
         return {
@@ -716,7 +890,22 @@ Try:
         };
       }
 
-      // ✅ JOB CATEGORY FIRST (specific category match)
+      // ✅ NAVIGATION COMMANDS
+      for (const [command, path] of Object.entries(NAVIGATION_COMMANDS)) {
+        if (lowerQuery.includes(`go to ${command}`) || 
+            lowerQuery.includes(`take me to ${command}`) ||
+            lowerQuery.includes(`navigate to ${command}`) ||
+            lowerQuery.includes(`open ${command}`) ||
+            lowerQuery === command) {
+          const displayName = command.charAt(0).toUpperCase() + command.slice(1);
+          return {
+            response: `📍 Taking you to ${displayName} page!`,
+            action: path,
+          };
+        }
+      }
+
+      // ✅ JOB CATEGORY FIRST
       const jobCommand = handleJobCategoryCommand(query);
 
       if (jobCommand) {
@@ -758,17 +947,27 @@ Redirecting you to browse jobs with the "${displayCategory}" category filter...`
         help: "help",
         hello: "hello",
         hi: "hi",
+        "what can you do": "what can you do",
+        capabilities: "what can you do",
+        about: "tell me about hireloop",
+        "how does": "how does hireloop work",
+        "find me": "find me a job",
+        "need a job": "i need a job",
+        "job search": "find me a job",
+        "looking for": "find me a job",
       };
 
       for (const [word, key] of Object.entries(keywords)) {
         if (lowerQuery.includes(word)) return FAQ_RESPONSES[key];
       }
 
-      // ✅ GENERIC JOB / CATEGORY REQUEST
-      if (GENERIC_JOBS_REGEX.test(lowerQuery)) {
+      // ✅ GENERIC JOB / CATEGORY REQUEST - Show all categories
+      if (GENERIC_JOBS_REGEX.test(lowerQuery) || lowerQuery.includes("category") || lowerQuery.includes("categories")) {
         return {
           response:
-            "🔍 Sure! Which category are you interested in? Tap one below, or just type it:",
+            "🔍 Sure! Here are all the job categories available on HireLoop:\n\n" +
+            Object.values(CATEGORY_DISPLAY_NAMES).map(cat => `• ${cat}`).join('\n') +
+            "\n\nJust say \"Show me [category] jobs\" and I'll help you find them!\n\nOr say \"Go to Browse Jobs\" to see all jobs.",
           action: null,
           showCategories: true,
         };
@@ -802,6 +1001,8 @@ Redirecting you to browse jobs with the "${displayCategory}" category filter...`
 
       if (isSleeping) wakeUp();
 
+      setHasUserInteracted(true);
+
       const userMessage = {
         id: Date.now(),
         type: "user",
@@ -833,12 +1034,16 @@ Redirecting you to browse jobs with the "${displayCategory}" category filter...`
         setIsTyping(false);
         setBlobMood("happy");
 
-        // Scroll to bottom after new message
         setTimeout(() => {
           messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
         }, 100);
 
-        if (response.isJobSearch && response.action) {
+        if (response.action && !response.isJobSearch) {
+          setTimeout(() => {
+            setIsOpen(false);
+            router.push(response.action);
+          }, 1500);
+        } else if (response.isJobSearch && response.action) {
           setTimeout(() => {
             setIsOpen(false);
             router.push(response.action);
@@ -861,6 +1066,24 @@ Redirecting you to browse jobs with the "${displayCategory}" category filter...`
     setIsOpen(false);
     router.push(path);
   };
+
+  // ==========================================================
+  // LAUNCHER CLICK
+  // ==========================================================
+
+  const handleLauncherClick = useCallback(() => {
+    if (hasDraggedRef.current) {
+      hasDraggedRef.current = false;
+      return;
+    }
+
+    if (isSleeping) {
+      wakeUp();
+      startIdleTimer();
+      return;
+    }
+    setIsOpen(true);
+  }, [isSleeping, wakeUp]);
 
   // ==========================================================
   // POKE
@@ -987,47 +1210,58 @@ Redirecting you to browse jobs with the "${displayCategory}" category filter...`
 
   if (!isMounted) return null;
 
+  // DON'T RENDER FLOATING BUTTON ON AUTH PAGES
+  if (isAuthPage) return null;
+
   return (
     <>
       {/* ====================================================
-          FLOATING BUTTON
+          FLOATING BUTTON (draggable)
       ==================================================== */}
 
       {!isOpen && (
-        <div className="fixed bottom-6 right-6 z-50">
-          <div className="relative">
-            <div className="absolute inset-[-8px] rounded-full bg-gradient-to-r from-blue-500/30 to-purple-500/30 blur-xl animate-pulse" />
+        <>
+          <div
+            ref={dragBoundsRef}
+            className="fixed inset-4 z-40 pointer-events-none"
+          />
 
-            <button
-              type="button"
-              onClick={() => {
-                if (isSleeping) {
-                  wakeUp();
-                  startIdleTimer();
-                  return;
+          <motion.div
+            drag
+            dragConstraints={dragBoundsRef}
+            dragElastic={0.08}
+            dragMomentum={false}
+            onDragStart={handleLauncherDragStart}
+            onDrag={handleLauncherDrag}
+            className="fixed bottom-6 right-6 z-50 touch-none select-none"
+          >
+            <div className="relative">
+              <div className="absolute inset-[-8px] rounded-full bg-gradient-to-r from-blue-500/30 to-purple-500/30 blur-xl animate-pulse pointer-events-none" />
+
+              <button
+                type="button"
+                onClick={handleLauncherClick}
+                className="relative cursor-grab active:cursor-grabbing hover:scale-105 transition-transform duration-300"
+                aria-label={
+                  isSleeping ? "Wake up assistant" : "Open AI assistant"
                 }
-                setIsOpen(true);
-              }}
-              className="relative cursor-pointer hover:scale-105 transition-transform duration-300"
-              aria-label={
-                isSleeping ? "Wake up assistant" : "Open AI assistant"
-              }
-            >
-              <div className="relative w-16 h-16 md:w-20 md:h-20">
-                <BlobWrapper
-                  mood={isSleeping ? "neutral" : blobMood}
-                  gaze={blobGaze}
-                  size={80}
-                  themeColors={botTheme}
-                  onOverpoke={handleOverpoke}
-                  speechText={getSpeechText()}
-                  speechMood={getSpeechMood()}
-                  speechAlign="right"
-                />
-              </div>
-            </button>
-          </div>
-        </div>
+              >
+                <div className="relative w-16 h-16 md:w-20 md:h-20">
+                  <BlobWrapper
+                    mood={isSleeping ? "neutral" : blobMood}
+                    gaze={blobGaze}
+                    size={80}
+                    themeColors={botTheme}
+                    onOverpoke={handleOverpoke}
+                    speechText={getSpeechText()}
+                    speechMood={getSpeechMood()}
+                    speechAlign="right"
+                  />
+                </div>
+              </button>
+            </div>
+          </motion.div>
+        </>
       )}
 
       {/* ====================================================
@@ -1146,7 +1380,7 @@ Redirecting you to browse jobs with the "${displayCategory}" category filter...`
                                     `Show me ${label} jobs`
                                   )
                                 }
-                                className="suggestion-button"
+                                className={SUGGESTION_BUTTON_CLASSES}
                               >
                                 <Compass className="w-3 h-3 text-blue-400" />
                                 {label}
@@ -1191,14 +1425,15 @@ Redirecting you to browse jobs with the "${displayCategory}" category filter...`
                   <div ref={messagesEndRef} />
                 </div>
 
-                {messages.length <= 3 && (
+                {/* SUGGESTIONS - Only show if user hasn't interacted yet */}
+                {messages.length <= 3 && !hasUserInteracted && (
                   <div className="px-4 pb-2 flex flex-wrap gap-2 max-h-28 overflow-y-auto">
                     {userRole === "admin" && (
                       <>
                         <button
                           type="button"
                           onClick={() => handleSuggestionClick("Analytics")}
-                          className="suggestion-button"
+                          className={SUGGESTION_BUTTON_CLASSES}
                         >
                           <BarChart className="w-3 h-3 text-purple-400" />
                           Analytics
@@ -1209,7 +1444,7 @@ Redirecting you to browse jobs with the "${displayCategory}" category filter...`
                           onClick={() =>
                             handleSuggestionClick("Manage users")
                           }
-                          className="suggestion-button"
+                          className={SUGGESTION_BUTTON_CLASSES}
                         >
                           <UsersRound className="w-3 h-3 text-blue-400" />
                           Manage Users
@@ -1218,7 +1453,7 @@ Redirecting you to browse jobs with the "${displayCategory}" category filter...`
                         <button
                           type="button"
                           onClick={() => handleSuggestionClick("Reports")}
-                          className="suggestion-button"
+                          className={SUGGESTION_BUTTON_CLASSES}
                         >
                           <FileText className="w-3 h-3 text-green-400" />
                           Reports
@@ -1231,7 +1466,7 @@ Redirecting you to browse jobs with the "${displayCategory}" category filter...`
                         <button
                           type="button"
                           onClick={() => handleSuggestionClick("Find jobs")}
-                          className="suggestion-button"
+                          className={SUGGESTION_BUTTON_CLASSES}
                         >
                           <Search className="w-3 h-3 text-blue-400" />
                           Find jobs
@@ -1242,7 +1477,7 @@ Redirecting you to browse jobs with the "${displayCategory}" category filter...`
                           onClick={() =>
                             handleSuggestionClick("How to apply?")
                           }
-                          className="suggestion-button"
+                          className={SUGGESTION_BUTTON_CLASSES}
                         >
                           <FileText className="w-3 h-3 text-green-400" />
                           How to apply?
@@ -1251,69 +1486,23 @@ Redirecting you to browse jobs with the "${displayCategory}" category filter...`
                         <button
                           type="button"
                           onClick={() =>
-                            handleSuggestionClick("Show me design jobs")
+                            handleSuggestionClick("My applications")
                           }
-                          className="suggestion-button"
+                          className={SUGGESTION_BUTTON_CLASSES}
                         >
-                          <Compass className="w-3 h-3 text-cyan-400" />
-                          Design
+                          <BookOpen className="w-3 h-3 text-purple-400" />
+                          My Applications
                         </button>
 
                         <button
                           type="button"
                           onClick={() =>
-                            handleSuggestionClick("Find technology jobs")
+                            handleSuggestionClick("Go to Dashboard")
                           }
-                          className="suggestion-button"
+                          className={SUGGESTION_BUTTON_CLASSES}
                         >
-                          <Compass className="w-3 h-3 text-purple-400" />
-                          Technology
-                        </button>
-
-                        <button
-                          type="button"
-                          onClick={() =>
-                            handleSuggestionClick("Find marketing jobs")
-                          }
-                          className="suggestion-button"
-                        >
-                          <Compass className="w-3 h-3 text-pink-400" />
-                          Marketing
-                        </button>
-
-                        <button
-                          type="button"
-                          onClick={() =>
-                            handleSuggestionClick("Show me sales jobs")
-                          }
-                          className="suggestion-button"
-                        >
-                          <Compass className="w-3 h-3 text-yellow-400" />
-                          Sales
-                        </button>
-
-                        <button
-                          type="button"
-                          onClick={() =>
-                            handleSuggestionClick(
-                              "Show me human resources jobs"
-                            )
-                          }
-                          className="suggestion-button"
-                        >
-                          <Users className="w-3 h-3 text-green-400" />
-                          HR
-                        </button>
-
-                        <button
-                          type="button"
-                          onClick={() =>
-                            handleSuggestionClick("Show me education jobs")
-                          }
-                          className="suggestion-button"
-                        >
-                          <Compass className="w-3 h-3 text-blue-400" />
-                          Education
+                          <BarChart className="w-3 h-3 text-purple-400" />
+                          Dashboard
                         </button>
                       </>
                     )}
@@ -1323,7 +1512,7 @@ Redirecting you to browse jobs with the "${displayCategory}" category filter...`
                         <button
                           type="button"
                           onClick={() => handleSuggestionClick("Post a job")}
-                          className="suggestion-button"
+                          className={SUGGESTION_BUTTON_CLASSES}
                         >
                           <Briefcase className="w-3 h-3 text-purple-400" />
                           Post a job
@@ -1334,10 +1523,32 @@ Redirecting you to browse jobs with the "${displayCategory}" category filter...`
                           onClick={() =>
                             handleSuggestionClick("Find talent")
                           }
-                          className="suggestion-button"
+                          className={SUGGESTION_BUTTON_CLASSES}
                         >
                           <Users className="w-3 h-3 text-green-400" />
                           Find talent
+                        </button>
+
+                        <button
+                          type="button"
+                          onClick={() =>
+                            handleSuggestionClick("My jobs")
+                          }
+                          className={SUGGESTION_BUTTON_CLASSES}
+                        >
+                          <Briefcase className="w-3 h-3 text-blue-400" />
+                          My Jobs
+                        </button>
+
+                        <button
+                          type="button"
+                          onClick={() =>
+                            handleSuggestionClick("Go to Dashboard")
+                          }
+                          className={SUGGESTION_BUTTON_CLASSES}
+                        >
+                          <BarChart className="w-3 h-3 text-purple-400" />
+                          Dashboard
                         </button>
                       </>
                     )}
@@ -1346,8 +1557,17 @@ Redirecting you to browse jobs with the "${displayCategory}" category filter...`
                       <>
                         <button
                           type="button"
+                          onClick={() => handleSuggestionClick("Tell me about HireLoop")}
+                          className={SUGGESTION_BUTTON_CLASSES}
+                        >
+                          <Award className="w-3 h-3 text-yellow-400" />
+                          About HireLoop
+                        </button>
+
+                        <button
+                          type="button"
                           onClick={() => handleSuggestionClick("Benefits")}
-                          className="suggestion-button"
+                          className={SUGGESTION_BUTTON_CLASSES}
                         >
                           <Star className="w-3 h-3 text-yellow-400" />
                           Benefits
@@ -1356,12 +1576,77 @@ Redirecting you to browse jobs with the "${displayCategory}" category filter...`
                         <button
                           type="button"
                           onClick={() =>
-                            handleSuggestionClick("Create account")
+                            handleSuggestionClick("Sign up")
                           }
-                          className="suggestion-button"
+                          className={SUGGESTION_BUTTON_CLASSES}
                         >
                           <User className="w-3 h-3 text-blue-400" />
                           Sign up
+                        </button>
+
+                        <button
+                          type="button"
+                          onClick={() => handleSuggestionClick("Find jobs")}
+                          className={SUGGESTION_BUTTON_CLASSES}
+                        >
+                          <Search className="w-3 h-3 text-blue-400" />
+                          Find jobs
+                        </button>
+
+                        <button
+                          type="button"
+                          onClick={() =>
+                            handleSuggestionClick("Go to Browse Jobs")
+                          }
+                          className={SUGGESTION_BUTTON_CLASSES}
+                        >
+                          <Compass className="w-3 h-3 text-cyan-400" />
+                          Browse Jobs
+                        </button>
+
+                        <button
+                          type="button"
+                          onClick={() =>
+                            handleSuggestionClick("How does HireLoop work?")
+                          }
+                          className={SUGGESTION_BUTTON_CLASSES}
+                        >
+                          <HelpCircle className="w-3 h-3 text-purple-400" />
+                          How it works
+                        </button>
+
+                        <button
+                          type="button"
+                          onClick={() =>
+                            handleSuggestionClick("What can you do?")
+                          }
+                          className={SUGGESTION_BUTTON_CLASSES}
+                        >
+                          <MessageSquare className="w-3 h-3 text-green-400" />
+                          What can you do?
+                        </button>
+                      </>
+                    )}
+
+                    {/* Theme buttons - Only show for LOGGED IN users */}
+                    {user && (
+                      <>
+                        <button
+                          type="button"
+                          onClick={() => handleSuggestionClick("Dark mode")}
+                          className={SUGGESTION_BUTTON_CLASSES}
+                        >
+                          <Moon className="w-3 h-3 text-purple-400" />
+                          Dark Mode
+                        </button>
+
+                        <button
+                          type="button"
+                          onClick={() => handleSuggestionClick("Light mode")}
+                          className={SUGGESTION_BUTTON_CLASSES}
+                        >
+                          <Sun className="w-3 h-3 text-yellow-400" />
+                          Light Mode
                         </button>
                       </>
                     )}
@@ -1369,28 +1654,10 @@ Redirecting you to browse jobs with the "${displayCategory}" category filter...`
                     <button
                       type="button"
                       onClick={() => handleSuggestionClick("Help")}
-                      className="suggestion-button"
+                      className={SUGGESTION_BUTTON_CLASSES}
                     >
                       <HelpCircle className="w-3 h-3 text-red-400" />
                       Help
-                    </button>
-
-                    <button
-                      type="button"
-                      onClick={() => handleSuggestionClick("Dark mode")}
-                      className="suggestion-button"
-                    >
-                      <Moon className="w-3 h-3 text-purple-400" />
-                      Dark Mode
-                    </button>
-
-                    <button
-                      type="button"
-                      onClick={() => handleSuggestionClick("Light mode")}
-                      className="suggestion-button"
-                    >
-                      <Sun className="w-3 h-3 text-yellow-400" />
-                      Light Mode
                     </button>
                   </div>
                 )}
@@ -1430,48 +1697,6 @@ Redirecting you to browse jobs with the "${displayCategory}" category filter...`
           </motion.div>
         )}
       </AnimatePresence>
-
-      <style jsx>{`
-        .suggestion-button {
-          display: inline-flex;
-          align-items: center;
-          gap: 0.375rem;
-          padding: 0.375rem 0.75rem;
-          background: rgba(39, 39, 42, 0.3);
-          color: rgb(212, 212, 216);
-          font-size: 0.75rem;
-          line-height: 1rem;
-          border-radius: 9999px;
-          border: 1px solid rgba(63, 63, 70, 0.3);
-          transition: all 150ms ease;
-          cursor: pointer;
-        }
-
-        .suggestion-button:hover {
-          background: rgba(63, 63, 70, 0.4);
-          color: white;
-        }
-
-        .dark .suggestion-button {
-          background: rgba(39, 39, 42, 0.5);
-          border-color: rgba(63, 63, 70, 0.5);
-        }
-
-        .dark .suggestion-button:hover {
-          background: rgba(63, 63, 70, 0.6);
-        }
-
-        .light .suggestion-button {
-          background: rgba(220, 220, 225, 0.5);
-          border-color: rgba(200, 200, 205, 0.5);
-          color: rgb(50, 50, 55);
-        }
-
-        .light .suggestion-button:hover {
-          background: rgba(200, 200, 205, 0.6);
-          color: rgb(20, 20, 25);
-        }
-      `}</style>
     </>
   );
 };
